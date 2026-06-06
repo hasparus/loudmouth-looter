@@ -437,7 +437,6 @@ function transformInlineTextNodes(node: Node): boolean {
   if (node.tagName === "STRONG" || node.tagName === "I") return false;
 
   // Snapshot: recursion may replaceWith() on children and mutate the live list.
-  // eslint-disable-next-line unicorn/no-useless-spread
   for (const child of [...node.childNodes]) {
     changed = transformInlineTextNodes(child) || changed;
   }
@@ -449,7 +448,6 @@ function absorbTrailingPunctuation(block: HTMLElement) {
   let changed = false;
 
   // Snapshot: body mutates siblings (appends to child, rewrites next text node).
-  // eslint-disable-next-line unicorn/no-useless-spread
   for (const child of [...block.childNodes]) {
     if (!(child instanceof HTMLElement)) continue;
     if (child.tagName !== "STRONG" && child.tagName !== "I") continue;
@@ -836,7 +834,6 @@ export function handleEditorPaste(
   let previous: ChildNode = insertAfter;
   // Snapshot: previous.after(node) moves node out of content, mutating the
   // live childNodes list.
-  // eslint-disable-next-line unicorn/no-useless-spread
   for (const node of [...content.childNodes]) {
     if (node instanceof Element && BLOCK_TAGS.has(node.tagName)) {
       previous.after(node);

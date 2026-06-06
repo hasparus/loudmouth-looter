@@ -7,8 +7,9 @@
 // NOTE: Avara (the display face) is intentionally NOT preloaded — its license
 // for public web hosting is unverified (see HANDOFF blocker). Headings fall back
 // to Georgia via --font-serif until the font is cleared and dropped into public/.
-import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
 import { TextEditor } from "../editor/text-editor";
+import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
+
 import "../editor/editor-skin.css";
 ---
 
@@ -16,7 +17,16 @@ import "../editor/editor-skin.css";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#fafaf9" />
+    <meta
+      name="theme-color"
+      content="#fafaf9"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#1c1917"
+      media="(prefers-color-scheme: dark)"
+    />
     <title>editor — loudmouth looter</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -7,7 +7,10 @@ module.exports = {
     {
       files: ["*.ts", "*.tsx"],
       parserOptions: {
-        project: require.resolve("./tsconfig.json"),
+        project: [
+          require.resolve("./tsconfig.json"),
+          require.resolve("./src/editor/tsconfig.json"),
+        ],
       },
       rules: {
         "react/jsx-key": "off",

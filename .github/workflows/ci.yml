@@ -25,56 +25,58 @@ jobs:
           # Empty on push/workflow_dispatch — falls back to default ref
           ref: "${{ github.event.pull_request.merge_commit_sha }}"
 
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
+      # Node is still used to run .github/scripts/deploy.mjs.
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-          cache: "pnpm"
 
       - name: Install
         id: install
         run: |
-          pnpm install --frozen-lockfile
+          bun install --frozen-lockfile
 
       - name: Commit lockfile
         if: ${{ env.IS_DEPENDABOT == 1 }}
         uses: EndBug/add-and-commit@v9
         with:
-          { add: "pnpm-lock.yaml", fetch: false, message: "Update lockfile" }
+          { add: "bun.lock", fetch: false, message: "Update lockfile" }
 
       - name: Generate types
-        run: pnpm astro sync
+        run: bunx astro sync
         env:
           OG_IMAGE_SECRET: placeholder
 
       - name: Run linter
-        run: pnpm lint --quiet
+        run: bun run lint --quiet
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: bun run typecheck
 
       - name: Build
-        run: pnpm build
+        run: bun run build
         env:
           OG_IMAGE_SECRET:
             ${{ case(github.event.pull_request.head.repo.fork == true,
             'fork-og-image-secret', secrets.OG_IMAGE_SECRET) }}
 
       - name: Install Playwright system deps
-        run: pnpm exec playwright install-deps chromium
+        run: bunx playwright install-deps chromium
         timeout-minutes: 5
         env:
           DEBIAN_FRONTEND: noninteractive
           NEEDRESTART_MODE: a
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install chromium
+        run: bunx playwright install chromium
         timeout-minutes: 5
 
       - name: Run tests
         id: test
-        run: pnpm test
+        run: bun run test
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}

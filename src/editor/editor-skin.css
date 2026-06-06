@@ -57,6 +57,10 @@ html {
 }
 
 html.dark {
+  /* Make native UI (form controls, scrollbars, the help <dialog> backdrop)
+     follow dark mode. base.css sets this site-wide, but the editor page is
+     standalone and doesn't load it. */
+  color-scheme: dark;
   color: var(--color-stone-300);
   --grain-bg: var(--color-stone-900);
   --grain-blend: screen;

@@ -22,18 +22,18 @@ if (!token) {
 const environment = prod ? "production" : "preview";
 
 /**
- * Run `pnpm <args...>` and exit the script on failure.
+ * Run `bunx <args...>` and exit the script on failure.
  *
  * @param {string} label
  * @param {string[]} args
  * @param {{ captureStdout?: boolean }} [opts]
  * @returns {string} captured stdout (empty string when captureStdout is false)
  */
-function pnpmRun(label, args, opts = {}) {
+function bunxRun(label, args, opts = {}) {
   const redacted = args.map((a) => a.replace(token, "***"));
-  console.log(`\n▶ ${label}: pnpm ${redacted.join(" ")}`);
+  console.log(`\n▶ ${label}: bunx ${redacted.join(" ")}`);
 
-  const result = spawnSync("pnpm", args, {
+  const result = spawnSync("bunx", args, {
     stdio: opts.captureStdout
       ? ["inherit", "pipe", "inherit"]
       : "inherit",
@@ -56,7 +56,7 @@ function pnpmRun(label, args, opts = {}) {
 }
 
 // 1. Pull Vercel environment information.
-pnpmRun("vercel pull", [
+bunxRun("vercel pull", [
   "vercel",
   "pull",
   "--yes",
@@ -65,7 +65,7 @@ pnpmRun("vercel pull", [
 ]);
 
 // 2. Build project artifacts.
-pnpmRun("vercel build", [
+bunxRun("vercel build", [
   "vercel",
   "build",
   `--token=${token}`,
@@ -73,7 +73,7 @@ pnpmRun("vercel build", [
 ]);
 
 // 3. Deploy prebuilt artifacts. Capture stdout so we can extract the URL.
-const deployStdout = pnpmRun(
+const deployStdout = bunxRun(
   "vercel deploy",
   [
     "vercel",
@@ -110,7 +110,7 @@ if (process.env.GITHUB_ENV) {
   );
 }
 
-pnpmRun("vercel alias", [
+bunxRun("vercel alias", [
   "vercel",
   "alias",
   deploymentUrl,

@@ -1,6 +1,8 @@
 ---
 import type { MarkdownInstance } from "astro";
 
+import Line from "../editor/render/Line.astro";
+import Track from "../editor/render/Track.astro";
 import PostLayout from "../layouts/PostLayout.astro";
 import { isPostVisible } from "../lib/isPostVisible";
 import { Link } from "../lib/Link";
@@ -12,8 +14,6 @@ import { Ol } from "../lib/prose/Ol";
 import { Paragraph } from "../lib/prose/Paragraph";
 import { Table } from "../lib/prose/Table";
 import { Ul } from "../lib/prose/Ul";
-import Line from "../editor/render/Line.astro";
-import Track from "../editor/render/Track.astro";
 import type { PostFrontmatter } from "../types";
 
 export const getStaticPaths = async () => {
