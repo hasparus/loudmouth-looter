@@ -1,0 +1,13 @@
+---
+// Throwaway page validating a React island renders alongside the site's Solid
+// islands. Delete together with src/editor/JsxSmokeTest.tsx.
+import { JsxSmokeTest } from "../editor/JsxSmokeTest";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="jsx smoke test">
+  <main style="padding: 2rem">
+    <h1>React × Solid smoke test</h1>
+    <JsxSmokeTest client:load />
+  </main>
+</BaseLayout>

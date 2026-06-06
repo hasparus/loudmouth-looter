@@ -1,4 +1,5 @@
 import mdx from "@astrojs/mdx";
+import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import solidJs from "@astrojs/solid-js";
 import tailwind from "@astrojs/tailwind";
@@ -67,7 +68,8 @@ export default defineConfig({
       remarkPlugins: remarkPlugins(__dirname),
       rehypePlugins: rehypePlugins,
     }),
-    solidJs(),
+    react({ include: ["**/editor/**"] }),
+    solidJs({ exclude: ["**/editor/**"] }),
     sitemap({
       filter: (page) =>
         !hiddenPaths.has(stripTrailingSlash(new URL(page).pathname)),
