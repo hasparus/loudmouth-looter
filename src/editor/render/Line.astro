@@ -1,0 +1,15 @@
+---
+// Render-side counterpart to the editor's <Line> atom. Matches editor-mdx.ts's
+// lineToDom output (<p class="te-arrow|te-chevron">…</p>) so the marker line
+// styles in editor-atoms.css apply identically to published posts.
+import "../editor-atoms.css";
+
+interface Props {
+  kind?: "arrow" | "chevron";
+}
+
+const { kind = "arrow" } = Astro.props;
+const cls = kind === "chevron" ? "te-chevron" : "te-arrow";
+---
+
+<p class={cls}><slot /></p>

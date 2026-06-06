@@ -12,6 +12,8 @@ import { Ol } from "../lib/prose/Ol";
 import { Paragraph } from "../lib/prose/Paragraph";
 import { Table } from "../lib/prose/Table";
 import { Ul } from "../lib/prose/Ul";
+import Line from "../editor/render/Line.astro";
+import Track from "../editor/render/Track.astro";
 import type { PostFrontmatter } from "../types";
 
 export const getStaticPaths = async () => {
@@ -59,6 +61,9 @@ const mdxComponents = {
   // Take note that `mdxComponents` replace only Markdown and uppercased components,
   // not inline lowercased JSX, so using `<p>` in and .mdx file won't use the `Paragraph`.
   p: Paragraph,
+  // Editor atoms authored in the /editor tool and saved into .mdx posts.
+  Track,
+  Line,
 };
 ---
 
