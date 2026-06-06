@@ -1,0 +1,58 @@
+.editor {
+  font-family: var(--font-text);
+}
+
+.editor h1,
+.editor h2 {
+  font-family: var(--font-serif);
+  font-weight: 900;
+}
+
+.editor h1 {
+  margin: 0 0 1rem;
+  font-size: 2.2rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.editor h2 {
+  margin: 4rem 0 0.75rem;
+  font-size: 1.5rem;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+}
+
+.editor p {
+  margin: 0;
+}
+
+.editor p+* {
+  margin-top: 1rem;
+}
+
+.editor ul,
+.editor ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+/* Tailwind's preflight strips list markers; restore them for editor content. */
+.editor ul {
+  list-style: disc;
+}
+
+.editor ol {
+  list-style: decimal;
+}
+
+.editor li::marker {
+  color: var(--color-stone-400);
+}
+
+.editor strong {
+  font-weight: 600;
+}
+
+.editor i {
+  font-style: italic;
+}

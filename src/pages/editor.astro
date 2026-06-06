@@ -1,0 +1,53 @@
+---
+// Standalone editor page (own <html>, no site chrome) — mirrors dungeon-motion's
+// editor.astro. The editor is a React island (client:only); the slotted markup
+// is the pre-hydration skeleton. Skin + Tailwind utilities come from
+// editor-skin.css, imported here so they load only on this route.
+//
+// NOTE: Avara (the display face) is intentionally NOT preloaded — its license
+// for public web hosting is unverified (see HANDOFF blocker). Headings fall back
+// to Georgia via --font-serif until the font is cleared and dropped into public/.
+import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
+import { TextEditor } from "../editor/text-editor";
+import "../editor/editor-skin.css";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#fafaf9" />
+    <title>editor — loudmouth looter</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Caveat:wght@400;600;700&display=block"
+      rel="stylesheet"
+    />
+    <InitColorScheme />
+  </head>
+  <body class="m-0">
+    <TextEditor client:only="react">
+      <main class="min-h-screen">
+        <div class="mx-auto max-w-3xl px-4 py-24 md:px-6 animate-pulse">
+          <div class="mb-4 h-8 w-2/3 rounded bg-stone-200 dark:bg-stone-800"></div>
+          <div class="mb-3 h-4 w-full rounded bg-stone-200 dark:bg-stone-800"></div>
+          <div class="mb-6 h-4 w-5/6 rounded bg-stone-200 dark:bg-stone-800"></div>
+          <div class="mb-3 h-6 w-1/2 rounded bg-stone-200 dark:bg-stone-800"></div>
+          <div class="mb-3 h-4 w-full rounded bg-stone-200 dark:bg-stone-800"></div>
+          <div class="h-4 w-4/5 rounded bg-stone-200 dark:bg-stone-800"></div>
+        </div>
+      </main>
+    </TextEditor>
+  </body>
+</html>
+
+<style>
+  @media print {
+    @page {
+      size: A4 portrait;
+      margin: 12mm;
+    }
+  }
+</style>

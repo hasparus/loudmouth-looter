@@ -54,6 +54,7 @@ module.exports = {
       white: tailwindColors.white,
 
       gray: tailwindColors.neutral,
+      stone: tailwindColors.stone,
     },
     extend: {
       maxWidth: {

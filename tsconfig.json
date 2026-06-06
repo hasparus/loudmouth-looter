@@ -1,11 +1,13 @@
 {
   "extends": "astro/tsconfigs/strictest",
   "compilerOptions": {
-    "lib": ["DOM", "ESNext"],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "skipLibCheck": true,
     "allowJs": true
   },
-  "include": ["src", "api", "test", "*.ts"]
+  "include": ["src", "api", "test", "*.ts"],
+  "comment": "The editor cluster (src/editor) is React + typechecked under its own tsconfig at the `strict` level it was authored against (see src/editor/tsconfig.json). The site stays at `strictest`.",
+  "exclude": ["src/editor"]
 }

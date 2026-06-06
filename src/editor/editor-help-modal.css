@@ -1,0 +1,83 @@
+/* Help modal — a native <dialog> with a spring entry/exit, mirroring the
+   modal animation from the ludamus project (zagrajmy/ludamus modal.css):
+   @starting-style + allow-discrete transitions so both open and close
+   animate, with an overshooting spring easing. */
+
+.te-help-dialog {
+  --ease-spring-a-bit: linear(
+    0 0%,
+    0.5007 7.21%,
+    0.7803 12.29%,
+    0.8883 14.93%,
+    0.9724 17.63%,
+    1.0343 20.44%,
+    1.0754 23.44%,
+    1.0898 25.22%,
+    1.0984 27.11%,
+    1.1014 29.15%,
+    1.0989 31.4%,
+    1.0854 35.23%,
+    1.0196 48.86%,
+    1.0043 54.06%,
+    0.9956 59.6%,
+    0.9925 68.11%,
+    1 100%
+  );
+
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  max-height: calc(100dvh - 3rem);
+  overflow-y: auto;
+  opacity: 0;
+  transform: scale(0.9) translateY(16px);
+  transition:
+    opacity 0.35s var(--ease-spring-a-bit),
+    transform 0.35s var(--ease-spring-a-bit),
+    overlay 0.35s allow-discrete,
+    display 0.35s allow-discrete;
+}
+
+.te-help-dialog[open] {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+@starting-style {
+  .te-help-dialog[open] {
+    opacity: 0;
+    transform: scale(0.9) translateY(16px);
+  }
+}
+
+.te-help-dialog::backdrop {
+  background-color: transparent;
+  transition:
+    display 0.2s allow-discrete,
+    overlay 0.2s allow-discrete,
+    background-color 0.2s;
+}
+
+.te-help-dialog[open]::backdrop {
+  background-color: color-mix(in srgb, #ffffff 50%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+/* Class-based dark mode (zaduma toggles html.dark). */
+.dark .te-help-dialog[open]::backdrop {
+  background-color: color-mix(in srgb, #1c1917 50%, transparent);
+}
+
+@starting-style {
+  .te-help-dialog[open]::backdrop {
+    background-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .te-help-dialog,
+  .te-help-dialog::backdrop {
+    transition-duration: 0.01ms;
+  }
+}
