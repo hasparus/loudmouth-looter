@@ -1,0 +1,81 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { formatDate } from "../lib/formatDate";
+import { isPostVisible } from "../lib/isPostVisible";
+import { Link } from "../lib/Link";
+import { Paragraph } from "../lib/prose/Paragraph";
+import type { PostFrontmatter } from "../types";
+
+const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
+  "../../posts/**/*.mdx",
+  { eager: true },
+);
+const posts = Object.values(postModules).filter((post) =>
+  isPostVisible(post.frontmatter, { isProd: import.meta.env.PROD }),
+);
+
+posts.sort((a, b) => {
+  return (
+    new Date(b.frontmatter.date).getTime() -
+    new Date(a.frontmatter.date).getTime()
+  );
+});
+---
+
+<BaseLayout
+  title="zaduma"
+  description="Astro starter template for understated personal websites using Solid.js, Tailwind CSS, and MDX."
+>
+  <h1 slot="header-content" class="text-gray-600 dark:text-gray-500">zaduma</h1>
+  <main class="zaduma-prose py-10">
+    <Paragraph>
+      <small class="text-gray-600 dark:text-gray-500"
+        >IPA /zaˈdu.ma/ — reverie, musing</small
+      >
+      <br />
+      is an Astro starter template for understated personal websites
+    </Paragraph>
+    <Paragraph class="mt-6">
+      Learn about it by reading the articles below, take a look at the
+      <Link href="https://github.com/hasparus/zaduma">readme</Link>, or boldly
+      <Link href="https://github.com/hasparus/zaduma/generate">
+        {"create a new repository"}
+      </Link>. I wish you a pleasant journey.
+    </Paragraph>
+  </main>
+  <ul>
+    {
+      posts.map(({ frontmatter }) => {
+        const date = new Date(frontmatter.date);
+
+        return (
+          <li>
+            <Link
+              href={frontmatter.path}
+              class="flex flex-row justify-between gap-2"
+              noUnderline
+            >
+              <h2 class="font-sans text-gray-800 dark:text-gray-300">
+                {frontmatter.title}
+              </h2>
+              <time
+                datetime={date.toISOString()}
+                class="shrink-0 tabular-nums tracking-tighter text-gray-600 dark:text-gray-400"
+              >
+                {formatDate(date)}
+              </time>
+            </Link>
+          </li>
+        );
+      })
+    }
+  </ul>
+  <style>
+    ul:hover li:not(:hover) :where(h2, time) {
+      @apply text-gray-600 transition-colors;
+      :global(.dark) & {
+        @apply text-gray-500;
+      }
+    }
+  </style>
+</BaseLayout>

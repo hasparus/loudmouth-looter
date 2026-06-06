@@ -1,0 +1,46 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { createOgImageLink } from "../lib/createOgImageLink";
+import { Link } from "../lib/Link";
+import type { PostFrontmatter } from "../types";
+
+const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
+  "../../posts/**/*.mdx",
+  { eager: true },
+);
+const posts = Object.values(postModules);
+
+const linksToOGImages = posts.map((post) =>
+  createOgImageLink(post.frontmatter),
+);
+---
+
+<BaseLayout
+  title="admin"
+  description="a page for inspecting and debugging OG images"
+>
+  <section class="py-10">
+    <h1>OG Images</h1>
+    <ul class="flex flex-col">
+      {
+        linksToOGImages.map((href) => (
+          <li class="w-full">
+            <Link
+              href={href}
+              noUnderline
+              class="mx-0 my-0 flex w-full flex-row gap-2 break-all text-sm"
+            >
+              <span>{href}</span>
+              <img
+                width="320px"
+                height="160px"
+                class="h-[160px] w-[320px] border border-gray-600"
+                src={href}
+              />
+            </Link>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

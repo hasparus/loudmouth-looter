@@ -1,0 +1,114 @@
+---
+import brygadaPath from "@fontsource-variable/brygada-1918/files/brygada-1918-latin-wght-italic.woff2";
+import interPath from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2";
+
+import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
+import { Commands } from "../lib/Commands";
+import GrainOverlay from "../lib/GrainOverlay/GrainOverlay.astro";
+import { isPostVisible } from "../lib/isPostVisible";
+import { Link } from "../lib/Link";
+import ScrollbarStyles from "../lib/ScrollbarStyles.astro";
+import { websiteSchema } from "../lib/seo/jsonLd";
+import JsonLd from "../lib/seo/JsonLd.astro";
+import { SITE_NAME } from "../lib/siteMeta";
+import SocialCardMetaTags from "../lib/SocialCardMetaTags.astro";
+import type { PostFrontmatter } from "../types";
+
+import "../global-styles/base.css";
+import "../global-styles/controls.css";
+import "../global-styles/integrations.css";
+import "../global-styles/font.css";
+import "../lib/prose/prose.css";
+
+interface Props {
+  title: string;
+  description: string;
+  children: astroHTML.JSX.Element;
+  ogImage?: string;
+}
+
+const { title, description, ogImage } = Astro.props;
+
+const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
+  "../../posts/**/*.mdx",
+  { eager: true },
+);
+const posts = Object.values(postModules)
+  .filter((p) => isPostVisible(p.frontmatter, { isProd: import.meta.env.PROD }))
+  .map((p) => ({
+    href: p.frontmatter.path,
+    title: p.frontmatter.title,
+    date: p.frontmatter.date,
+  }))
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+const postPaths = new Set(posts.map((p) => p.href));
+
+// Normalize trailing slash before lookup
+const rawPathname = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isPostRoute = postPaths.has(rawPathname);
+
+const canonical = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).href
+  : Astro.url.pathname;
+
+const markdownAlt = Astro.site
+  ? new URL(rawPathname + ".md", Astro.site).href
+  : rawPathname + ".md";
+
+const websiteData = websiteSchema({
+  name: SITE_NAME,
+  url: Astro.site ? Astro.site.href : Astro.url.origin + "/",
+});
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    {
+      [interPath, brygadaPath].map((href) => (
+        <link
+          rel="preload"
+          href={href}
+          as="font"
+          type="font/woff2"
+          crossorigin
+        />
+      ))
+    }
+
+    <SocialCardMetaTags ogImage={ogImage} />
+
+    <link rel="canonical" href={canonical} />
+    {
+      isPostRoute && (
+        <link rel="alternate" type="text/markdown" href={markdownAlt} />
+      )
+    }
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <title>{title}</title>
+    <JsonLd data={websiteData} />
+    <slot name="head" />
+    <InitColorScheme />
+  </head>
+  <body>
+    <div class="mx-auto max-w-container px-4">
+      <header
+        class="-mt-2 flex items-center justify-between"
+        style={{ height: "37.5px" }}
+      >
+        <slot name="header-content">
+          <Link href="/">← back</Link>
+        </slot>
+        <Commands client:load posts={posts} />
+      </header>
+      <slot />
+      <GrainOverlay opacity={0.25} />
+    </div>
+    <ScrollbarStyles />
+  </body>
+</html>
