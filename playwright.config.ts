@@ -12,7 +12,7 @@ export default defineConfig({
     trace: "retain-on-first-failure",
   },
   webServer: {
-    command: "pnpm preview",
+    command: "bun run preview",
     url: "http://localhost:4321",
     reuseExistingServer: !process.env.CI,
   },

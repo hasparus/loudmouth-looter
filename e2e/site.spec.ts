@@ -6,8 +6,9 @@ test.describe("Homepage", () => {
     await expect(page.locator("h1")).toHaveText("zaduma");
     // Check that article links are present
     const articles = page.locator("ul li a");
-    await expect(articles).toHaveCount(7);
+    await expect(articles).toHaveCount(8);
     // Verify some known titles
+    await expect(page.getByText("Editor Atoms")).toBeVisible();
     await expect(page.getByText("OG Images")).toBeVisible();
     await expect(page.getByText("Asides")).toBeVisible();
     await expect(page.getByText("Shiki Twoslash")).toBeVisible();
