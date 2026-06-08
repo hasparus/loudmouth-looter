@@ -12,8 +12,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Avara — Raphaël Bastide / Velvetyne, SIL Open Font License 1.1.
+   See public/fonts/Avara-OFL.txt. Self-hosted from public/fonts. */
+@font-face {
+  font-family: "Avara";
+  src: url("/fonts/Avara-Bold.woff2") format("woff2");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Avara";
+  src: url("/fonts/Avara-BoldItalic.woff2") format("woff2");
+  font-weight: 400 600;
+  font-style: italic;
+  font-display: block;
+}
+@font-face {
+  font-family: "Avara";
+  src: url("/fonts/Avara-Black.woff2") format("woff2");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: block;
+}
+
 :root {
-  --font-serif: "Avara", Georgia, serif; /* Avara pending license; falls back to Georgia */
+  --font-serif: "Avara", Georgia, serif;
   --font-hand: "Caveat", cursive;
   --font-text: "Crimson Text", Georgia, serif;
 

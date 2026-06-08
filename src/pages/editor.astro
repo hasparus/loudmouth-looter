@@ -3,10 +3,8 @@
 // editor.astro. The editor is a React island (client:only); the slotted markup
 // is the pre-hydration skeleton. Skin + Tailwind utilities come from
 // editor-skin.css, imported here so they load only on this route.
-//
-// NOTE: Avara (the display face) is intentionally NOT preloaded — its license
-// for public web hosting is unverified (see HANDOFF blocker). Headings fall back
-// to Georgia via --font-serif until the font is cleared and dropped into public/.
+// Avara (display face) is self-hosted from public/fonts under the SIL OFL 1.1
+// (Raphaël Bastide / Velvetyne, see public/fonts/Avara-OFL.txt) and preloaded.
 import { TextEditor } from "../editor/text-editor";
 import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
 
@@ -29,6 +27,20 @@ import "../editor/editor-skin.css";
     />
     <title>editor — loudmouth looter</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="preload"
+      href="/fonts/Avara-Black.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/Avara-Bold.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
