@@ -13,7 +13,6 @@ import type {
   MdxJsxFlowElement,
   MdxJsxTextElement,
 } from "mdast-util-mdx-jsx";
-
 import remarkGfm from "remark-gfm";
 import remarkMdx from "remark-mdx";
 import remarkParse from "remark-parse";
@@ -181,7 +180,7 @@ function trackElement(track: HTMLElement): MdxJsxTextElement {
 }
 
 export function mdxToHtml(mdx: string): string {
-  const tree = processor.parse(mdx) as Root;
+  const tree = processor.parse(mdx);
   const container = document.createElement("div");
   for (const node of tree.children) {
     const el = blockToDom(node);
@@ -315,8 +314,7 @@ function appendPhrasing(parent: HTMLElement, nodes: PhrasingContent[]): void {
         parent.append(document.createTextNode(node.value));
         break;
       default:
-        if ("children" in node)
-          appendPhrasing(parent, node.children as PhrasingContent[]);
+        if ("children" in node) appendPhrasing(parent, node.children);
         else if ("value" in node)
           parent.append(document.createTextNode(node.value));
     }
@@ -335,7 +333,7 @@ function trackToDom(node: MdxJsxFlowElement | MdxJsxTextElement): HTMLElement {
   const track = buildTrackElement(shape, total);
   const toggles = track.querySelectorAll(".te-toggle");
   for (let i = 0; i < filled; i++)
-    toggles[i]?.setAttribute("aria-checked", "true");
+    toggles[i].setAttribute("aria-checked", "true");
   return track;
 }
 

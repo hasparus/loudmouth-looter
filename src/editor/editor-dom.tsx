@@ -456,7 +456,7 @@ function absorbTrailingPunctuation(block: HTMLElement) {
     const next = child.nextSibling;
     if (!(next instanceof Text)) continue;
 
-    const match = next.textContent?.match(/^(\u200B*)([.,!?])(.*)$/s);
+    const match = /^(\u200B*)([.,!?])(.*)$/s.exec(next.textContent);
     if (!match) continue;
 
     child.append(match[2]);
@@ -513,7 +513,7 @@ export function applyTaskShorthand(root: HTMLElement): UndoSnapshot | null {
   const text = normalizeEditableText(block.textContent ?? "");
 
   if (block.tagName === "P") {
-    const match = text.match(/^[-*+] \[([ xX])\] $/);
+    const match = /^[-*+] \[([ xX])\] $/.exec(text);
     if (!match) return null;
 
     const snapshot = captureSnapshot(root);
@@ -528,7 +528,7 @@ export function applyTaskShorthand(root: HTMLElement): UndoSnapshot | null {
   }
 
   if (block.tagName === "LI" && !block.classList.contains("te-task")) {
-    const match = text.match(/^\[([ xX])\] /);
+    const match = /^\[([ xX])\] /.exec(text);
     if (!match) return null;
 
     const prefixNode = findPrefixTextNode(block, match[0]);
@@ -609,9 +609,9 @@ export function readSlashState(root: HTMLElement): SlashState | null {
   if (!range.collapsed || !(range.startContainer instanceof Text)) return null;
   if (!root.contains(range.startContainer)) return null;
 
-  const localMatch = range.startContainer.data
-    .slice(0, range.startOffset)
-    .match(SLASH_QUERY);
+  const localMatch = SLASH_QUERY.exec(
+    range.startContainer.data.slice(0, range.startOffset),
+  );
   if (!localMatch) return null;
 
   const block = getCurrentBlock(root);
@@ -620,7 +620,7 @@ export function readSlashState(root: HTMLElement): SlashState | null {
   const blockRange = document.createRange();
   blockRange.selectNodeContents(block);
   blockRange.setEnd(range.startContainer, range.startOffset);
-  const blockMatch = blockRange.toString().match(SLASH_QUERY_BOUNDED);
+  const blockMatch = SLASH_QUERY_BOUNDED.exec(blockRange.toString());
   if (!blockMatch) return null;
 
   const caretRect = range.getBoundingClientRect();
@@ -680,8 +680,8 @@ export function handleEnter(root: HTMLElement) {
   // `- ` / `* ` / `+ ` start an unordered list; `1. ` an ordered one. The
   // caret lands in a fresh trailing item so the list keeps going on Enter;
   // an Enter on that still-empty item exits the list (see the LI branch).
-  const bulletMatch = rawText.match(/^[-*+] /);
-  const listMatch = bulletMatch ?? rawText.match(/^\d+\. /);
+  const bulletMatch = /^[-*+] /.exec(rawText);
+  const listMatch = bulletMatch ?? /^\d+\. /.exec(rawText);
   if (block.tagName === "P" && listMatch) {
     const firstItem = document.createElement("li");
     firstItem.append(extractBeforeCaret(block, listMatch[0]));

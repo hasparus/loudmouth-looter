@@ -43,11 +43,12 @@ import { EditorHelpModal } from "./editor-help-modal";
 import { SlashMenu } from "./slash-menu";
 import styles from "./text-editor.module.css";
 import { useLinkedFile } from "./use-linked-file";
+
 import "./editor-atoms.css";
 
 // Keeps a track's roving tabindex on whichever toggle focus last reached.
 function handleFocus(event: FocusEvent<HTMLDivElement>) {
-  const toggle = (event.target as HTMLElement).closest?.(".te-toggle");
+  const toggle = (event.target as HTMLElement).closest(".te-toggle");
   if (!(toggle instanceof HTMLElement)) return;
   const track = toggle.closest(".te-track");
   if (!track) return;
@@ -60,7 +61,7 @@ function handleFocus(event: FocusEvent<HTMLDivElement>) {
 // the caret. Stop the default so a click toggles without uprooting the writer;
 // keyboard focus still works because it never goes via mousedown.
 function handleMouseDown(event: MouseEvent<HTMLDivElement>) {
-  const toggle = (event.target as HTMLElement).closest?.(".te-toggle");
+  const toggle = (event.target as HTMLElement).closest(".te-toggle");
   if (toggle) event.preventDefault();
 }
 
@@ -254,7 +255,7 @@ export function TextEditor() {
   function handleClick(event: MouseEvent<HTMLDivElement>) {
     const editor = editorRef.current;
     if (!editor) return;
-    const toggle = (event.target as HTMLElement).closest?.(".te-toggle");
+    const toggle = (event.target as HTMLElement).closest(".te-toggle");
     if (toggle instanceof HTMLElement && editor.contains(toggle)) {
       const checked = toggle.getAttribute("aria-checked") === "true";
       toggle.setAttribute("aria-checked", checked ? "false" : "true");
@@ -360,7 +361,7 @@ export function TextEditor() {
 
     // Keys on a focused toggle: arrows rove within the track, the rest
     // (Space, Enter, Tab) are left to the native button.
-    const onToggle = (event.target as HTMLElement).closest?.(".te-toggle");
+    const onToggle = (event.target as HTMLElement).closest(".te-toggle");
     if (onToggle) {
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         event.preventDefault();

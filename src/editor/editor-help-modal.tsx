@@ -2,6 +2,7 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import { SLASH_COMMANDS, TrackPreview } from "./editor-atoms";
+
 import "./editor-help-modal.css";
 
 function Row({ children, code }: { children: ReactNode; code: string }) {
