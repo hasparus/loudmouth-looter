@@ -78,6 +78,7 @@ const TAG_RENAME: Record<string, string> = { B: "STRONG", EM: "I" };
 const ATOM_TAGS: Record<string, string> = {
   "te-arrow": "P",
   "te-chevron": "P",
+  "te-move": "DIV",
   "te-task": "LI",
   "te-toggle": "BUTTON",
   "te-track": "SPAN",

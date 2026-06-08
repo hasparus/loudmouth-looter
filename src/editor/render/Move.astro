@@ -1,0 +1,19 @@
+---
+// Render-side counterpart to the editor's <Move> card. The moveCardPlugin
+// (build-time) lifts the wrapped heading into `title` / `id`, so here the title
+// is the card's heading and the id its anchor; the rest of the move is slotted.
+// Shares editor-atoms.css's .te-move so published cards match the editor.
+import "../editor-atoms.css";
+
+interface Props {
+  title?: string;
+  id?: string;
+}
+
+const { title, id } = Astro.props;
+---
+
+<article class="te-move" id={id}>
+  {title && <h3>{title}</h3>}
+  <slot />
+</article>

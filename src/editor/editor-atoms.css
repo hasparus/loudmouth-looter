@@ -113,6 +113,31 @@
   color: var(--color-stone-400, #a8a29e);
 }
 
+/* Move card: groups a move's heading + rules in a bordered block. The first
+   heading reads as the card's title (the render side lifts it to MoveCard's
+   title/id; here it's styled in place to keep the editor source-faithful). */
+.te-move {
+  border: 1px solid var(--color-stone-300, #d6d3d1);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.9rem 0.7rem;
+  margin: 1rem 0;
+  break-inside: avoid;
+}
+.te-move > :first-child {
+  margin-top: 0;
+  font-size: 1.15em;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.te-move > :last-child {
+  margin-bottom: 0;
+}
+@media (prefers-color-scheme: dark) {
+  .te-move {
+    border-color: var(--color-stone-700, #44403c);
+  }
+}
+
 /* Task-list item: one clickable box followed by editable text. */
 .te-task {
   list-style: none;

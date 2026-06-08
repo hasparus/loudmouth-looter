@@ -6,6 +6,7 @@ import { titleCase } from "../lib/titleCase";
 
 import { asidesPlugin } from "./asidesPlugin";
 import { derivedTitleAndDatePlugin } from "./derivedTitleAndDatePlugin";
+import { moveCardPlugin } from "./moveCardPlugin";
 import {
   readingTimePlugin,
   remarkMdxReadingTimePlugin,
@@ -19,6 +20,7 @@ export const remarkPlugins = (projectDir: string): PluggableList => {
       { absoluteDirPath: resolve(projectDir, "./posts") },
     ],
     [derivedTitleAndDatePlugin, { title: titleCase }],
+    moveCardPlugin,
     remarkSupersub,
     readingTimePlugin,
     remarkMdxReadingTimePlugin,

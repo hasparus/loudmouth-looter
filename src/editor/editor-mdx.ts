@@ -67,6 +67,8 @@ function blockFrom(node: ChildNode): RootContent | null {
       return heading(2, node);
     case "OL":
       return listFrom(node, true);
+    case "DIV":
+      return node.classList.contains("te-move") ? moveElement(node) : null;
     case "P":
       if (node.classList.contains("te-arrow")) return lineElement("arrow", node);
       if (node.classList.contains("te-chevron"))
@@ -77,6 +79,15 @@ function blockFrom(node: ChildNode): RootContent | null {
     default:
       return null;
   }
+}
+
+function moveElement(el: HTMLElement): MdxJsxFlowElement {
+  return {
+    type: "mdxJsxFlowElement",
+    attributes: [],
+    children: blocksFrom(el) as BlockContent[],
+    name: "Move",
+  };
 }
 
 function heading(depth: 1 | 2, el: HTMLElement): Heading {
@@ -234,12 +245,23 @@ function lineToDom(node: MdxJsxFlowElement | MdxJsxTextElement): HTMLElement {
 
 function flowElementToDom(node: MdxJsxFlowElement): HTMLElement | null {
   if (node.name === "Line") return lineToDom(node);
+  if (node.name === "Move") return moveToDom(node);
   if (node.name === "Track") {
     const el = document.createElement("p");
     el.append(trackToDom(node));
     return el;
   }
   return null;
+}
+
+function moveToDom(node: MdxJsxFlowElement): HTMLElement {
+  const el = document.createElement("div");
+  el.className = "te-move";
+  for (const child of node.children) {
+    const childEl = blockToDom(child);
+    if (childEl) el.append(childEl);
+  }
+  return el;
 }
 
 function appendBlocksInline(parent: HTMLElement, children: RootContent[]): void {
