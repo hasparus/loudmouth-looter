@@ -50,7 +50,8 @@ export function useLinkedFile(): LinkedFile {
         setStatus("saved");
         return true;
       } catch (error) {
-        if (activeHtml !== null && pending.current === null) pending.current = activeHtml;
+        if (activeHtml !== null && pending.current === null)
+          pending.current = activeHtml;
         console.warn("text-editor: file save failed", error);
         setStatus("error");
         return false;

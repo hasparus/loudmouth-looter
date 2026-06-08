@@ -1,4 +1,3 @@
-
 const ACCEPT: FilePickerAcceptType[] = [
   { accept: { "text/markdown": [".mdx", ".md"] }, description: "MDX document" },
 ];
@@ -31,7 +30,10 @@ export async function pickFileToCreate(
   suggestedName = "untitled.mdx",
 ): Promise<FileSystemFileHandle | null> {
   try {
-    return await globalThis.showSaveFilePicker({ types: ACCEPT, suggestedName });
+    return await globalThis.showSaveFilePicker({
+      types: ACCEPT,
+      suggestedName,
+    });
   } catch (error) {
     if (isAbort(error)) return null;
     throw error;

@@ -24,7 +24,7 @@ const readingTime = frontmatter.readingTime;
 const date = new Date(frontmatter.date);
 const imgSrc =
   typeof frontmatter.img === "object" ? frontmatter.img.src : frontmatter.img;
-const description = frontmatter.description || ""
+const description = frontmatter.description || "";
 
 const canonical = Astro.site
   ? new URL(Astro.url.pathname, Astro.site).href
@@ -39,14 +39,18 @@ const postSchema = blogPostingSchema({
 });
 ---
 
-<BaseLayout title={frontmatter.title} ogImage={ogImage} description={description}>
+<BaseLayout
+  title={frontmatter.title}
+  ogImage={ogImage}
+  description={description}
+>
   <JsonLd data={postSchema} slot="head" />
   <main class="zaduma-prose py-4">
     <header
-      class="flex justify-between items-start sm:items-center flex-col sm:flex-row"
+      class="flex flex-col items-start justify-between sm:flex-row sm:items-center"
     >
       <h1 class="!my-0">{frontmatter.title}</h1>
-      <div class="text-gray-600 dark:text-gray-400 text-right">
+      <div class="text-right text-gray-600 dark:text-gray-400">
         {
           readingTime.minutes > 1 && (
             <>
@@ -57,7 +61,7 @@ const postSchema = blogPostingSchema({
         }
         <time
           datetime={date.toISOString()}
-          class="tabular-nums tracking-tighter"
+          class="tracking-tighter tabular-nums"
         >
           {formatDate(date)}
         </time>
@@ -72,9 +76,7 @@ const postSchema = blogPostingSchema({
   </main>
   <TableOfContents headings={headings} />
   <style is:global>
-     {
-      /* make the spacing even when there's no callout nor image */
-    }
+    /* make the spacing even when there's no callout nor image */
     .zaduma-prose > header + :is(p, .zaduma-aside) {
       margin-top: 2em;
     }

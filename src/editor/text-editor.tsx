@@ -409,7 +409,7 @@ export function TextEditor() {
           aria-label="Editor"
           autoCapitalize={spellcheck ? "sentences" : "off"}
           autoCorrect={spellcheck ? "on" : "off"}
-          className={`${styles.editor} min-h-[75vh] w-full border-0 bg-transparent outline-none text-[1.22rem] leading-normal print:min-h-0 print:text-black`}
+          className={`${styles.editor} min-h-[75vh] w-full border-0 bg-transparent text-[1.22rem] leading-normal outline-none print:min-h-0 print:text-black`}
           contentEditable
           onBlur={handleBlur}
           onClick={handleClick}
@@ -440,7 +440,7 @@ export function TextEditor() {
         />
       )}
 
-      <footer className="px-4 pb-5 mt-auto flex items-center justify-between gap-2 print:hidden">
+      <footer className="mt-auto flex items-center justify-between gap-2 px-4 pb-5 print:hidden">
         <div className="flex min-w-0 items-center gap-1 font-mono text-xs text-stone-500 dark:text-stone-400">
           {file.supported &&
             (file.name === null ? (

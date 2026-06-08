@@ -1,4 +1,3 @@
-
 import type {
   BlockContent,
   Heading,
@@ -36,7 +35,6 @@ const processor = unified()
   .use(remarkGfm)
   .use(remarkMdx);
 
-
 export function htmlToMdx(html: string): string {
   const template = document.createElement("template");
   template.innerHTML = html;
@@ -70,7 +68,8 @@ function blockFrom(node: ChildNode): RootContent | null {
     case "DIV":
       return node.classList.contains("te-move") ? moveElement(node) : null;
     case "P":
-      if (node.classList.contains("te-arrow")) return lineElement("arrow", node);
+      if (node.classList.contains("te-arrow"))
+        return lineElement("arrow", node);
       if (node.classList.contains("te-chevron"))
         return lineElement("chevron", node);
       return paragraph(node);
@@ -117,8 +116,13 @@ function listItemFrom(li: HTMLElement): ListItem {
   };
 }
 
-function lineElement(kind: "arrow" | "chevron", el: HTMLElement): MdxJsxFlowElement {
-  const children: BlockContent[] = [{ type: "paragraph", children: phrasingFrom(el) }];
+function lineElement(
+  kind: "arrow" | "chevron",
+  el: HTMLElement,
+): MdxJsxFlowElement {
+  const children: BlockContent[] = [
+    { type: "paragraph", children: phrasingFrom(el) },
+  ];
   return {
     type: "mdxJsxFlowElement",
     attributes: [attribute("kind", kind)],
@@ -175,7 +179,6 @@ function trackElement(track: HTMLElement): MdxJsxTextElement {
     name: "Track",
   };
 }
-
 
 export function mdxToHtml(mdx: string): string {
   const tree = processor.parse(mdx) as Root;
@@ -264,7 +267,10 @@ function moveToDom(node: MdxJsxFlowElement): HTMLElement {
   return el;
 }
 
-function appendBlocksInline(parent: HTMLElement, children: RootContent[]): void {
+function appendBlocksInline(
+  parent: HTMLElement,
+  children: RootContent[],
+): void {
   for (const child of children) {
     if (child.type === "paragraph") {
       appendPhrasing(parent, child.children);
@@ -311,7 +317,8 @@ function appendPhrasing(parent: HTMLElement, nodes: PhrasingContent[]): void {
       default:
         if ("children" in node)
           appendPhrasing(parent, node.children as PhrasingContent[]);
-        else if ("value" in node) parent.append(document.createTextNode(node.value));
+        else if ("value" in node)
+          parent.append(document.createTextNode(node.value));
     }
   }
 }
@@ -320,7 +327,10 @@ function trackToDom(node: MdxJsxFlowElement | MdxJsxTextElement): HTMLElement {
   const rawShape = attributeOf(node, "shape");
   const shape = SHAPES.has(rawShape as Shape) ? (rawShape as Shape) : "square";
   const total = clampCount(Number(attributeOf(node, "total")) || 1);
-  const filled = Math.min(Math.max(Number(attributeOf(node, "filled")) || 0, 0), total);
+  const filled = Math.min(
+    Math.max(Number(attributeOf(node, "filled")) || 0, 0),
+    total,
+  );
 
   const track = buildTrackElement(shape, total);
   const toggles = track.querySelectorAll(".te-toggle");
@@ -328,7 +338,6 @@ function trackToDom(node: MdxJsxFlowElement | MdxJsxTextElement): HTMLElement {
     toggles[i]?.setAttribute("aria-checked", "true");
   return track;
 }
-
 
 function attribute(name: string, value: string): MdxJsxAttribute {
   return { type: "mdxJsxAttribute", name, value };
@@ -339,7 +348,11 @@ function attributeOf(
   name: string,
 ): string | undefined {
   for (const attr of node.attributes)
-    if (attr.type === "mdxJsxAttribute" && attr.name === name && typeof attr.value === "string")
+    if (
+      attr.type === "mdxJsxAttribute" &&
+      attr.name === name &&
+      typeof attr.value === "string"
+    )
       return attr.value;
   return undefined;
 }

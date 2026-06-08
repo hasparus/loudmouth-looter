@@ -32,7 +32,7 @@ export function SlashMenu({
 
   return (
     <div
-      className="fixed z-40 overflow-hidden rounded-lg ring-stone-400/30 dark:ring-stone-600/30 bg-white font-text shadow-xl dark:bg-stone-900 ring"
+      className="font-text fixed z-40 overflow-hidden rounded-lg bg-white shadow-xl ring ring-stone-400/30 dark:bg-stone-900 dark:ring-stone-600/30"
       id={id}
       role="listbox"
       style={{

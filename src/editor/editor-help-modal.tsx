@@ -20,7 +20,7 @@ function Row({ children, code }: { children: ReactNode; code: string }) {
 function Section({ children, title }: { children: ReactNode; title: string }) {
   return (
     <section className="mt-5">
-      <h3 className="m-0 font-serif text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">
+      <h3 className="m-0 font-serif text-xs tracking-wide text-stone-500 uppercase dark:text-stone-400">
         {title}
       </h3>
       <div className="mt-1">{children}</div>
@@ -55,13 +55,13 @@ export function EditorHelpModal() {
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-label="Editor guide"
-        className="fixed right-3 top-3 z-30 flex size-9 items-center justify-center rounded-full text-stone-500 transition-colors hover:text-stone-800 focus-visible:text-stone-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400 dark:text-stone-400 dark:hover:text-stone-200 dark:focus-visible:text-stone-200 print:hidden hover:bg-stone-200/70 hover:duration-0 dark:hover:bg-stone-800"
+        className="fixed top-3 right-3 z-30 flex size-9 items-center justify-center rounded-full text-stone-500 transition-colors hover:bg-stone-200/70 hover:text-stone-800 hover:duration-0 focus-visible:text-stone-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-200 dark:focus-visible:text-stone-200 print:hidden"
         onClick={() => setOpen(true)}
         type="button"
       >
         <span
           aria-hidden="true"
-          className="text-lg leading-none trim-cap-alphabetic"
+          className="trim-cap-alphabetic text-lg leading-none"
         >
           ?
         </span>
@@ -81,26 +81,26 @@ export function EditorHelpModal() {
       >
         <div className="p-6" ref={innerRef}>
           <header className="flex items-start justify-between gap-4">
-            <h2 className="m-0 font-serif text-xl tracking-wide trim-cap-alphabetic">
+            <h2 className="trim-cap-alphabetic m-0 font-serif text-xl tracking-wide">
               Editor guide
             </h2>
             <button
               aria-label="Close"
-              className="flex size-8 shrink-0 items-center justify-center rounded-full text-stone-500 transition hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-50 -mt-2 -mr-2"
+              className="-mt-2 -mr-2 flex size-8 shrink-0 items-center justify-center rounded-full text-stone-500 transition hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-50"
               onClick={() => setOpen(false)}
               type="button"
             >
               <span
                 aria-hidden="true"
-                className="leading-none trim-end-alphabetic -translate-y-[.5px]"
+                className="trim-end-alphabetic -translate-y-[.5px] leading-none"
               >
                 ✕
               </span>
             </button>
           </header>
-          <p className="font-text text-lg text-stone-700 dark:text-stone-300 mt-4">
+          <p className="font-text mt-4 text-lg text-stone-700 dark:text-stone-300">
             Type{" "}
-            <code className="font-mono text-stone-700 dark:text-stone-300 text-sm bg-stone-100 dark:bg-stone-800 px-1 py-0.5">
+            <code className="bg-stone-100 px-1 py-0.5 font-mono text-sm text-stone-700 dark:bg-stone-800 dark:text-stone-300">
               /
             </code>{" "}
             for the command menu. Click any square, circle or rhomb to fill it

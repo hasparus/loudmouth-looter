@@ -88,13 +88,19 @@ export function populateToggleElement(
 // Live, interactive toggle: a real <button> so keyboard users can focus it and
 // toggle with Space/Enter (a span carrying role=checkbox is a lie — Space
 // would just type a space into the surrounding contenteditable).
-export function buildToggleElement(shape: Shape, filled: boolean): HTMLButtonElement {
+export function buildToggleElement(
+  shape: Shape,
+  filled: boolean,
+): HTMLButtonElement {
   const toggle = document.createElement("button");
   populateToggleElement(toggle, shape, filled);
   return toggle;
 }
 
-export function buildTrackElement(shape: Shape, count: number): HTMLSpanElement {
+export function buildTrackElement(
+  shape: Shape,
+  count: number,
+): HTMLSpanElement {
   const track = document.createElement("span");
   track.className = "te-track";
   track.setAttribute("contenteditable", "false");

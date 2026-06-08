@@ -14,9 +14,11 @@ export type AsidesPluginOptions = {};
  * Types come from hast, augmented by `mdast-util-mdx-jsx` to know
  * `mdxJsxFlowElement` — keep this in sync with moveCardPlugin's typing.
  */
-export const asidesPlugin: Plugin<[AsidesPluginOptions], hast.Root, hast.Root> = (
-  _options,
-) => {
+export const asidesPlugin: Plugin<
+  [AsidesPluginOptions],
+  hast.Root,
+  hast.Root
+> = (_options) => {
   return (root) => {
     let children = [...root.children];
 

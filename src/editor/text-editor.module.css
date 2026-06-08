@@ -26,7 +26,7 @@
   margin: 0;
 }
 
-.editor p+* {
+.editor p + * {
   margin-top: 1rem;
 }
 

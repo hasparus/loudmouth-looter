@@ -1,4 +1,3 @@
-
 interface FilePickerAcceptType {
   accept: Record<string, readonly string[] | string>;
   description?: string;
