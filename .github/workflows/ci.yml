@@ -30,7 +30,7 @@ jobs:
           bun-version: latest
 
       # Node is still used to run .github/scripts/deploy.mjs.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "24"
 
