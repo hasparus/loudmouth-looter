@@ -81,7 +81,7 @@ test("homepage is readable on mobile", async ({ page }, testInfo) => {
   await page.goto("/");
   await expect(page.locator("h1")).toBeVisible();
   const articles = page.locator("ul li a");
-  await expect(articles).toHaveCount(7);
+  await expect(articles).toHaveCount(8);
   // Content should not overflow
   const body = page.locator("body");
   const box = await body.boundingBox();
