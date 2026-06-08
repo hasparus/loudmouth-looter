@@ -7,9 +7,24 @@ test.describe("published post render parity", () => {
   });
 
   test("renders section headings", async ({ page }) => {
-    for (const name of ["Tracks", "Marker lines", "Tasks"]) {
+    for (const name of ["Tracks", "Marker lines", "Tasks", "Moves"]) {
       await expect(page.getByRole("heading", { name })).toBeVisible();
     }
+  });
+
+  test("renders a move card with its heading lifted to title/id", async ({
+    page,
+  }) => {
+    const card = page.locator("article.te-move");
+    await expect(card).toHaveCount(1);
+    await expect(card).toHaveAttribute("id", "learn-and-grow");
+
+    await expect(
+      card.getByRole("heading", { name: "Learn and Grow" }),
+    ).toBeVisible();
+    await expect(card).toContainText(
+      "discuss with the table what move or compendium fits",
+    );
   });
 
   test("renders all three track shapes with correct fill", async ({ page }) => {

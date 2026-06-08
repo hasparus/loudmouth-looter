@@ -132,10 +132,8 @@
 .te-move > :last-child {
   margin-bottom: 0;
 }
-@media (prefers-color-scheme: dark) {
-  .te-move {
-    border-color: var(--color-stone-700, #44403c);
-  }
+.dark .te-move {
+  border-color: var(--color-stone-700, #44403c);
 }
 
 /* Task-list item: one clickable box followed by editable text. */

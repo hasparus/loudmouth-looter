@@ -1,4 +1,5 @@
 import type * as hast from "hast";
+import type { MdxJsxFlowElementHast } from "mdast-util-mdx-jsx";
 import type { Plugin } from "unified";
 
 export const FLEX_CONTAINER_CLASS = "zaduma-aside";
@@ -9,14 +10,17 @@ export type AsidesPluginOptions = {};
  * Wraps `aside` elements with previous sibling in a flex container.
  *
  * Read posts/features/asides.mdx for more information.
+ *
+ * Types come from hast, augmented by `mdast-util-mdx-jsx` to know
+ * `mdxJsxFlowElement` — keep this in sync with moveCardPlugin's typing.
  */
-export const asidesPlugin: Plugin<[AsidesPluginOptions], Root, Root> = (
+export const asidesPlugin: Plugin<[AsidesPluginOptions], hast.Root, hast.Root> = (
   _options,
 ) => {
   return (root) => {
     let children = [...root.children];
 
-    const childrenToRemove: Set<RootContent> = new Set();
+    const childrenToRemove = new Set<hast.RootContent>();
 
     for (let i = 0; i < children.length; i++) {
       const node = children[i];
@@ -30,7 +34,7 @@ export const asidesPlugin: Plugin<[AsidesPluginOptions], Root, Root> = (
             childrenToRemove.add(node);
             lastAsideIndex = i;
 
-            children[j] = {
+            const wrapper: MdxJsxFlowElementHast = {
               type: "mdxJsxFlowElement",
               name: "div",
               position: prev.position,
@@ -52,6 +56,7 @@ export const asidesPlugin: Plugin<[AsidesPluginOptions], Root, Root> = (
                 node,
               ],
             };
+            children[j] = wrapper;
 
             break;
           }
@@ -64,34 +69,3 @@ export const asidesPlugin: Plugin<[AsidesPluginOptions], Root, Root> = (
     return { ...root, children };
   };
 };
-
-interface RootContentMap extends hast.RootContentMap {
-  mdxJsxFlowElement: MdxJsxFlowElement;
-}
-
-type RootContent = RootContentMap[keyof RootContentMap];
-
-interface Root {
-  type: "root";
-  children: RootContent[];
-}
-
-interface ElementContentMap extends hast.ElementContentMap {
-  mdxJsxFlowElement: MdxJsxFlowElement;
-}
-
-type ElementContent = ElementContentMap[keyof ElementContentMap];
-
-interface MdxJsxFlowElement {
-  type: "mdxJsxFlowElement";
-  name: string;
-  attributes: { type: "mdxJsxAttribute"; name: string; value: unknown }[];
-  children: ElementContent[];
-  position?:
-    | undefined
-    | {
-        start: { line: number; column: number; offset?: number | undefined };
-        end: { line: number; column: number; offset?: number | undefined };
-      };
-  data?: unknown;
-}
