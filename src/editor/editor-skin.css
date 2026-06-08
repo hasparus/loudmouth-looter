@@ -8,9 +8,12 @@
    Imported only by the /editor page and the render-side atom styles, so it does
    not touch the rest of the (still zaduma-skinned) site. */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Class-based dark mode (.dark / html.dark), matching the site toggle. The
+   stone/blue/orange palette and --font-* tokens stay declared in :root below,
+   so the editor utilities keep resolving to the same values as under v3. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* Avara — Raphaël Bastide / Velvetyne, SIL Open Font License 1.1.
    See public/fonts/Avara-OFL.txt. Self-hosted from public/fonts. */
@@ -76,7 +79,10 @@ html {
     linear-gradient(to top, var(--grain-bg), transparent var(--grain-fade)),
     var(--grain-noise);
   background-repeat: no-repeat, no-repeat, repeat;
-  background-size: auto, auto, 512px 512px;
+  background-size:
+    auto,
+    auto,
+    512px 512px;
   background-blend-mode: normal, normal, var(--grain-blend);
 }
 

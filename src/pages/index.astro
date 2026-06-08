@@ -60,7 +60,7 @@ posts.sort((a, b) => {
               </h2>
               <time
                 datetime={date.toISOString()}
-                class="shrink-0 tabular-nums tracking-tighter text-gray-600 dark:text-gray-400"
+                class="shrink-0 tracking-tighter text-gray-600 tabular-nums dark:text-gray-400"
               >
                 {formatDate(date)}
               </time>
@@ -71,6 +71,8 @@ posts.sort((a, b) => {
     }
   </ul>
   <style>
+    @reference "../global-styles/base.css";
+
     ul:hover li:not(:hover) :where(h2, time) {
       @apply text-gray-600 transition-colors;
       :global(.dark) & {

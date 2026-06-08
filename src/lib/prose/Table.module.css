@@ -1,9 +1,13 @@
+@reference "../../global-styles/base.css";
+
 .Table {
   border-collapse: collapse;
   table-layout: fixed;
 
   & thead {
-    @apply border-b;
+    /* Explicit gray-200: v4's default border color is currentColor, not the
+       v3 default of gray-200. */
+    @apply border-b border-gray-200;
   }
 
   & th {
