@@ -1,0 +1,17 @@
+---
+// Live multiplayer cursors, reusing the shared cursor-party PartyKit backend
+// (https://github.com/partykit/cursor-party). cursors.js is self-contained
+// (bundles preact), injects a .cursors-root into <body>, and scopes the room
+// to the page URL — so each page is its own room. Styling lives in
+// global-styles/cursor-party.css.
+//
+// The backend gates connections by a WEBSITES allowlist but always allows
+// localhost, so this works in dev as-is. For production, add the deployed
+// hostname to that PartyKit server's WEBSITES env and redeploy it.
+import "../global-styles/cursor-party.css";
+---
+
+<script
+  is:inline
+  async
+  src="https://cursor-party.hasparus.partykit.dev/cursors.js"></script>

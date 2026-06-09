@@ -4,6 +4,7 @@ import interPath from "@fontsource-variable/inter/files/inter-latin-wght-normal.
 
 import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
 import { Commands } from "../lib/Commands";
+import CursorParty from "../lib/CursorParty.astro";
 import GrainOverlay from "../lib/GrainOverlay/GrainOverlay.astro";
 import { isPostVisible } from "../lib/isPostVisible";
 import { Link } from "../lib/Link";
@@ -25,9 +26,11 @@ interface Props {
   description: string;
   children: astroHTML.JSX.Element;
   ogImage?: string;
+  /** Live multiplayer cursors. On by default; opt out per page (e.g. admin). */
+  cursors?: boolean;
 }
 
-const { title, description, ogImage } = Astro.props;
+const { title, description, ogImage, cursors = true } = Astro.props;
 
 const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
   "../../posts/**/*.mdx",
@@ -110,5 +113,6 @@ const websiteData = websiteSchema({
       <GrainOverlay opacity={0.25} />
     </div>
     <ScrollbarStyles />
+    {cursors && <CursorParty />}
   </body>
 </html>
