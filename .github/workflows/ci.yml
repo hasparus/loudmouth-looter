@@ -59,9 +59,14 @@ jobs:
       - name: Build
         run: bun run build
         env:
-          OG_IMAGE_SECRET:
-            ${{ case(github.event.pull_request.head.repo.fork == true,
-            'fork-og-image-secret', secrets.OG_IMAGE_SECRET) }}
+          OG_IMAGE_SECRET: ${{ secrets.OG_IMAGE_SECRET || 'placeholder' }}
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: playwright-${{ runner.os }}-
 
       - name: Install Playwright system deps
         run: bunx playwright install-deps chromium
@@ -87,7 +92,7 @@ jobs:
           retention-days: 7
 
       - name: Deploy Production to Vercel
-        if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'main' }}
+        if: ${{ env.HAS_VERCEL == 'true' && env.IS_PROD_RUN == 'true' }}
         run:
           node .github/scripts/deploy.mjs --token=${{ secrets.VERCEL_TOKEN }}
           --prod
@@ -95,21 +100,13 @@ jobs:
           OG_IMAGE_SECRET: ${{ secrets.OG_IMAGE_SECRET }}
 
       - name: Deploy Preview to Vercel
-        if:
-          ${{ github.event_name != 'push' && github.event_name != 'workflow_dispatch' &&
-          (!github.event.pull_request.head.repo.fork ||
-          (github.event_name == 'pull_request_target' &&
-          contains(github.event.pull_request.labels.*.name, 'trusted'))) }}
+        if: ${{ env.HAS_VERCEL == 'true' && env.IS_PR_RUN == 'true' && env.IS_TRUSTED == 'true' }}
         run: node .github/scripts/deploy.mjs --token=${{ secrets.VERCEL_TOKEN }}
         env:
           OG_IMAGE_SECRET: ${{ secrets.OG_IMAGE_SECRET }}
 
       - name: Create GitHub Preview Deployment
-        if:
-          ${{ github.event_name != 'push' && github.event_name != 'workflow_dispatch' &&
-          (!github.event.pull_request.head.repo.fork ||
-          (github.event_name == 'pull_request_target' &&
-          contains(github.event.pull_request.labels.*.name, 'trusted'))) }}
+        if: ${{ env.HAS_VERCEL == 'true' && env.IS_PR_RUN == 'true' && env.IS_TRUSTED == 'true' }}
         uses: chrnorm/deployment-action@v2
         with:
           token: "${{ github.token }}"
@@ -120,7 +117,7 @@ jobs:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Create GitHub Production Deployment
-        if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'main' }}
+        if: ${{ env.HAS_VERCEL == 'true' && env.IS_PROD_RUN == 'true' }}
         uses: chrnorm/deployment-action@v2
         with:
           token: "${{ github.token }}"
@@ -130,14 +127,13 @@ jobs:
           initial-status: success
     outputs:
       deployment: ${{ env.DEPLOYMENT_ALIAS || env.PRODUCTION_HOSTNAME }}
+      has-vercel: ${{ env.HAS_VERCEL }}
+      is-trusted: ${{ env.IS_TRUSTED }}
 
   lighthouse:
     needs: build-and-deploy
     runs-on: ubuntu-latest
-    if:
-      ${{ !github.event.pull_request.head.repo.fork ||
-      (github.event_name == 'pull_request_target' &&
-      contains(github.event.pull_request.labels.*.name, 'trusted')) }}
+    if: ${{ needs.build-and-deploy.outputs.has-vercel == 'true' && needs.build-and-deploy.outputs.is-trusted == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - name: Audit URLs
@@ -168,3 +164,8 @@ env:
   IS_DEPENDABOT: ${{ secrets.IS_DEPENDABOT }}
   REF_NAME: "${{ github.head_ref || github.ref_name }}"
   PRODUCTION_HOSTNAME: zaduma.vercel.app
+  # Token presence is used as proxy for full deploy capability (also needs VERCEL_ORG_ID/VERCEL_PROJECT_ID)
+  HAS_VERCEL: ${{ secrets.VERCEL_TOKEN != '' }}
+  IS_PROD_RUN: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'main' }}
+  IS_PR_RUN: ${{ github.event_name != 'push' && github.event_name != 'workflow_dispatch' }}
+  IS_TRUSTED: ${{ !github.event.pull_request.head.repo.fork || (github.event_name == 'pull_request_target' && contains(github.event.pull_request.labels.*.name, 'trusted')) }}
