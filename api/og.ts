@@ -274,7 +274,16 @@ async function assertTokenIsValid(
     )
     .join("");
 
-  if (receivedToken !== token) {
+  if (!timingSafeEqualHex(receivedToken, token)) {
     throw new HttpError("Invalid token.", 401);
   }
+}
+
+function timingSafeEqualHex(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
 }

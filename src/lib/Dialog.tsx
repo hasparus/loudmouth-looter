@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-import { createEffect, type JSX, splitProps } from "solid-js";
+import { createEffect, type JSX, onCleanup, splitProps } from "solid-js";
 
 import { useFocusTrap } from "./useFocusTrap";
 
@@ -26,6 +26,11 @@ export function Dialog(props: DialogProps) {
       });
 
       observer.observe(dialog, { attributes: true, attributeFilter: ["open"] });
+
+      onCleanup(() => {
+        observer.disconnect();
+        document.body.style.overflow = "";
+      });
     }
   });
 
