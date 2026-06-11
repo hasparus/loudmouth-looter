@@ -27,11 +27,11 @@ test.describe("published post render parity", () => {
   });
 
   test("renders all three track shapes with correct fill", async ({ page }) => {
-    await expect(page.locator(".te-track")).toHaveCount(3);
-    await expect(page.locator(".te-toggle")).toHaveCount(12);
+    await expect(page.locator(".te-track")).toHaveCount(4);
+    await expect(page.locator(".te-toggle")).toHaveCount(16);
 
     await expect(page.locator('.te-toggle[data-shape="square"]')).toHaveCount(
-      4,
+      8,
     );
     await expect(page.locator('.te-toggle[data-shape="circle"]')).toHaveCount(
       5,
@@ -39,7 +39,7 @@ test.describe("published post render parity", () => {
     await expect(page.locator('.te-toggle[data-shape="rhomb"]')).toHaveCount(3);
 
     await expect(page.locator('.te-toggle[aria-checked="true"]')).toHaveCount(
-      6,
+      7,
     );
   });
 
@@ -52,10 +52,26 @@ test.describe("published post render parity", () => {
   });
 
   test("renders GFM tasks with preserved checked state", async ({ page }) => {
-    const checkboxes = page.getByRole("main").getByRole("checkbox");
+    const checkboxes = page.locator("main input[type=checkbox]");
     await expect(checkboxes).toHaveCount(3);
     await expect(checkboxes.nth(0)).toBeChecked();
     await expect(checkboxes.nth(1)).toBeChecked();
     await expect(checkboxes.nth(2)).not.toBeChecked();
+  });
+
+  test("interactive track toggles on click", async ({ page }) => {
+    const track = page.locator(".te-track:not([data-preview])");
+    await expect(track).toHaveCount(1);
+
+    const secondToggle = track.locator(".te-toggle").nth(1);
+    await expect(secondToggle).toHaveAttribute("aria-checked", "false");
+    await secondToggle.click();
+    await expect(secondToggle).toHaveAttribute("aria-checked", "true");
+
+    await page.reload();
+    const trackAfter = page.locator(".te-track:not([data-preview])");
+    await expect(
+      trackAfter.locator('.te-toggle[aria-checked="true"]'),
+    ).toHaveCount(1);
   });
 });

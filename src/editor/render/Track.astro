@@ -1,16 +1,24 @@
 ---
-// Render-side counterpart to the editor's <Track> atom. Produces the exact same
-// inert markup as editor-atoms.tsx's <TrackPreview> (aria-hidden span of
-// te-toggle spans) so the shared editor-atoms.css styles published posts and the
-// editor identically — the single CSS source of truth for atom render-parity.
+// Render-side counterpart to the editor's <Track> atom. Two variants:
+// - value (controlled): inert aria-hidden spans, same as editor TrackPreview.
+// - defaultValue (uncontrolled): real buttons with roving tabindex + click
+//   delegation via a module script so the published track is interactive.
 import "../editor-atoms.css";
 
 type Shape = "circle" | "rhomb" | "square";
 
 interface Props {
   shape?: Shape;
-  filled?: number | string;
+  /** Controlled fill count — renders inert (static). */
+  value?: number | string;
+  /** Uncontrolled initial fill count — renders interactive (clickable). */
+  defaultValue?: number | string;
+  /** Toggle count. Aliases: total (legacy). */
+  max?: number | string;
+  /** Legacy alias for max. */
   total?: number | string;
+  /** Legacy alias for value. */
+  filled?: number | string;
 }
 
 const SHAPES: ReadonlySet<string> = new Set(["circle", "rhomb", "square"]);
@@ -18,22 +26,71 @@ const MAX = 12;
 const clamp = (v: number) =>
   Number.isFinite(v) ? Math.min(Math.max(Math.trunc(v), 1), MAX) : 1;
 
-const { shape: rawShape, filled: rawFilled, total: rawTotal } = Astro.props;
+const {
+  shape: rawShape,
+  value: rawValue,
+  defaultValue: rawDefaultValue,
+  max: rawMax,
+  total: rawTotal,
+  filled: rawFilled,
+} = Astro.props;
+
 const shape: Shape = SHAPES.has(rawShape as string)
   ? (rawShape as Shape)
   : "square";
-const total = clamp(Number(rawTotal) || 1);
-const filled = Math.min(Math.max(Number(rawFilled) || 0, 0), total);
+
+// value wins over defaultValue (controlled beats uncontrolled)
+const isInteractive = rawDefaultValue !== undefined && rawValue === undefined;
+const rawFillSource = rawValue ?? rawDefaultValue ?? rawFilled;
+
+const maxVal = clamp(Number(rawMax ?? rawTotal) || 1);
+const fillVal = Math.min(Math.max(Number(rawFillSource) || 0, 0), maxVal);
 ---
 
-<span aria-hidden="true" class="te-track" data-preview="1">
-  {
-    Array.from({ length: total }, (_, i) => (
-      <span
-        aria-checked={i < filled ? "true" : "false"}
-        class="te-toggle"
-        data-shape={shape}
-      />
-    ))
-  }
-</span>
+{
+  isInteractive ? (
+    <span class="te-track">
+      {Array.from({ length: maxVal }, (_, i) => (
+        <button
+          type="button"
+          class="te-toggle"
+          data-shape={shape}
+          role="checkbox"
+          aria-checked={i < fillVal ? "true" : "false"}
+          aria-label={shape}
+          tabindex={i === 0 ? 0 : -1}
+        />
+      ))}
+    </span>
+  ) : (
+    <span aria-hidden="true" class="te-track" data-preview="1">
+      {Array.from({ length: maxVal }, (_, i) => (
+        <span
+          aria-checked={i < fillVal ? "true" : "false"}
+          class="te-toggle"
+          data-shape={shape}
+        />
+      ))}
+    </span>
+  )
+}
+
+<script>
+  // Module script — Astro deduplicates this across all Track instances.
+  // Delegation handles click on any interactive track toggle on the page.
+  document.addEventListener("click", (e) => {
+    const toggle = (e.target as Element).closest<HTMLElement>(
+      ".te-track:not([data-preview]) > .te-toggle",
+    );
+    if (!toggle) return;
+    const checked = toggle.getAttribute("aria-checked") === "true";
+    toggle.setAttribute("aria-checked", checked ? "false" : "true");
+
+    // Roving tabindex: keep the clicked toggle as the tab stop.
+    const track = toggle.parentElement;
+    if (!track) return;
+    for (const t of track.querySelectorAll<HTMLElement>(".te-toggle")) {
+      t.tabIndex = t === toggle ? 0 : -1;
+    }
+  });
+</script>

@@ -167,12 +167,16 @@ function trackElement(track: HTMLElement): MdxJsxTextElement {
   const toggles = [...track.querySelectorAll(".te-toggle")];
   const shape = toggleShape(toggles[0]);
   const filled = toggles.filter((toggle) => isChecked(toggle)).length;
+  const interactive = track.dataset.interactive === "1";
+  const fillAttr = interactive
+    ? attribute("defaultValue", String(filled))
+    : attribute("value", String(filled));
   return {
     type: "mdxJsxTextElement",
     attributes: [
       attribute("shape", shape),
-      attribute("filled", String(filled)),
-      attribute("total", String(toggles.length)),
+      fillAttr,
+      attribute("max", String(toggles.length)),
     ],
     children: [],
     name: "Track",
@@ -324,13 +328,18 @@ function appendPhrasing(parent: HTMLElement, nodes: PhrasingContent[]): void {
 function trackToDom(node: MdxJsxFlowElement | MdxJsxTextElement): HTMLElement {
   const rawShape = attributeOf(node, "shape");
   const shape = SHAPES.has(rawShape as Shape) ? (rawShape as Shape) : "square";
-  const total = clampCount(Number(attributeOf(node, "total")) || 1);
-  const filled = Math.min(
-    Math.max(Number(attributeOf(node, "filled")) || 0, 0),
-    total,
+  const total = clampCount(
+    Number(attributeOf(node, "max") ?? attributeOf(node, "total")) || 1,
   );
+  const rawValue = attributeOf(node, "value");
+  const rawDefaultValue = attributeOf(node, "defaultValue");
+  const rawFilled = attributeOf(node, "filled");
+  const fillSource = rawValue ?? rawDefaultValue ?? rawFilled;
+  const filled = Math.min(Math.max(Number(fillSource) || 0, 0), total);
+  const interactive = rawDefaultValue !== undefined && rawValue === undefined;
 
   const track = buildTrackElement(shape, total);
+  if (interactive) track.dataset.interactive = "1";
   const toggles = track.querySelectorAll(".te-toggle");
   for (let i = 0; i < filled; i++)
     toggles[i].setAttribute("aria-checked", "true");
