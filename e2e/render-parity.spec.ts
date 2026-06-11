@@ -55,7 +55,7 @@ test.describe("published post render parity", () => {
   });
 
   test("renders GFM tasks with preserved checked state", async ({ page }) => {
-    const checkboxes = page.getByRole("checkbox");
+    const checkboxes = page.getByRole("main").getByRole("checkbox");
     await expect(checkboxes).toHaveCount(3);
     await expect(checkboxes.nth(0)).toBeChecked();
     await expect(checkboxes.nth(1)).toBeChecked();
