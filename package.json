@@ -15,7 +15,7 @@
     "serve": "astro preview",
     "astro": "astro",
     "lint": "eslint src api e2e .github/scripts playwright.config.ts astro.config.ts --max-warnings 0",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p src/editor/tsconfig.json",
+    "typecheck": "astro check && tsc --noEmit && tsc --noEmit -p src/editor/tsconfig.json",
     "format": "prettier --write src api e2e .github/scripts playwright.config.ts astro.config.ts",
     "ci": "bun run lint && prettier --check src api e2e .github/scripts playwright.config.ts astro.config.ts",
     "test": "playwright test"

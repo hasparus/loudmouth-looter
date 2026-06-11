@@ -44,11 +44,11 @@ export function websiteSchema(input: {
 export function blogPostingSchema(input: {
   headline: string;
   datePublished: string;
-  dateModified?: string;
-  description?: string;
-  author?: AuthorRef;
+  dateModified?: string | undefined;
+  description?: string | undefined;
+  author?: AuthorRef | undefined;
   canonical: string;
-  inLanguage?: string;
+  inLanguage?: string | undefined;
 }): BlogPostingSchema {
   return {
     "@context": "https://schema.org",
