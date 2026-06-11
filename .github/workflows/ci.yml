@@ -19,7 +19,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           # Empty on push/workflow_dispatch — falls back to default ref
@@ -135,7 +135,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.build-and-deploy.outputs.has-vercel == 'true' && needs.build-and-deploy.outputs.is-trusted == 'true' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Audit URLs
         uses: treosh/lighthouse-ci-action@v12
         with:
