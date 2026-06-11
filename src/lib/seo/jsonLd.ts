@@ -28,8 +28,8 @@ export interface BlogPostingSchema {
 export function websiteSchema(input: {
   name: string;
   url: string;
-  inLanguage?: string;
-  author?: AuthorRef;
+  inLanguage?: string | undefined;
+  author?: AuthorRef | undefined;
 }): WebSiteSchema {
   return {
     "@context": "https://schema.org",
