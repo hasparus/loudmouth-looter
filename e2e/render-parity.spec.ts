@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-
 test.describe("published post render parity", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/features/editor-atoms");
@@ -31,19 +30,17 @@ test.describe("published post render parity", () => {
     await expect(page.locator(".te-track")).toHaveCount(3);
     await expect(page.locator(".te-toggle")).toHaveCount(12);
 
-    await expect(
-      page.locator('.te-toggle[data-shape="square"]'),
-    ).toHaveCount(4);
-    await expect(
-      page.locator('.te-toggle[data-shape="circle"]'),
-    ).toHaveCount(5);
-    await expect(
-      page.locator('.te-toggle[data-shape="rhomb"]'),
-    ).toHaveCount(3);
+    await expect(page.locator('.te-toggle[data-shape="square"]')).toHaveCount(
+      4,
+    );
+    await expect(page.locator('.te-toggle[data-shape="circle"]')).toHaveCount(
+      5,
+    );
+    await expect(page.locator('.te-toggle[data-shape="rhomb"]')).toHaveCount(3);
 
-    await expect(
-      page.locator('.te-toggle[aria-checked="true"]'),
-    ).toHaveCount(6);
+    await expect(page.locator('.te-toggle[aria-checked="true"]')).toHaveCount(
+      6,
+    );
   });
 
   test("renders arrow and chevron marker lines", async ({ page }) => {

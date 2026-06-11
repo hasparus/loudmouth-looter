@@ -1,4 +1,5 @@
 module.exports = {
+  root: true,
   parser: "@typescript-eslint/parser",
   extends: ["@edgeandnode"],
   settings: { react: { version: "999.999.999" } },

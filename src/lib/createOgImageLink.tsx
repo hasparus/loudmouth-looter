@@ -15,7 +15,7 @@ export function createOgImageLink(frontmatter: PostFrontmatter) {
 
   const stringifiedPost: StringifiedPost = `${timestamp}\t${minutes}\t${title}\t${image}`;
 
-  const hmac = createHmac("sha256", OG_IMAGE_SECRET);
+  const hmac = createHmac("sha256", OG_IMAGE_SECRET as string);
   hmac.update(stringifiedPost);
   const token = hmac.digest("hex");
 

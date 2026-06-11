@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-
 const EDITOR = { name: "Editor" } as const;
 
 async function clearEditor(page: import("@playwright/test").Page) {
@@ -36,9 +35,7 @@ test.describe("editor", () => {
 
     const menu = page.getByRole("listbox");
     await expect(menu).toBeVisible();
-    await expect(
-      menu.getByRole("option", { name: /squares/i }),
-    ).toBeVisible();
+    await expect(menu.getByRole("option", { name: /squares/i })).toBeVisible();
   });
 
   test("inserts a squares track with the requested count", async ({ page }) => {
@@ -48,9 +45,9 @@ test.describe("editor", () => {
     await editor.pressSequentially("/squares 4");
     await page.keyboard.press("Enter");
 
-    await expect(
-      editor.getByRole("checkbox", { name: "square" }),
-    ).toHaveCount(4);
+    await expect(editor.getByRole("checkbox", { name: "square" })).toHaveCount(
+      4,
+    );
   });
 
   test("converts `- [ ] ` shorthand into a task with a toggle", async ({

@@ -34,9 +34,7 @@ function bunxRun(label, args, opts = {}) {
   console.log(`\n▶ ${label}: bunx ${redacted.join(" ")}`);
 
   const result = spawnSync("bunx", args, {
-    stdio: opts.captureStdout
-      ? ["inherit", "pipe", "inherit"]
-      : "inherit",
+    stdio: opts.captureStdout ? ["inherit", "pipe", "inherit"] : "inherit",
     encoding: "utf8",
   });
 
@@ -52,7 +50,7 @@ function bunxRun(label, args, opts = {}) {
     process.exit(result.status ?? 1);
   }
 
-  return opts.captureStdout ? result.stdout ?? "" : "";
+  return opts.captureStdout ? (result.stdout ?? "") : "";
 }
 
 // 1. Pull Vercel environment information.
