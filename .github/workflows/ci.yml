@@ -91,6 +91,8 @@ jobs:
         run:
           node .github/scripts/deploy.mjs --token=${{ secrets.VERCEL_TOKEN }}
           --prod
+        env:
+          OG_IMAGE_SECRET: ${{ secrets.OG_IMAGE_SECRET }}
 
       - name: Deploy Preview to Vercel
         if:
@@ -99,6 +101,8 @@ jobs:
           (github.event_name == 'pull_request_target' &&
           contains(github.event.pull_request.labels.*.name, 'trusted'))) }}
         run: node .github/scripts/deploy.mjs --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          OG_IMAGE_SECRET: ${{ secrets.OG_IMAGE_SECRET }}
 
       - name: Create GitHub Preview Deployment
         if:
