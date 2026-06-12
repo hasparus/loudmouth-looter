@@ -44,7 +44,7 @@ test.describe("Visual regression", () => {
  * Settle the page so a fullPage screenshot has a stable height across runs:
  * scroll the full height to trigger lazy images, then wait for every image to
  * decode and the self-hosted fonts to load. Deliberately no remote webfont —
- * the site ships Inter + Brygada and falls back to system mono for code, so a
+ * the site ships Inter + Avara + Crimson Text and falls back to system mono for code, so a
  * network font request would only add non-determinism (and per-platform
  * snapshots already cover the system-mono difference).
  */
