@@ -4,5 +4,4 @@
  * an AUTHOR and thread it through PostLayout / rss.
  */
 export const SITE_NAME = "loudmouth looter";
-// TODO: maintainer should wordsmith this blurb
-export const SITE_BLURB = "haspar's posts, drafted in their own editor.";
+export const SITE_BLURB = "rants, mechanics and kitbashes";
