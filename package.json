@@ -18,7 +18,8 @@
     "typecheck": "astro check && tsc --noEmit && tsc --noEmit -p src/editor/tsconfig.json",
     "format": "prettier --write src api e2e .github/scripts playwright.config.ts astro.config.ts",
     "ci": "bun run lint && prettier --check src api e2e .github/scripts playwright.config.ts astro.config.ts",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:unit": "bun test src"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^6.3.10",
@@ -62,6 +63,7 @@
     "@astrojs/check": "0.9.9",
     "@astrojs/rss": "^4.0.18",
     "@edgeandnode/eslint-config": "^2.0.3",
+    "@happy-dom/global-registrator": "20.10.1",
     "@playwright/test": "1.60.0",
     "@types/hast": "3.0.4",
     "@types/mdast": "4.0.4",

@@ -56,6 +56,9 @@ jobs:
       - name: Typecheck
         run: bun run typecheck
 
+      - name: Unit tests
+        run: bun test src
+
       - name: Build
         run: bun run build
         env:
