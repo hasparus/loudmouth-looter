@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^6.3.10",
-    "@astrojs/mdx": "^4.3.13",
+    "@astrojs/mdx": "^6.0.3",
     "@astrojs/react": "^4",
     "@astrojs/sitemap": "^3.7.2",
     "@astrojs/solid-js": "^5.1.3",
