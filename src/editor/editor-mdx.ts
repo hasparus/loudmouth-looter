@@ -19,14 +19,8 @@ import remarkParse from "remark-parse";
 import remarkStringify from "remark-stringify";
 import { unified } from "unified";
 
-import {
-  buildToggleElement,
-  buildTrackElement,
-  clampCount,
-  type Shape,
-} from "./editor-atoms";
-
-const SHAPES = new Set<Shape>(["circle", "rhomb", "square"]);
+import { buildToggleElement, buildTrackElement } from "./editor-atoms";
+import { resolveTrackProps, type Shape,TRACK_SHAPES } from "./track-props";
 
 const processor = unified()
   .use(remarkParse)
@@ -326,22 +320,19 @@ function appendPhrasing(parent: HTMLElement, nodes: PhrasingContent[]): void {
 }
 
 function trackToDom(node: MdxJsxFlowElement | MdxJsxTextElement): HTMLElement {
-  const rawShape = attributeOf(node, "shape");
-  const shape = SHAPES.has(rawShape as Shape) ? (rawShape as Shape) : "square";
-  const total = clampCount(
-    Number(attributeOf(node, "max") ?? attributeOf(node, "total")) || 1,
-  );
-  const rawValue = attributeOf(node, "value");
-  const rawDefaultValue = attributeOf(node, "defaultValue");
-  const rawFilled = attributeOf(node, "filled");
-  const fillSource = rawValue ?? rawDefaultValue ?? rawFilled;
-  const filled = Math.min(Math.max(Number(fillSource) || 0, 0), total);
-  const interactive = rawDefaultValue !== undefined && rawValue === undefined;
+  const { shape, fill, max, interactive } = resolveTrackProps({
+    shape: attributeOf(node, "shape"),
+    value: attributeOf(node, "value"),
+    defaultValue: attributeOf(node, "defaultValue"),
+    max: attributeOf(node, "max"),
+    total: attributeOf(node, "total"),
+    filled: attributeOf(node, "filled"),
+  });
 
-  const track = buildTrackElement(shape, total);
+  const track = buildTrackElement(shape, max);
   if (interactive) track.dataset.interactive = "1";
   const toggles = track.querySelectorAll(".te-toggle");
-  for (let i = 0; i < filled; i++)
+  for (let i = 0; i < fill; i++)
     toggles[i].setAttribute("aria-checked", "true");
   return track;
 }
@@ -350,6 +341,7 @@ function attribute(name: string, value: string): MdxJsxAttribute {
   return { type: "mdxJsxAttribute", name, value };
 }
 
+// Only reads string-valued MDX attributes; expression/boolean attrs resolve undefined — fine because the editor always writes strings.
 function attributeOf(
   node: MdxJsxFlowElement | MdxJsxTextElement,
   name: string,
@@ -366,7 +358,7 @@ function attributeOf(
 
 function toggleShape(toggle: Element | undefined): Shape {
   const raw = toggle instanceof HTMLElement ? toggle.dataset.shape : undefined;
-  return SHAPES.has(raw as Shape) ? (raw as Shape) : "square";
+  return TRACK_SHAPES.has(raw as Shape) ? (raw as Shape) : "square";
 }
 
 function isChecked(toggle: Element): boolean {
