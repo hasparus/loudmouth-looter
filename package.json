@@ -35,7 +35,7 @@
     "@types/react": "^19",
     "@types/unist": "^3.0.3",
     "@vercel/og": "^0.6.2",
-    "astro": "^5.17.2",
+    "astro": "^6.4.6",
     "astro-eslint-parser": "^1.4.0",
     "eslint-plugin-markdown": "^5.0.0",
     "estree-util-value-to-estree": "^3.5.0",
