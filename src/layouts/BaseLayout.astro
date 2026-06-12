@@ -120,7 +120,7 @@ const websiteData = websiteSchema({
         <slot name="header-content">
           <Link href="/">← back</Link>
         </slot>
-        <Commands client:load posts={posts} />
+        <Commands client:idle posts={posts} />
       </header>
       <slot />
     </div>
