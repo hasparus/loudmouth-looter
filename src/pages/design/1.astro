@@ -1,0 +1,144 @@
+---
+// Design comp 1 — "Quest ledger". Ruled hairline rows like a campaign
+// logbook: small-caps entry numerals, Avara titles left, tabular dates right.
+// Hover: a ◈ marker slides in and the bottom rule doubles. No background fill.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatDate } from "../../lib/formatDate";
+import { isPostVisible } from "../../lib/isPostVisible";
+import { SITE_BLURB, SITE_NAME } from "../../lib/siteMeta";
+import type { PostFrontmatter } from "../../types";
+
+const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
+  "../../../posts/**/*.mdx",
+  { eager: true },
+);
+const posts = Object.values(postModules)
+  .filter((p) => isPostVisible(p.frontmatter, { isProd: import.meta.env.PROD }))
+  .sort(
+    (a, b) =>
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime(),
+  );
+const total = posts.length;
+---
+
+<BaseLayout title={SITE_NAME} description={SITE_BLURB}>
+  <h1
+    slot="header-content"
+    class="font-serif font-bold text-stone-600 dark:text-stone-500"
+  >
+    {SITE_NAME}
+  </h1>
+  <main class="py-12">
+    <ol class="ledger" reversed>
+      {
+        posts.map(({ frontmatter }, i) => {
+          const date = new Date(frontmatter.date);
+          return (
+            <li>
+              <a href={frontmatter.path}>
+                <span class="num">
+                  no. {String(total - i).padStart(3, "0")}
+                </span>
+                <span class="mark" aria-hidden="true">
+                  ◈
+                </span>
+                <span class="title font-serif">{frontmatter.title}</span>
+                <time datetime={date.toISOString()}>{formatDate(date)}</time>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </main>
+  <style>
+    .ledger {
+      --rule: var(--color-stone-200);
+      --rule-ink: var(--color-stone-500);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--rule);
+    }
+    :global(html.dark) .ledger {
+      --rule: var(--color-stone-800);
+      --rule-ink: var(--color-stone-500);
+    }
+    .ledger a {
+      display: grid;
+      grid-template-columns: 4.4rem 1.15em 1fr auto;
+      align-items: baseline;
+      padding: 0.72rem 0.2rem 0.8rem;
+      text-decoration: none;
+      /* The bottom rule is a background layer, so on hover it can double
+         (ink pressed twice) without any layout shift or background fill. */
+      background-image: linear-gradient(var(--rule), var(--rule));
+      background-repeat: no-repeat;
+      background-size: 100% 1px;
+      background-position: 0 100%;
+    }
+    .ledger a:hover,
+    .ledger a:focus-visible {
+      background-image:
+        linear-gradient(var(--rule-ink), var(--rule-ink)),
+        linear-gradient(var(--rule-ink), var(--rule-ink));
+      background-size:
+        100% 1px,
+        100% 1px;
+      background-position:
+        0 100%,
+        0 calc(100% - 3px);
+    }
+    .ledger a:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: -2px;
+    }
+    .num {
+      font-variant: small-caps;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.82rem;
+      letter-spacing: 0.07em;
+      color: var(--color-stone-500);
+    }
+    .mark {
+      font-size: 0.78em;
+      color: var(--color-stone-400);
+      opacity: 0;
+      transform: translateX(-0.45em);
+      transition:
+        opacity 130ms ease,
+        transform 130ms ease;
+    }
+    .ledger a:hover .mark,
+    .ledger a:focus-visible .mark {
+      opacity: 1;
+      transform: none;
+    }
+    .title {
+      font-weight: 700;
+      color: var(--color-stone-800);
+    }
+    .ledger a:hover .title,
+    .ledger a:focus-visible .title {
+      color: var(--color-stone-950);
+    }
+    :global(html.dark) .title {
+      color: var(--color-stone-300);
+    }
+    :global(html.dark) .ledger a:hover .title,
+    :global(html.dark) .ledger a:focus-visible .title {
+      color: var(--color-stone-100);
+    }
+    .ledger time {
+      justify-self: end;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      font-size: 0.95rem;
+      color: var(--color-stone-500);
+    }
+    :global(html.dark) .ledger time {
+      color: var(--color-stone-400);
+    }
+  </style>
+</BaseLayout>

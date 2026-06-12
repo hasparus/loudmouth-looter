@@ -25,6 +25,10 @@ const hiddenPaths = getHiddenPostPaths(resolve(__dirname, "./posts"), {
   isProd,
 });
 
+/** Throwaway design comps under /design/ — built, but unlisted. */
+const isUnlistedPage = (path: string) =>
+  path === "/design" || path.startsWith("/design/");
+
 export default defineConfig({
   site,
   env: {
@@ -68,8 +72,10 @@ export default defineConfig({
     react({ include: ["**/editor/**"] }),
     solidJs({ exclude: ["**/editor/**"] }),
     sitemap({
-      filter: (page) =>
-        !hiddenPaths.has(stripTrailingSlash(new URL(page).pathname)),
+      filter: (page) => {
+        const path = stripTrailingSlash(new URL(page).pathname);
+        return !hiddenPaths.has(path) && !isUnlistedPage(path);
+      },
     }),
   ],
   vite: {

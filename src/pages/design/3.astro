@@ -1,0 +1,135 @@
+---
+// Design comp 3 — "Marginalia". Asymmetric two-column layout: a narrow left
+// margin holds the date and an inert editor track sigil (purely decorative);
+// large Avara titles in the main column with generous whitespace. Hover: the
+// sigil's toggles fill and the title takes the editor's dashed-em underline.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatDate } from "../../lib/formatDate";
+import { isPostVisible } from "../../lib/isPostVisible";
+import { SITE_BLURB, SITE_NAME } from "../../lib/siteMeta";
+import type { PostFrontmatter } from "../../types";
+
+import "../../editor/editor-atoms.css";
+
+const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
+  "../../../posts/**/*.mdx",
+  { eager: true },
+);
+const posts = Object.values(postModules)
+  .filter((p) => isPostVisible(p.frontmatter, { isProd: import.meta.env.PROD }))
+  .sort(
+    (a, b) =>
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime(),
+  );
+---
+
+<BaseLayout title={SITE_NAME} description={SITE_BLURB}>
+  <h1
+    slot="header-content"
+    class="font-serif font-bold text-stone-600 dark:text-stone-500"
+  >
+    {SITE_NAME}
+  </h1>
+  <main class="py-16">
+    <ul class="marginalia">
+      {
+        posts.map(({ frontmatter }) => {
+          const date = new Date(frontmatter.date);
+          return (
+            <li>
+              <a href={frontmatter.path}>
+                <span class="margin">
+                  <time datetime={date.toISOString()}>{formatDate(date)}</time>
+                  <span
+                    class="te-track sigil"
+                    data-preview="1"
+                    aria-hidden="true"
+                  >
+                    <span class="te-toggle" data-shape="rhomb" />
+                    <span class="te-toggle" data-shape="rhomb" />
+                    <span class="te-toggle" data-shape="rhomb" />
+                  </span>
+                </span>
+                <span class="title font-serif">{frontmatter.title}</span>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </main>
+  <style>
+    .marginalia {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2.6rem;
+    }
+    .marginalia a {
+      display: grid;
+      grid-template-columns: 6.5rem 1fr;
+      gap: 1.6rem;
+      align-items: baseline;
+      text-decoration: none;
+    }
+    .marginalia a:hover {
+      /* The sigil + dashed underline own this row's hover. */
+      background-image: none;
+    }
+    .marginalia a:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 4px;
+    }
+    .margin {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .margin time {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      font-size: 0.85rem;
+      color: var(--color-stone-500);
+    }
+    :global(html.dark) .margin time {
+      color: var(--color-stone-400);
+    }
+    .sigil {
+      font-size: 0.6rem;
+      color: var(--color-stone-400);
+    }
+    :global(html.dark) .sigil {
+      color: var(--color-stone-600);
+    }
+    .marginalia a:hover .sigil :global(.te-toggle),
+    .marginalia a:focus-visible .sigil :global(.te-toggle) {
+      /* Same visual as [aria-checked="true"] in editor-atoms.css. */
+      background-color: currentColor;
+    }
+    .title {
+      font-size: 1.65rem;
+      line-height: 1.25;
+      font-weight: 700;
+      color: var(--color-stone-800);
+      text-underline-offset: 5px;
+    }
+    :global(html.dark) .title {
+      color: var(--color-stone-300);
+    }
+    .marginalia a:hover .title,
+    .marginalia a:focus-visible .title {
+      color: var(--color-stone-950);
+      text-decoration: underline dashed
+        color-mix(in srgb, var(--color-stone-900) 25%, transparent);
+      text-decoration-thickness: 1px;
+    }
+    :global(html.dark) .marginalia a:hover .title,
+    :global(html.dark) .marginalia a:focus-visible .title {
+      color: var(--color-stone-100);
+      text-decoration-color: var(--color-stone-600);
+    }
+  </style>
+</BaseLayout>

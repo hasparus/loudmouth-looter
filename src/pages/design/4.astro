@@ -1,0 +1,134 @@
+---
+// Design comp 4 — "Character sheet". Each entry is a flat bordered field like
+// a pencil-and-paper sheet box: hairline edges drawn as background layers that
+// stop short of the corners (notches), a small-caps "ENTRY nnn · date" label
+// above the title. Hover: the ink darkens and the notches widen slightly.
+// Flat — paper, not plastic. No radius, no shadows, no fill.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatDate } from "../../lib/formatDate";
+import { isPostVisible } from "../../lib/isPostVisible";
+import { SITE_BLURB, SITE_NAME } from "../../lib/siteMeta";
+import type { PostFrontmatter } from "../../types";
+
+const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
+  "../../../posts/**/*.mdx",
+  { eager: true },
+);
+const posts = Object.values(postModules)
+  .filter((p) => isPostVisible(p.frontmatter, { isProd: import.meta.env.PROD }))
+  .sort(
+    (a, b) =>
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime(),
+  );
+const total = posts.length;
+---
+
+<BaseLayout title={SITE_NAME} description={SITE_BLURB}>
+  <h1
+    slot="header-content"
+    class="font-serif font-bold text-stone-600 dark:text-stone-500"
+  >
+    {SITE_NAME}
+  </h1>
+  <main class="py-12">
+    <ul class="sheet">
+      {
+        posts.map(({ frontmatter }, i) => {
+          const date = new Date(frontmatter.date);
+          return (
+            <li>
+              <a class="field" href={frontmatter.path}>
+                <span class="label">
+                  Entry {String(total - i).padStart(3, "0")} ·{" "}
+                  <time datetime={date.toISOString()}>{formatDate(date)}</time>
+                </span>
+                <span class="title font-serif">{frontmatter.title}</span>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </main>
+  <style>
+    .sheet {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 1.1rem;
+    }
+    .field {
+      --ink: var(--color-stone-300);
+      --notch: 0.55rem;
+      display: block;
+      padding: 0.95rem 1.2rem 1.05rem;
+      text-decoration: none;
+      /* Border as four background hairlines that stop short of the corners,
+         leaving notches — a pencil-and-paper sheet field, not a card. */
+      background-image:
+        linear-gradient(var(--ink), var(--ink)),
+        linear-gradient(var(--ink), var(--ink)),
+        linear-gradient(var(--ink), var(--ink)),
+        linear-gradient(var(--ink), var(--ink));
+      background-repeat: no-repeat;
+      background-size:
+        calc(100% - 2 * var(--notch)) 1px,
+        calc(100% - 2 * var(--notch)) 1px,
+        1px calc(100% - 2 * var(--notch)),
+        1px calc(100% - 2 * var(--notch));
+      background-position:
+        top center,
+        bottom center,
+        left center,
+        right center;
+      transition: background-size 140ms ease;
+    }
+    :global(html.dark) .field {
+      --ink: var(--color-stone-700);
+    }
+    .field:hover,
+    .field:focus-visible {
+      --ink: var(--color-stone-500);
+      --notch: 0.85rem;
+    }
+    :global(html.dark) .field:hover,
+    :global(html.dark) .field:focus-visible {
+      --ink: var(--color-stone-400);
+    }
+    .field:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 4px;
+    }
+    .label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-stone-500);
+      margin-bottom: 0.3rem;
+    }
+    :global(html.dark) .label {
+      color: var(--color-stone-500);
+    }
+    .title {
+      display: block;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--color-stone-800);
+    }
+    :global(html.dark) .title {
+      color: var(--color-stone-300);
+    }
+    .field:hover .title,
+    .field:focus-visible .title {
+      color: var(--color-stone-950);
+    }
+    :global(html.dark) .field:hover .title,
+    :global(html.dark) .field:focus-visible .title {
+      color: var(--color-stone-100);
+    }
+  </style>
+</BaseLayout>

@@ -1,0 +1,156 @@
+---
+// Design comp 2 — "Module contents". An adventure-module table of contents:
+// big Avara masthead with the blurb as a subtitle, Roman chapter numerals,
+// CSS-only dot leaders running title → date. Hover: the dots solidify into
+// a line and the title ink deepens.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatDate } from "../../lib/formatDate";
+import { isPostVisible } from "../../lib/isPostVisible";
+import { SITE_BLURB, SITE_NAME } from "../../lib/siteMeta";
+import type { PostFrontmatter } from "../../types";
+
+const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
+  "../../../posts/**/*.mdx",
+  { eager: true },
+);
+const posts = Object.values(postModules)
+  .filter((p) => isPostVisible(p.frontmatter, { isProd: import.meta.env.PROD }))
+  .sort(
+    (a, b) =>
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime(),
+  );
+
+const ROMAN = "I II III IV V VI VII VIII IX X XI XII".split(" ");
+const numeral = (i: number) => ROMAN[i] ?? String(i + 1);
+---
+
+<BaseLayout title={SITE_NAME} description={SITE_BLURB}>
+  <main class="module py-12">
+    <header class="masthead">
+      <h1 class="font-serif">{SITE_NAME}</h1>
+      <p class="blurb">{SITE_BLURB}</p>
+    </header>
+    <ol class="toc">
+      {
+        posts.map(({ frontmatter }, i) => {
+          const date = new Date(frontmatter.date);
+          return (
+            <li>
+              <a href={frontmatter.path}>
+                <span class="chapter font-serif">{numeral(i)}.</span>
+                <span class="title">{frontmatter.title}</span>
+                <span class="leader" aria-hidden="true" />
+                <time datetime={date.toISOString()}>{formatDate(date)}</time>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </main>
+  <style>
+    .module {
+      --dot: var(--color-stone-400);
+      --line: var(--color-stone-500);
+    }
+    :global(html.dark) .module {
+      --dot: var(--color-stone-600);
+      --line: var(--color-stone-400);
+    }
+    .masthead {
+      margin-bottom: 2.6rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--dot);
+    }
+    .masthead h1 {
+      font-size: 3rem;
+      line-height: 1.05;
+      font-weight: 800;
+      color: var(--color-stone-800);
+    }
+    :global(html.dark) .masthead h1 {
+      color: var(--color-stone-200);
+    }
+    .blurb {
+      margin-top: 0.5rem;
+      font-family: var(--font-text);
+      font-style: italic;
+      font-size: 1.2rem;
+      color: var(--color-stone-600);
+    }
+    :global(html.dark) .blurb {
+      color: var(--color-stone-400);
+    }
+    .toc {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .toc a {
+      display: flex;
+      align-items: baseline;
+      gap: 0.55em;
+      padding: 0.5rem 0.2rem;
+      text-decoration: none;
+      background-image: none;
+    }
+    .toc a:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: -2px;
+    }
+    .chapter {
+      min-width: 2.5em;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--color-stone-500);
+    }
+    .title {
+      font-family: var(--font-text);
+      font-size: 1.25rem;
+      color: var(--color-stone-700);
+      transition: color 130ms ease;
+    }
+    :global(html.dark) .title {
+      color: var(--color-stone-300);
+    }
+    .toc a:hover .title,
+    .toc a:focus-visible .title {
+      color: var(--color-stone-950);
+    }
+    :global(html.dark) .toc a:hover .title,
+    :global(html.dark) .toc a:focus-visible .title {
+      color: var(--color-stone-50);
+    }
+    /* Dot leader: an empty baseline-aligned flex item; its bottom edge sits
+       on the text baseline, and the dots are painted just above it. */
+    .leader {
+      flex: 1 1 2rem;
+      min-width: 2rem;
+      height: 4px;
+      background-image: radial-gradient(
+        circle at 2px 2px,
+        var(--dot) 1px,
+        transparent 1.5px
+      );
+      background-size: 7px 4px;
+      background-repeat: repeat-x;
+      background-position: 0 100%;
+    }
+    .toc a:hover .leader,
+    .toc a:focus-visible .leader {
+      background-image: linear-gradient(var(--line), var(--line));
+      background-size: 100% 1px;
+      background-position: 0 calc(100% - 1px);
+    }
+    .toc time {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      font-size: 0.95rem;
+      color: var(--color-stone-500);
+    }
+    :global(html.dark) .toc time {
+      color: var(--color-stone-400);
+    }
+  </style>
+</BaseLayout>
