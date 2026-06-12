@@ -175,14 +175,21 @@
     text-underline-offset: 4px;
   }
 
+  /* Canonical link hover: ink darkens, underline takes the accent, and a
+     faint wash pools at the baseline. The wash is capped at 1.6em and pinned
+     to the bottom so it hugs the text on tall block links (e.g. the
+     homepage's full-row links) instead of flooding the whole box. */
   a:hover {
     color: var(--color-stone-900);
     text-decoration-color: var(--color-blue-600);
-    background: linear-gradient(
+    background-image: linear-gradient(
       to bottom,
       transparent 0%,
       color-mix(in srgb, var(--color-blue-500) 10%, transparent 100%) 100%
     );
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: 100% min(100%, 1.6em);
   }
 
   html.dark a {
@@ -192,10 +199,10 @@
   html.dark a:hover {
     color: var(--color-stone-50);
     text-decoration-color: var(--color-orange-400);
-    background: linear-gradient(
+    background-image: linear-gradient(
       to bottom,
       transparent 0%,
-      color-mix(in srgb, var(--color-orange-500) 20%, transparent 100%) 100%
+      color-mix(in srgb, var(--color-orange-500) 18%, transparent 100%) 100%
     );
   }
 
