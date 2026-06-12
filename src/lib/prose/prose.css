@@ -47,6 +47,10 @@
     color: var(--color-stone-600);
     font: italic 400 1em var(--serif);
   }
+
+  :where(html.dark) & figcaption {
+    color: var(--color-stone-400);
+  }
 }
 
 /* Introduced in src/build-time/asidesPlugin.ts */

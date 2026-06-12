@@ -13,7 +13,7 @@ bun install
 cp .env.example .env.local   # fill in OG_IMAGE_SECRET (placeholder is fine locally)
 bun run dev                  # → http://localhost:4321
 # open http://localhost:4321/editor to try the MDX editor
-```
+```sh
 
 ## The editor
 
@@ -58,7 +58,7 @@ src/
   pages/            Astro routes
 api/                Vercel serverless functions
 e2e/                Playwright visual-regression + e2e tests
-```
+```text
 
 ## Deploying
 
