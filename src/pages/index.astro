@@ -23,24 +23,16 @@ posts.sort((a, b) => {
 ---
 
 <BaseLayout
-  title="zaduma"
-  description="Astro starter template for understated personal websites using Solid.js, Tailwind CSS, and MDX."
+  title="loudmouth looter"
+  description="haspar's posts, drafted in their own editor."
 >
-  <h1 slot="header-content" class="text-gray-600 dark:text-gray-500">zaduma</h1>
+  <h1 slot="header-content" class="text-stone-600 dark:text-stone-500">
+    loudmouth looter
+  </h1>
   <main class="zaduma-prose py-10">
     <Paragraph>
-      <small class="text-gray-600 dark:text-gray-500"
-        >IPA /zaˈdu.ma/ — reverie, musing</small
-      >
-      <br />
-      is an Astro starter template for understated personal websites
-    </Paragraph>
-    <Paragraph class="mt-6">
-      Learn about it by reading the articles below, take a look at the
-      <Link href="https://github.com/hasparus/zaduma">readme</Link>, or boldly
-      <Link href="https://github.com/hasparus/zaduma/generate">
-        {"create a new repository"}
-      </Link>. I wish you a pleasant journey.
+      Posts drafted in the <Link href="/editor">editor</Link> — built on{" "}
+      <Link href="https://github.com/hasparus/zaduma">zaduma</Link>.
     </Paragraph>
   </main>
   <ul>
@@ -55,12 +47,12 @@ posts.sort((a, b) => {
               class="flex flex-row justify-between gap-2"
               noUnderline
             >
-              <h2 class="font-sans text-gray-800 dark:text-gray-300">
+              <h2 class="font-sans text-stone-800 dark:text-stone-300">
                 {frontmatter.title}
               </h2>
               <time
                 datetime={date.toISOString()}
-                class="shrink-0 tracking-tighter text-gray-600 tabular-nums dark:text-gray-400"
+                class="shrink-0 tracking-tighter text-stone-600 tabular-nums dark:text-stone-400"
               >
                 {formatDate(date)}
               </time>
@@ -74,9 +66,11 @@ posts.sort((a, b) => {
     @reference "../global-styles/base.css";
 
     ul:hover li:not(:hover) :where(h2, time) {
-      @apply text-gray-600 transition-colors;
+      color: var(--color-stone-600);
+      transition: color 150ms;
+
       :global(.dark) & {
-        @apply text-gray-500;
+        color: var(--color-stone-500);
       }
     }
   </style>

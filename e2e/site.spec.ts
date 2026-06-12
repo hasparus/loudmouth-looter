@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test.describe("Homepage", () => {
   test("renders with article list", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("h1")).toHaveText("zaduma");
+    await expect(page.locator("h1")).toHaveText("loudmouth looter");
     // Check that article links are present
     const articles = page.locator("ul li a");
     await expect(articles).toHaveCount(8);
