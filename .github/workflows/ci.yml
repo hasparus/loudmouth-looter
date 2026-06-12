@@ -19,18 +19,19 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           fetch-depth: 0
+          persist-credentials: false
           # Empty on push/workflow_dispatch — falls back to default ref
           ref: "${{ github.event.pull_request.merge_commit_sha }}"
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
         with:
           bun-version: latest
 
       # Node is still used to run .github/scripts/deploy.mjs.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: "24"
 
@@ -41,9 +42,12 @@ jobs:
 
       - name: Commit lockfile
         if: ${{ env.IS_DEPENDABOT == 1 }}
-        uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321
         with:
-          { add: "bun.lock", fetch: false, message: "Update lockfile" }
+          add: "bun.lock"
+          fetch: false
+          github_token: "${{ github.token }}"
+          message: "Update lockfile"
 
       - name: Generate types
         run: bunx astro sync
@@ -65,7 +69,7 @@ jobs:
           OG_IMAGE_SECRET: ${{ secrets.OG_IMAGE_SECRET || 'placeholder' }}
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
@@ -88,7 +92,7 @@ jobs:
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: playwright-report
           path: playwright-report/
@@ -110,7 +114,7 @@ jobs:
 
       - name: Create GitHub Preview Deployment
         if: ${{ env.HAS_VERCEL == 'true' && env.IS_PR_RUN == 'true' && env.IS_TRUSTED == 'true' }}
-        uses: chrnorm/deployment-action@v2
+        uses: chrnorm/deployment-action@500aa6a23c81ffa1acf71072aee3cfa2cc2e556a
         with:
           token: "${{ github.token }}"
           environment-url: https://${{ env.DEPLOYMENT_ALIAS }}
@@ -121,7 +125,7 @@ jobs:
 
       - name: Create GitHub Production Deployment
         if: ${{ env.HAS_VERCEL == 'true' && env.IS_PROD_RUN == 'true' }}
-        uses: chrnorm/deployment-action@v2
+        uses: chrnorm/deployment-action@500aa6a23c81ffa1acf71072aee3cfa2cc2e556a
         with:
           token: "${{ github.token }}"
           environment-url: https://${{ env.PRODUCTION_HOSTNAME }}
@@ -138,9 +142,11 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.build-and-deploy.outputs.has-vercel == 'true' && needs.build-and-deploy.outputs.is-trusted == 'true' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        with:
+          persist-credentials: false
       - name: Audit URLs
-        uses: treosh/lighthouse-ci-action@v12
+        uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18
         with:
           urls: |
             https://${{ needs.build-and-deploy.outputs.deployment }}/
