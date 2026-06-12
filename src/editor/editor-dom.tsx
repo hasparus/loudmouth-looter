@@ -111,6 +111,8 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
       el.className = atomClass;
       if (atomClass === "te-track") {
         el.setAttribute("contenteditable", "false");
+        if (child.dataset.interactive === "1")
+          el.setAttribute("data-interactive", "1");
       }
       if (atomClass === "te-toggle") {
         const rawShape = child.dataset.shape ?? "";
@@ -329,6 +331,7 @@ export function restoreSelection(
   let node: Node = root;
   for (const index of snapshot.path) {
     const child: ChildNode | undefined = node.childNodes[index];
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!child) return;
     node = child;
   }
@@ -420,7 +423,7 @@ function transformInlineTextNodes(node: Node): boolean {
   let changed = false;
 
   if (node instanceof Text) {
-    const raw = normalizeEditableText(node.textContent ?? "");
+    const raw = normalizeEditableText(node.textContent);
     if (!raw.includes("**") && !raw.includes("_")) return false;
 
     const wrapper = document.createElement("span");
@@ -483,7 +486,7 @@ export function applyInlineTransform(root: HTMLElement) {
   if (!block || (block.tagName === "LI" && block.closest("ul, ol") === null))
     return;
 
-  const raw = normalizeEditableText(block.textContent ?? "");
+  const raw = normalizeEditableText(block.textContent);
   let changed = false;
 
   if (/\*\*[^*]+\*\*/.test(raw) || /_[^_]+_/.test(raw)) {
@@ -510,7 +513,7 @@ export function applyTaskShorthand(root: HTMLElement): UndoSnapshot | null {
   const block = getCurrentBlock(root);
   if (!block) return null;
 
-  const text = normalizeEditableText(block.textContent ?? "");
+  const text = normalizeEditableText(block.textContent);
 
   if (block.tagName === "P") {
     const match = /^[-*+] \[([ xX])\] $/.exec(text);
@@ -654,7 +657,7 @@ export function handleEnter(root: HTMLElement) {
   const block = getCurrentBlock(root);
   if (!block) return false;
 
-  const rawText = normalizeEditableText(block.textContent ?? "");
+  const rawText = normalizeEditableText(block.textContent);
 
   if (
     block.tagName === "P" &&

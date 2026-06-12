@@ -14,11 +14,12 @@
     "preview": "astro preview",
     "serve": "astro preview",
     "astro": "astro",
-    "lint": "eslint src",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p src/editor/tsconfig.json",
-    "format": "prettier --write src",
-    "ci": "eslint src && prettier --check src",
-    "test": "playwright test"
+    "lint": "eslint src api e2e .github/scripts playwright.config.ts astro.config.ts --max-warnings 0",
+    "typecheck": "astro check && tsc --noEmit && tsc --noEmit -p src/editor/tsconfig.json",
+    "format": "prettier --write src api e2e .github/scripts playwright.config.ts astro.config.ts",
+    "ci": "bun run lint && prettier --check src api e2e .github/scripts playwright.config.ts astro.config.ts",
+    "test": "playwright test",
+    "test:unit": "bun test src"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^6.3.10",
@@ -26,8 +27,8 @@
     "@astrojs/react": "^4",
     "@astrojs/sitemap": "^3.7.2",
     "@astrojs/solid-js": "^5.1.3",
-    "@fontsource-variable/brygada-1918": "^5.0.19",
-    "@fontsource-variable/inter": "^5.0.18",
+    "@fontsource-variable/brygada-1918": "^5.2.8",
+    "@fontsource-variable/inter": "^5.2.8",
     "@mdx-js/mdx": "3.1.1",
     "@shikijs/twoslash": "^3.22.0",
     "@tailwindcss/vite": "4",
@@ -41,7 +42,6 @@
     "gray-matter": "4.0.3",
     "mdast-util-mdx-jsx": "3.2.0",
     "plaiceholder": "^3.0.0",
-    "postcss": "8.5.10",
     "react": "^19",
     "react-dom": "^19",
     "reading-time": "^1.5.0",
@@ -57,24 +57,26 @@
     "twoslash": "^0.3.8",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.1.0",
-    "vercel": "^51.7.0",
     "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.9",
     "@astrojs/rss": "^4.0.18",
     "@edgeandnode/eslint-config": "^2.0.3",
+    "@happy-dom/global-registrator": "20.10.1",
     "@playwright/test": "1.60.0",
+    "@types/bun": "1.3.14",
     "@types/hast": "3.0.4",
     "@types/mdast": "4.0.4",
-    "@types/node": "20.13.0",
+    "@types/node": "^22.0.0",
     "@types/react-dom": "^19",
     "eslint": "^8.57.0",
-    "prettier": "^3.3.0",
+    "prettier": "^3.8.3",
     "prettier-plugin-astro": "^0.14.0",
-    "prettier-plugin-tailwindcss": "^0.6.1",
+    "prettier-plugin-tailwindcss": "^0.8.0",
     "tsx": "^4.21.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vercel": "^51.7.0"
   },
   "overrides": {
     "vite": "^6.4.1"

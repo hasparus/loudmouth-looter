@@ -1,7 +1,7 @@
-import { test, expect, Page } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 import { readdir } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

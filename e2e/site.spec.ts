@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("Homepage", () => {
   test("renders with article list", async ({ page }) => {
@@ -42,9 +42,7 @@ test.describe("Article pages", () => {
 test.describe("Asides render as side notes on wide viewports", () => {
   test("aside positioned to the right on desktop", async ({
     page,
-    browserName,
   }, testInfo) => {
-    
     await page.goto("/features/asides/");
     const aside = page.locator("aside").first();
     await expect(aside).toBeVisible();
@@ -66,8 +64,6 @@ test.describe("Code blocks render with syntax highlighting", () => {
   });
 });
 
-  
-
 test.describe("OG images", () => {
   test("og meta tags are present on article pages", async ({ page }) => {
     await page.goto("/features/og-images/");
@@ -88,13 +84,15 @@ test("homepage is readable on mobile", async ({ page }, testInfo) => {
   expect(box!.width).toBeLessThanOrEqual(375);
 });
 
-test("color scheme switches with command palette and responds to media preference", async ({ page }, testInfo) => {
+test("color scheme switches with command palette and responds to media preference", async ({
+  page,
+}, testInfo) => {
   await page.goto("/");
   await page.waitForLoadState("domcontentloaded");
-  
+
   if (testInfo.project.name !== "mobile") {
     await page.getByLabel("Open command palette").waitFor({ state: "visible" });
-    
+
     try {
       await page.keyboard.press("ControlOrMeta+K");
     } catch {
@@ -123,7 +121,7 @@ test("color scheme switches with command palette and responds to media preferenc
     await expect(page.getByText("Set Theme to System")).toBeVisible();
     await page.keyboard.press("3");
     await expect(page.locator("html")).not.toHaveClass(/dark/);
-    await expect(page.getByRole("dialog")).not.toBeVisible();    
+    await expect(page.getByRole("dialog")).not.toBeVisible();
   }
 
   await page.emulateMedia({ colorScheme: "dark" });

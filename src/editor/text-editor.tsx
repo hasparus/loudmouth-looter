@@ -412,6 +412,7 @@ export function TextEditor() {
           autoCorrect={spellcheck ? "on" : "off"}
           className={`${styles.editor} min-h-[75vh] w-full border-0 bg-transparent text-[1.22rem] leading-normal outline-none print:min-h-0 print:text-black`}
           contentEditable
+          tabIndex={0}
           onBlur={handleBlur}
           onClick={handleClick}
           onFocus={handleFocus}

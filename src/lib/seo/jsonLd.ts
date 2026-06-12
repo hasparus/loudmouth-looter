@@ -28,8 +28,8 @@ export interface BlogPostingSchema {
 export function websiteSchema(input: {
   name: string;
   url: string;
-  inLanguage?: string;
-  author?: AuthorRef;
+  inLanguage?: string | undefined;
+  author?: AuthorRef | undefined;
 }): WebSiteSchema {
   return {
     "@context": "https://schema.org",
@@ -44,11 +44,11 @@ export function websiteSchema(input: {
 export function blogPostingSchema(input: {
   headline: string;
   datePublished: string;
-  dateModified?: string;
-  description?: string;
-  author?: AuthorRef;
+  dateModified?: string | undefined;
+  description?: string | undefined;
+  author?: AuthorRef | undefined;
   canonical: string;
-  inLanguage?: string;
+  inLanguage?: string | undefined;
 }): BlogPostingSchema {
   return {
     "@context": "https://schema.org",

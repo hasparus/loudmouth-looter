@@ -19,7 +19,7 @@ export async function pickFileToOpen(): Promise<FileSystemFileHandle | null> {
       types: ACCEPT,
       multiple: false,
     });
-    return handle ?? null;
+    return handle;
   } catch (error) {
     if (isAbort(error)) return null;
     throw error;

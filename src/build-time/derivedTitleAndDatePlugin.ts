@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import type { Plugin } from "unified";
 
 import type { PostFrontmatter, PostProps } from "../types";
@@ -15,8 +15,16 @@ export const derivedTitleAndDatePlugin: Plugin<
     }
 
     if (!frontmatter.date) {
-      let createdAt = execSync(
-        `git log --follow --diff-filter=A --find-renames=40% --format="%ai" "${file.path}"`,
+      let createdAt = execFileSync(
+        "git",
+        [
+          "log",
+          "--follow",
+          "--diff-filter=A",
+          "--find-renames=40%",
+          "--format=%ai",
+          file.path,
+        ],
         { encoding: "utf-8" },
       )
         .trim()

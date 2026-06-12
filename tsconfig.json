@@ -5,9 +5,10 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "skipLibCheck": true,
+    "types": ["node", "bun"],
     "allowJs": true
   },
-  "include": ["src", "api", "test", "*.ts"],
+  "include": ["src", "api", "e2e", "*.ts"],
   "comment": "The editor cluster (src/editor) is React + typechecked under its own tsconfig at the `strict` level it was authored against (see src/editor/tsconfig.json). The site stays at `strictest`.",
   "exclude": ["src/editor"]
 }

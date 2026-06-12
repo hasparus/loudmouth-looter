@@ -47,9 +47,7 @@ test.describe("agent-ready endpoints", () => {
     expect(body).toMatch(/^# .+/m);
     expect(body).toContain("## Posts");
     // At least one known post rendered as `- [Title](absolute-url)`
-    expect(body).toMatch(
-      /- \[Asides\]\(https?:\/\/[^)]+\/features\/asides\)/,
-    );
+    expect(body).toMatch(/- \[Asides\]\(https?:\/\/[^)]+\/features\/asides\)/);
   });
 
   test("/llms-full.txt concatenates raw post bodies without frontmatter", async ({
@@ -89,9 +87,7 @@ test.describe("head metadata for agents", () => {
       /https?:\/\/.+\/features\/asides\/?$/,
     );
 
-    const mdAlt = page.locator(
-      'link[rel="alternate"][type="text/markdown"]',
-    );
+    const mdAlt = page.locator('link[rel="alternate"][type="text/markdown"]');
     await expect(mdAlt).toHaveAttribute(
       "href",
       /https?:\/\/.+\/features\/asides\.md$/,
@@ -100,15 +96,19 @@ test.describe("head metadata for agents", () => {
     const jsonLdBlocks = await page
       .locator('script[type="application/ld+json"]')
       .allTextContents();
-    const parsed = jsonLdBlocks.map((t) => JSON.parse(t));
+    const parsed = jsonLdBlocks.map(
+      (t) => JSON.parse(t) as Record<string, unknown>,
+    );
     const types = parsed.map((p) => p["@type"]);
     expect(types).toContain("WebSite");
     expect(types).toContain("BlogPosting");
 
-    const post = parsed.find((p) => p["@type"] === "BlogPosting");
-    expect(post.headline).toBe("Asides");
-    expect(typeof post.datePublished).toBe("string");
-    expect(post.mainEntityOfPage["@id"]).toMatch(/\/features\/asides\/?$/);
+    const post = parsed.find((p) => p["@type"] === "BlogPosting")!;
+    expect(post["headline"]).toBe("Asides");
+    expect(typeof post["datePublished"]).toBe("string");
+    expect(
+      (post["mainEntityOfPage"] as Record<string, unknown>)["@id"],
+    ).toMatch(/\/features\/asides\/?$/);
   });
 
   test("homepage has canonical but no markdown alternate", async ({ page }) => {

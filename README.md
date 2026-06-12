@@ -1,102 +1,79 @@
-# zaduma
+# loudmouth-looter
 
-_an [Astro] starter template for understated personal websites_
+Personal site with a rich-text MDX editor, live at [lol.haspar.us]. Scaffolded
+from [zaduma] — an Astro starter for understated personal websites.
 
-**Built with:**
+[lol.haspar.us]: https://lol.haspar.us
+[zaduma]: https://github.com/hasparus/zaduma
 
-- [SolidJS]
-- [MDX], [Remark] and [Unified]
-- [Shiki Twoslash][shiki-twoslash]
-- [Tailwind CSS][tailwind-css]
-- Vercel and [Vercel OG][vercel-og]
-- [GitHub Actions][github-actions]
+## Quick start
 
-[astro]: https://astro.build/
-[solidjs]: https://www.solidjs.com/
-[mdx]: https://mdxjs.com/
-[remark]: https://github.com/remarkjs/remark
-[unified]: https://unifiedjs.com/
-[shiki-twoslash]: https://github.com/shikijs/twoslash
-[tailwind-css]: https://tailwindcss.com/
-[vercel-og]:
-  https://vercel.com/blog/introducing-vercel-og-image-generation-fast-dynamic-social-card-images
-[github-actions]: https://github.com/features/actions
+```sh
+bun install
+cp .env.example .env.local   # fill in OG_IMAGE_SECRET (placeholder is fine locally)
+bun run dev                  # → http://localhost:4321
+# open http://localhost:4321/editor to try the MDX editor
+```
 
-## 🏎️ Usage TLDR
+## The editor
 
-1. Click <kbd>Use this template</kbd> to create a new repo.
-2. Set [`VERCEL_TOKEN`], `VERCEL_PROJECT_ID`, and [`VERCEL_ORG_ID`] secrets to
-   deploy to Vercel from GHA (enables access to git history).
-3. Add `OG_IMAGE_SECRET` to secure your OG image endpoint.
-4. Remove `e2e` directory and `playwright.config.ts` or adapt tests to your
-   usecase.
+`/editor` is a contenteditable React island backed by the File System Access API
+— open a `.mdx` post, edit, save. No server round-trips.
 
-_[See full usage instructions.](#-usage)_
+- **Slash menu**: type `/squares 4` (or `/circles`, `/rhombs`) to insert a Track
+  atom; `/arrow` and `/chevron` insert marker lines. Move cards are authored as
+  `<Move>` blocks in MDX.
+- **GFM tasks**: type `- [ ] ` to start an interactive task list.
+- **Track props**: `value` (static fill), `defaultValue` (interactive,
+  ephemeral), `max` (1–12). `value` beats `defaultValue`; `filled`/`total` are
+  legacy parse-only aliases.
+- Atoms render identically in the editor and on published pages via the shared
+  stylesheet `src/editor/editor-atoms.css`.
 
-## 🏛 Project Structure
+## Commands
 
-Inside of your Astro project, you'll see the following folders and files:
+| Command             | Action                                                                               |
+| :------------------ | :----------------------------------------------------------------------------------- |
+| `bun run dev`       | Dev server at `localhost:4321`                                                       |
+| `bun run build`     | Production build to `./dist/` (needs `OG_IMAGE_SECRET`)                              |
+| `bun run preview`   | Preview the production build locally                                                 |
+| `bun run lint`      | ESLint (zero warnings allowed)                                                       |
+| `bun run typecheck` | `astro check` + two `tsc` passes (Solid + React)                                     |
+| `bun run format`    | Prettier write                                                                       |
+| `bun run ci`        | lint + prettier check (local pre-push gate; CI runs lint/typecheck/tests separately) |
+| `bun test src`      | Unit tests (always scope to `src`; bare `bun test` runs Playwright too)              |
+| `bun run test`      | Playwright e2e (requires `bun run build` first)                                      |
 
-<pre>
-<code>
-├── posts/
-│   └── rebuilding-a-blog.mdx — <i>posts written in <a href="https://mdxjs.com/">MDX</a></i>
-├── public/ — <i>static assets apart from images</i>
-├── src/
-│   ├── build-time/* — <i>remark plugins</i>
-│   ├── global-styles/* — <i>fonts, body and prose styles</i>
-│   ├── layouts/
-│   │   ├── BaseLayout.astro — <i>UI shared between all pages</i>
-│   │   └── PostLayout.astro — <i>layout for all posts</i>
-│   ├── lib/* — <i>reusable utils and UI components</i>
-│   ├── images/* — <i>pictures (need to be here to be optimized by Astro Image)</i>
-│   ├── pages/
-│   │   ├── [path].astro — <i>Astro dynamic route for posts, supplies MDX components</i>
-│   │   └── index.astro — <i>index page, lists all posts</i>
-│   ├── env.d.ts
-│   └── types.ts
-├── astro.config.ts
-├── package.json
-├── postcss.config.cjs
-├── tailwind.config.cjs — <i>Tailwind config, colors, fonts</i>
-└── tsconfig.json
-</code>
-</pre>
+## Project structure
 
-## 🧞 Commands
+```
+posts/              MDX blog posts
+public/             static assets
+src/
+  build-time/       remark/rehype plugins
+  editor/           React 19 rich-text editor (File System Access API)
+  global-styles/    fonts, body, prose
+  layouts/          BaseLayout.astro, PostLayout.astro
+  lib/              shared utils and UI components (SolidJS)
+  pages/            Astro routes
+api/                Vercel serverless functions
+e2e/                Playwright visual-regression + e2e tests
+```
 
-All commands are run from the root of the project, from a terminal:
+## Deploying
 
-| Command                 | Action                                           |
-| :---------------------- | :----------------------------------------------- |
-| `pnpm install`          | Installs dependencies                            |
-| `pnpm run dev`          | Starts local dev server at `localhost:3000`      |
-| `pnpm run build`        | Build your production site to `./dist/`          |
-| `pnpm run preview`      | Preview your build locally, before deploying     |
-| `pnpm run astro ...`    | Run CLI commands like `astro add`, `astro check` |
-| `pnpm run astro --help` | Get help using the Astro CLI                     |
+CI (`/.github/workflows/ci.yml`) runs lint → typecheck → unit tests → build →
+e2e → Vercel deploy → Lighthouse.
 
-## 👌 Usage
+Secrets required in GitHub Actions:
 
-1. Click <kbd>Use this template</kbd> to create a new repo.
-2. Clone the repository, install with `pnpm install` and run with `pnpm dev`.
-3. Style it and personalize however you like 💅
-4. Set [`VERCEL_TOKEN`], `VERCEL_PROJECT_ID`, and [`VERCEL_ORG_ID`] secrets to
-   deploy to Vercel from GHA (what enables access to git history).
-   ([_Settings→Secrets_](https://github.com/hasparus/zaduma/settings/secrets/actions))
+| Secret              | Purpose                              |
+| :------------------ | :----------------------------------- |
+| `OG_IMAGE_SECRET`   | Signs OG image URLs                  |
+| `VERCEL_TOKEN`      | Deploy gate (`HAS_VERCEL` condition) |
+| `VERCEL_ORG_ID`     | Vercel org                           |
+| `VERCEL_PROJECT_ID` | Vercel project                       |
 
-   - Alternatively — if all your blog posts have a `date` in frontmatter, you
-     don't need to deploy through _workflows/ci.yml_. Feel free to remove the
-     deploy steps from the YML file and connect Vercel/Netlify integration. Go
-     to `derivedTitleAndDatePlugin` function and remove `execSync("git log")`
-     from it. (TODO: Can we make it more convenient?)
+See [docs/tradeoffs-and-limitations.md] for architectural notes.
 
-5. Generate a passphrase for `OG_IMAGE_SECRET` to secure your OG image endpoint,
-   and add it to
-   [Actions Secrets](<(https://github.com/hasparus/zaduma/settings/secrets/actions)>).
-
-[`vercel_token`]: https://vercel.com/account/tokens
-[`vercel_org_id`]: https://vercel.com/account#your-id
-
-6. Remove `e2e` directory and `playwright.config.ts` or adapt tests to your
-   usecase.
+[docs/tradeoffs-and-limitations.md]: ./docs/tradeoffs-and-limitations.md
