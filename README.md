@@ -32,17 +32,17 @@ bun run dev                  # → http://localhost:4321
 
 ## Commands
 
-| Command             | Action                                                                  |
-| :------------------ | :---------------------------------------------------------------------- |
-| `bun run dev`       | Dev server at `localhost:4321`                                          |
-| `bun run build`     | Production build to `./dist/` (needs `OG_IMAGE_SECRET`)                 |
-| `bun run preview`   | Preview the production build locally                                    |
-| `bun run lint`      | ESLint (zero warnings allowed)                                          |
-| `bun run typecheck` | `astro check` + two `tsc` passes (Solid + React)                        |
-| `bun run format`    | Prettier write                                                          |
-| `bun run ci`        | lint + prettier check (what CI runs pre-build)                          |
-| `bun test src`      | Unit tests (always scope to `src`; bare `bun test` runs Playwright too) |
-| `bun run test`      | Playwright e2e (requires `bun run build` first)                         |
+| Command             | Action                                                                               |
+| :------------------ | :----------------------------------------------------------------------------------- |
+| `bun run dev`       | Dev server at `localhost:4321`                                                       |
+| `bun run build`     | Production build to `./dist/` (needs `OG_IMAGE_SECRET`)                              |
+| `bun run preview`   | Preview the production build locally                                                 |
+| `bun run lint`      | ESLint (zero warnings allowed)                                                       |
+| `bun run typecheck` | `astro check` + two `tsc` passes (Solid + React)                                     |
+| `bun run format`    | Prettier write                                                                       |
+| `bun run ci`        | lint + prettier check (local pre-push gate; CI runs lint/typecheck/tests separately) |
+| `bun test src`      | Unit tests (always scope to `src`; bare `bun test` runs Playwright too)              |
+| `bun run test`      | Playwright e2e (requires `bun run build` first)                                      |
 
 ## Project structure
 

@@ -35,7 +35,7 @@ describe("titleCase", () => {
     expect(titleCase("hello")).toBe("Hello");
   });
 
-  test("prepositions stay lowercase in middle", () => {
+  test("words outside the small-words list stay capitalized", () => {
     expect(titleCase("getting started with astro")).toBe(
       "Getting Started With Astro",
     );

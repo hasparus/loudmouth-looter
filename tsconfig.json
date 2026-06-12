@@ -5,6 +5,7 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "skipLibCheck": true,
+    "types": ["node", "bun"],
     "allowJs": true
   },
   "include": ["src", "api", "e2e", "*.ts"],

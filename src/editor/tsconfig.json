@@ -5,7 +5,8 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["react", "react-dom", "bun"]
   },
   "include": ["."]
 }
