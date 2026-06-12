@@ -93,6 +93,7 @@
 .te-arrow::before {
   content: "➤";
   margin-right: 0.55em;
+  font-size: 1.4cap;
 }
 
 .te-chevron {
@@ -123,15 +124,19 @@
   margin: 1rem 0;
   break-inside: avoid;
 }
-.te-move > :first-child {
+
+.te-move> :first-child {
   margin-top: 0;
   font-size: 1.15em;
-  font-weight: 600; /* only 400/600 Crimson faces ship */
+  font-weight: 600;
+  /* only 400/600 Crimson faces ship */
   letter-spacing: 0.01em;
 }
-.te-move > :last-child {
+
+.te-move> :last-child {
   margin-bottom: 0;
 }
+
 .dark .te-move {
   border-color: var(--color-stone-700, #44403c);
 }
@@ -141,7 +146,7 @@
   list-style: none;
 }
 
-.te-task > .te-toggle {
+.te-task>.te-toggle {
   margin-right: 0.5em;
   vertical-align: -0.08em;
 }
