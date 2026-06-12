@@ -126,7 +126,7 @@
 .te-move > :first-child {
   margin-top: 0;
   font-size: 1.15em;
-  font-weight: 700;
+  font-weight: 600; /* only 400/600 Crimson faces ship */
   letter-spacing: 0.01em;
 }
 .te-move > :last-child {

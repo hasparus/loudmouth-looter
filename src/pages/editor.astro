@@ -5,6 +5,10 @@
 // editor-skin.css, imported here so they load only on this route.
 // Avara (display face) is self-hosted from public/fonts under the SIL OFL 1.1
 // (Raphaël Bastide / Velvetyne, see public/fonts/Avara-OFL.txt) and preloaded.
+// Crimson Text (body face, 400/600 only) is preloaded below for editor body text.
+import crimson400 from "@fontsource/crimson-text/files/crimson-text-latin-400-normal.woff2?url";
+import crimson600 from "@fontsource/crimson-text/files/crimson-text-latin-600-normal.woff2?url";
+
 import { TextEditor } from "../editor/text-editor";
 import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
 
@@ -41,11 +45,19 @@ import "../editor/editor-skin.css";
       type="font/woff2"
       crossorigin
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Caveat:wght@400;600;700&display=block"
-      rel="stylesheet"
+      rel="preload"
+      href={crimson400}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href={crimson600}
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
     <InitColorScheme />
   </head>
