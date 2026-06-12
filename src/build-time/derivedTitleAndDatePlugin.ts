@@ -23,6 +23,7 @@ export const derivedTitleAndDatePlugin: Plugin<
           "--diff-filter=A",
           "--find-renames=40%",
           "--format=%ai",
+          "--",
           file.path,
         ],
         { encoding: "utf-8" },

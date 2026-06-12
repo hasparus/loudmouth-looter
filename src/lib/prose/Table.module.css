@@ -5,9 +5,12 @@
   table-layout: fixed;
 
   & thead {
-    /* Explicit gray-200: v4's default border color is currentColor, not the
-       v3 default of gray-200. */
-    @apply border-b border-gray-200;
+    /* Explicit border color: v4's default border color is currentColor, not a gray default. */
+    border-bottom: 1px solid var(--color-stone-200);
+
+    :global(.dark) & {
+      border-bottom-color: var(--color-stone-700);
+    }
   }
 
   & th {
@@ -18,8 +21,4 @@
   & td {
     @apply px-2 py-1 md:px-4;
   }
-}
-
-:global(.dark) .Table thead {
-  @apply border-gray-700;
 }

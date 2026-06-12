@@ -5,7 +5,7 @@
   *
   *  <figure>
   *    <blockquote cite="https://www.huxley.net/bnw/four.html">
-  *      <p>Words can be like X-rays, if you use them properly—they’ll go through anything. You read and you’re pierced.</p>
+  *      <p>Words can be like X-rays, if you use them properly—they'll go through anything. You read and you're pierced.</p>
   *    </blockquote>
   *    <figcaption>
   *      —Aldous Huxley, <cite>
@@ -21,15 +21,16 @@
   font: 444 1.15em var(--serif);
 
   position: relative;
-  quotes: "“" "”" "‘" "’";
+  quotes: "\201C" "\201D" "\2018" "\2019";
 
   &:after,
   &:before {
-    @apply text-4xl leading-none font-black text-gray-300;
+    @apply text-4xl leading-none font-black;
+    color: var(--color-stone-300);
     position: absolute;
 
     :global(.dark) & {
-      @apply text-gray-600;
+      color: var(--color-stone-600);
     }
   }
 

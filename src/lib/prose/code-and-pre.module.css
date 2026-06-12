@@ -9,11 +9,12 @@
 
   &::before,
   &::after {
-    @apply font-black text-gray-400;
+    @apply font-black;
+    color: var(--color-stone-400);
     content: "`";
 
     :global(.dark) & {
-      @apply text-gray-600;
+      color: var(--color-stone-600);
     }
   }
 }

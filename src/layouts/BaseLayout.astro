@@ -1,11 +1,10 @@
 ---
-import brygadaPath from "@fontsource-variable/brygada-1918/files/brygada-1918-latin-wght-italic.woff2";
+import crimsonPath from "@fontsource/crimson-text/files/crimson-text-latin-400-normal.woff2";
 import interPath from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2";
 
 import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
 import { Commands } from "../lib/Commands";
 import CursorParty from "../lib/CursorParty.astro";
-import GrainOverlay from "../lib/GrainOverlay/GrainOverlay.astro";
 import { isPostVisible } from "../lib/isPostVisible";
 import { Link } from "../lib/Link";
 import ScrollbarStyles from "../lib/ScrollbarStyles.astro";
@@ -71,7 +70,7 @@ const websiteData = websiteSchema({
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     {
-      [interPath, brygadaPath].map((href) => (
+      [interPath, crimsonPath].map((href) => (
         <link
           rel="preload"
           href={href}
@@ -81,6 +80,20 @@ const websiteData = websiteSchema({
         />
       ))
     }
+    <link
+      rel="preload"
+      href="/fonts/Avara-Bold.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/Avara-Black.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
 
     <SocialCardMetaTags ogImage={ogImage} />
 
@@ -110,7 +123,6 @@ const websiteData = websiteSchema({
         <Commands client:load posts={posts} />
       </header>
       <slot />
-      <GrainOverlay opacity={0.25} />
     </div>
     <ScrollbarStyles />
     {cursors && <CursorParty />}

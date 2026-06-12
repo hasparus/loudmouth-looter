@@ -5,21 +5,13 @@
     margin-top: 2rem;
     margin-bottom: 1.5rem;
 
-    font: 555 1em var(--sans);
+    font-family: var(--font-serif);
+    font-weight: 700;
+    color: var(--color-stone-800);
 
-    &::before {
-      @apply text-gray-400 dark:text-gray-600;
+    :global(.dark) & {
+      color: var(--color-stone-200);
     }
-  }
-
-  &:is(h1)::before {
-    content: "# ";
-  }
-  &:is(h2)::before {
-    content: "## ";
-  }
-  &:is(h3)::before {
-    content: "### ";
   }
 
   & > a::after {
