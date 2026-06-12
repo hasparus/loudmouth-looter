@@ -4,6 +4,7 @@ import { formatDate } from "../lib/formatDate";
 import { isPostVisible } from "../lib/isPostVisible";
 import { Link } from "../lib/Link";
 import { Paragraph } from "../lib/prose/Paragraph";
+import { SITE_BLURB, SITE_NAME } from "../lib/siteMeta";
 import type { PostFrontmatter } from "../types";
 
 const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
@@ -22,12 +23,12 @@ posts.sort((a, b) => {
 });
 ---
 
-<BaseLayout
-  title="loudmouth looter"
-  description="haspar's posts, drafted in their own editor."
->
-  <h1 slot="header-content" class="font-serif font-bold text-stone-600 dark:text-stone-500">
-    loudmouth looter
+<BaseLayout title={SITE_NAME} description={SITE_BLURB}>
+  <h1
+    slot="header-content"
+    class="font-serif font-bold text-stone-600 dark:text-stone-500"
+  >
+    {SITE_NAME}
   </h1>
   <main class="zaduma-prose py-10">
     <Paragraph>

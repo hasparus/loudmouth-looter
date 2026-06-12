@@ -16,9 +16,7 @@
 }
 
 .zaduma-prose {
-  /* TODO: Get rid of thesse two and apply Tailwind styles */
-  --sans: "Inter";
-  --serif: "Crimson Text", Georgia, serif;
+  --serif: var(--font-text);
   --italic-serif: italic 444 1.15em var(--serif);
 
   --block-mb: 1.5rem;
@@ -142,7 +140,11 @@ details {
     &[aria-selected="true"]::before {
       background-color: var(--color-stone-100);
       :global(.dark) & {
-        background-color: color-mix(in srgb, var(--color-stone-800) 60%, transparent);
+        background-color: color-mix(
+          in srgb,
+          var(--color-stone-800) 60%,
+          transparent
+        );
       }
     }
   }

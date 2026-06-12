@@ -21,7 +21,7 @@
   font: 444 1.15em var(--serif);
 
   position: relative;
-  quotes: """ """ "'" "'";
+  quotes: "\201C" "\201D" "\2018" "\2019";
 
   &:after,
   &:before {

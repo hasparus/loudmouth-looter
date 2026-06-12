@@ -1,38 +1,18 @@
-/* Editor + render-side skin, ported from dungeon-motion's v4-native index.css
-   to Tailwind v3-compatible CSS so it can be adopted before the site-wide v4
-   migration (see HANDOFF). Two differences from the original:
-   - dark mode is class-based (.dark / html.dark), not prefers-color-scheme,
-     to match zaduma's toggle.
-   - the stone/blue/orange palette and --font-* tokens, which Tailwind v4 ships
-     as theme variables automatically, are declared here by hand for v3.
-   Imported only by the /editor page and the render-side atom styles, so it does
-   not touch the rest of the site. */
+/* Editor + render-side skin for the /editor page (Tailwind v4, class-based
+   dark mode matching the site toggle). skin.css is the single source of truth
+   for the grain background, typography, and link styles; this file adds only
+   editor-specific resets and layout.
+
+   color-scheme for html.dark lives in skin.css (inside @layer base). The stone
+   scale and --font-serif are declared in skin.css @theme and flow through to
+   every bundle that imports tailwindcss + skin.css — no manual :root copies
+   needed here. */
 
 @import "tailwindcss";
 @import "../global-styles/skin.css";
 
-/* Class-based dark mode (.dark / html.dark), matching the site toggle. The
-   stone/blue/orange palette and --font-* tokens stay declared in :root below,
-   so the editor utilities keep resolving to the same values as under v3. */
+/* Class-based dark mode (.dark / html.dark), matching the site toggle. */
 @custom-variant dark (&:where(.dark, .dark *));
-
-:root {
-  --font-serif: "Avara", Georgia, serif;
-
-  /* Tailwind `stone` scale — v4 exposes these as --color-stone-*; v3 does not.
-     Keep in sync with base.css @theme (which doesn't load here). */
-  --color-stone-50: #fafaf9;
-  --color-stone-100: #f5f5f4;
-  --color-stone-200: #e7e5e4;
-  --color-stone-300: #d6d3d1;
-  --color-stone-400: #a8a29e;
-  --color-stone-500: #78716c;
-  --color-stone-600: #57534e;
-  --color-stone-700: #44403c;
-  --color-stone-800: #292524;
-  --color-stone-900: #1c1917;
-  --color-stone-950: #0c0a09;
-}
 
 html {
   font-family: var(--font-serif);
@@ -41,14 +21,9 @@ html {
 }
 
 html.dark {
-  /* Make native UI (form controls, scrollbars, the help <dialog> backdrop)
-     follow dark mode. base.css sets this site-wide, but the editor page is
-     standalone and doesn't load it. */
+  /* color-scheme is set by skin.css @layer base; repeat color here for
+     specificity inside the editor bundle. */
   color: var(--color-stone-300);
-}
-
-button {
-  cursor: pointer;
 }
 
 h5 {

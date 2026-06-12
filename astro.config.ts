@@ -75,10 +75,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     ssr: {
-      noExternal: [
-        "@fontsource-variable/inter",
-        "@fontsource-variable/brygada-1918",
-      ],
+      noExternal: ["@fontsource-variable/inter"],
     },
     define: {
       "import.meta.env.PUBLIC_URL": JSON.stringify(makePublicURL()),
