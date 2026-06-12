@@ -77,9 +77,12 @@ html {
   scroll-behavior: smooth;
 
   font-size: 15px;
+  min-height: 100%;
+  color: var(--color-stone-700);
 
   &.dark {
-    color-scheme: dark;
+    /* color-scheme set by skin.css; repeat color here for specificity */
+    color: var(--color-stone-300);
   }
 }
 
@@ -88,7 +91,9 @@ html {
 }
 
 body {
-  @apply relative min-h-screen bg-white px-0 pt-4 pb-20 text-gray-800 md:px-4 md:pt-8 md:pb-48 dark:bg-gray-900 dark:text-gray-300;
+  /* bg-transparent lets the grain background on html show through.
+     text color inherits from html (stone-700 / stone-300 via skin.css). */
+  @apply relative min-h-screen bg-transparent px-0 pt-4 pb-20 md:px-4 md:pt-8 md:pb-48;
 }
 
 body,

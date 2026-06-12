@@ -29,9 +29,7 @@
     margin-bottom: var(--block-mb);
   }
 
-  & em {
-    font: var(--italic-serif);
-  }
+  /* em inherits the dashed-underline style from skin.css for editor parity */
 
   & strong,
   & strong > em {
@@ -39,12 +37,16 @@
   }
 
   & hr {
-    @apply border-b-2 border-gray-100 dark:border-gray-800;
+    border-bottom: 2px solid var(--color-stone-100);
+
+    :global(.dark) & {
+      border-bottom-color: var(--color-stone-800);
+    }
   }
 
   & figcaption {
-    @apply px-6 text-gray-600 dark:text-gray-600;
-
+    @apply px-6;
+    color: var(--color-stone-600);
     font: italic 400 1em var(--serif);
   }
 }
@@ -71,7 +73,12 @@
 
     &::before {
       content: "";
-      @apply absolute -left-px h-full border-l border-gray-200 dark:border-gray-700;
+      @apply absolute -left-px h-full border-l;
+      border-color: var(--color-stone-200);
+
+      :global(.dark) & {
+        border-color: var(--color-stone-700);
+      }
     }
   }
 
@@ -93,7 +100,12 @@
 }
 
 details {
-  @apply -mx-4 rounded-lg border border-gray-300 dark:border-gray-700/60;
+  @apply -mx-4 rounded-lg border;
+  border-color: var(--color-stone-300);
+
+  :global(.dark) & {
+    border-color: color-mix(in srgb, var(--color-stone-700) 60%, transparent);
+  }
 
   & summary::after {
     content: "↧";
@@ -124,6 +136,14 @@ details {
       @apply !m-0 !px-0;
     }
 
-    @apply selected:before:bg-gray-100 dark:selected:before:bg-gray-800/60 relative before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded before:bg-transparent before:transition-colors before:content-[''] hover:before:bg-gray-100 focus:before:bg-gray-100 dark:hover:before:bg-gray-800/60 dark:focus:before:bg-gray-800/60;
+    @apply relative before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded before:bg-transparent before:transition-colors before:content-[''];
+    &:hover::before,
+    &:focus::before,
+    &[aria-selected="true"]::before {
+      background-color: var(--color-stone-100);
+      :global(.dark) & {
+        background-color: color-mix(in srgb, var(--color-stone-800) 60%, transparent);
+      }
+    }
   }
 }
