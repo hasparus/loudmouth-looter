@@ -21,8 +21,12 @@ interface Props {
   filled?: number | string;
 }
 
-const { shape, fill, max: maxVal, interactive: isInteractive } =
-  resolveTrackProps(Astro.props);
+const {
+  shape,
+  fill,
+  max: maxVal,
+  interactive: isInteractive,
+} = resolveTrackProps(Astro.props);
 ---
 
 {

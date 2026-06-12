@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import type * as hast from "hast";
 import type { MdxJsxFlowElementHast } from "mdast-util-mdx-jsx";
 
-import { asidesPlugin,FLEX_CONTAINER_CLASS } from "./asidesPlugin";
+import { asidesPlugin, FLEX_CONTAINER_CLASS } from "./asidesPlugin";
 
 function makeAside(
   children: MdxJsxFlowElementHast["children"] = [],
@@ -37,7 +37,10 @@ describe("asidesPlugin", () => {
     const result = runPlugin([makeElement("p"), makeAside()]);
     const wrapper = result.children[0] as MdxJsxFlowElementHast;
     expect(wrapper.children).toHaveLength(2);
-    const [inner, aside] = wrapper.children as [hast.Element, MdxJsxFlowElementHast];
+    const [inner, aside] = wrapper.children as [
+      hast.Element,
+      MdxJsxFlowElementHast,
+    ];
     expect(inner.type).toBe("element");
     expect(inner.tagName).toBe("div");
     expect(aside.type).toBe("mdxJsxFlowElement");

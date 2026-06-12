@@ -86,14 +86,14 @@ if (isRaw) {
     // the 'raw' images can contain text or important details that should
     // not be cut off.
     const derivedAspectRatio = parseFloat(props.aspectRatio as string);
-    height =
-      !isNaN(derivedAspectRatio)
-        ? parseFloat(props.width as string) / derivedAspectRatio
-        : props.height
-          ? parseFloat(props.height as string)
-          : undefined;
+    height = !isNaN(derivedAspectRatio)
+      ? parseFloat(props.width as string) / derivedAspectRatio
+      : props.height
+        ? parseFloat(props.height as string)
+        : undefined;
     props.aspectRatio = imported.width / imported.height;
-    width = height != null ? height * (imported.width / imported.height) : undefined;
+    width =
+      height != null ? height * (imported.width / imported.height) : undefined;
   }
 } else {
   if (src.startsWith(SRC_IMAGES_PREFIX)) {

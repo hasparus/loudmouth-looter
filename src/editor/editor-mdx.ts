@@ -20,7 +20,7 @@ import remarkStringify from "remark-stringify";
 import { unified } from "unified";
 
 import { buildToggleElement, buildTrackElement } from "./editor-atoms";
-import { resolveTrackProps, type Shape,TRACK_SHAPES } from "./track-props";
+import { resolveTrackProps, type Shape, TRACK_SHAPES } from "./track-props";
 
 const processor = unified()
   .use(remarkParse)

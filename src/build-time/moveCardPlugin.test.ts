@@ -7,7 +7,12 @@ function makeMove(
   children: MdxJsxFlowElement["children"],
   attrs: MdxJsxFlowElement["attributes"] = [],
 ): MdxJsxFlowElement {
-  return { type: "mdxJsxFlowElement", name: "Move", attributes: attrs, children };
+  return {
+    type: "mdxJsxFlowElement",
+    name: "Move",
+    attributes: attrs,
+    children,
+  };
 }
 
 function runPlugin(node: MdxJsxFlowElement) {

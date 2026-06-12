@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { resolveTrackProps,TRACK_MAX } from "./track-props";
+import { resolveTrackProps, TRACK_MAX } from "./track-props";
 
 describe("resolveTrackProps", () => {
   test("value-only → static, fill=value", () => {

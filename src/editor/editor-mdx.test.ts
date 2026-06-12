@@ -2,7 +2,6 @@ import { describe, expect, test } from "bun:test";
 
 import { htmlToMdx, mdxToHtml } from "./editor-mdx";
 
-
 describe("mdxToHtml", () => {
   test("h2 heading", () => {
     expect(mdxToHtml("## Hello World\n")).toBe("<h2>Hello World</h2>");
@@ -62,7 +61,6 @@ describe("mdxToHtml", () => {
   });
 });
 
-
 describe("htmlToMdx", () => {
   test("h2 → ## heading", () => {
     expect(htmlToMdx("<h2>Hello World</h2>")).toBe("## Hello World\n");
@@ -80,7 +78,7 @@ describe("htmlToMdx", () => {
 
   test("GFM task list round-trip", () => {
     const taskHtml =
-      '<ul>' +
+      "<ul>" +
       '<li class="te-task">' +
       '<button class="te-toggle" data-shape="square" type="button" role="checkbox" aria-label="square" aria-checked="true" contenteditable="false"></button>' +
       "done" +
@@ -95,7 +93,9 @@ describe("htmlToMdx", () => {
 
   test("static Track DOM → value/max MDX", () => {
     const html = mdxToHtml('<Track shape="circle" value="3" max="5" />\n');
-    expect(htmlToMdx(html)).toBe('<Track shape="circle" value="3" max="5" />\n');
+    expect(htmlToMdx(html)).toBe(
+      '<Track shape="circle" value="3" max="5" />\n',
+    );
   });
 
   test("interactive Track DOM → defaultValue MDX (core invariant)", () => {
@@ -109,9 +109,7 @@ describe("htmlToMdx", () => {
 
   test("legacy Track DOM → re-emits as value/max", () => {
     const html = mdxToHtml('<Track shape="rhomb" filled="1" total="3" />\n');
-    expect(htmlToMdx(html)).toBe(
-      '<Track shape="rhomb" value="1" max="3" />\n',
-    );
+    expect(htmlToMdx(html)).toBe('<Track shape="rhomb" value="1" max="3" />\n');
   });
 
   test("Move card survives round-trip", () => {

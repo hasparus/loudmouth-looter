@@ -17,7 +17,14 @@ export const derivedTitleAndDatePlugin: Plugin<
     if (!frontmatter.date) {
       let createdAt = execFileSync(
         "git",
-        ["log", "--follow", "--diff-filter=A", "--find-renames=40%", "--format=%ai", file.path],
+        [
+          "log",
+          "--follow",
+          "--diff-filter=A",
+          "--find-renames=40%",
+          "--format=%ai",
+          file.path,
+        ],
         { encoding: "utf-8" },
       )
         .trim()
