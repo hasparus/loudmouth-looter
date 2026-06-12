@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./skin.css";
 
 /* Class-based dark mode (html.dark), matching the v3 `darkMode: "class"`. */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -13,7 +14,9 @@
     "Segoe UI", Roboto, "Helvetica Neue", sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-serif:
-    "Brygada 1918", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+    "Avara", Georgia, serif;
+  /* Stone scale — also declared in editor-skin.css :root (editor page doesn't
+     load base.css). Keep both in sync. */
   --font-mono:
     "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", monospace;
