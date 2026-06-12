@@ -22,7 +22,7 @@
     "test:unit": "bun test src"
   },
   "dependencies": {
-    "@astrojs/markdown-remark": "^6.3.10",
+    "@astrojs/markdown-remark": "^7.2.0",
     "@astrojs/mdx": "^4.3.13",
     "@astrojs/react": "^4",
     "@astrojs/sitemap": "^3.7.2",
