@@ -21,7 +21,8 @@ bun run dev                  # → http://localhost:4321
 — open a `.mdx` post, edit, save. No server round-trips.
 
 - **Slash menu**: type `/squares 4` (or `/circles`, `/rhombs`) to insert a Track
-  atom; `/line` / `/move` for the other custom atoms.
+  atom; `/arrow` and `/chevron` insert marker lines. Move cards are authored as
+  `<Move>` blocks in MDX.
 - **GFM tasks**: type `- [ ] ` to start an interactive task list.
 - **Track props**: `value` (static fill), `defaultValue` (interactive,
   ephemeral), `max` (1–12). `value` beats `defaultValue`; `filled`/`total` are
