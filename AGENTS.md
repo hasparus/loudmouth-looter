@@ -16,7 +16,8 @@ Architectural notes for AI agents. Read before touching any file. See also
 - Do not move files across the `src/editor/` boundary without updating both
   tsconfigs and the astro integration config.
 
-**File map:**
+**Key files** (not exhaustive — `text-editor.tsx` is the editor island,
+`render/` holds the published-page atom renderers):
 
 ```
 src/editor/
@@ -47,7 +48,7 @@ bun run preview                          # serve the build locally
 bun run lint                             # ESLint, zero warnings allowed
 bun run typecheck                        # astro check + tsc (Solid) + tsc (React/editor)
 bun run format                           # prettier write
-bun run ci                               # lint + prettier check (pre-build gate in CI)
+bun run ci                               # lint + prettier check (local pre-push gate; CI runs the steps separately)
 bun test src                             # unit tests — ALWAYS scope to src/
 bun run test                             # playwright e2e — needs bun run build first
 ```
