@@ -163,7 +163,7 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   IS_DEPENDABOT: ${{ secrets.IS_DEPENDABOT }}
   REF_NAME: "${{ github.head_ref || github.ref_name }}"
-  PRODUCTION_HOSTNAME: zaduma.vercel.app
+  PRODUCTION_HOSTNAME: lol.haspar.us
   # Token presence is used as proxy for full deploy capability (also needs VERCEL_ORG_ID/VERCEL_PROJECT_ID)
   HAS_VERCEL: ${{ secrets.VERCEL_TOKEN != '' }}
   IS_PROD_RUN: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'main' }}

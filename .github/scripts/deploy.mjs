@@ -98,7 +98,7 @@ if (!deploymentUrl) {
 }
 console.log(`deployment URL: ${deploymentUrl}`);
 
-// 4. Alias the deployment to `${branch}--zaduma.vercel.app` and write the
+// 4. Alias the deployment to `${branch}--loudmouth-looter.vercel.app` and write the
 //    alias to $GITHUB_ENV so later steps can reference it.
 const deploymentAlias = createDeploymentAlias();
 console.log(`deployment alias: ${deploymentAlias}`);
@@ -129,5 +129,5 @@ function createDeploymentAlias() {
     .replace(/-+/g, "-")
     .toLowerCase();
 
-  return `${refSlug}--zaduma.vercel.app`;
+  return `${refSlug}--loudmouth-looter.vercel.app`;
 }

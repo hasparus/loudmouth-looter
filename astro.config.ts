@@ -15,7 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = dirname(__filename);
 
-const hostname = "zaduma.vercel.app";
+const hostname = "lol.haspar.us";
 const site = `https://${hostname}/`;
 
 const stripTrailingSlash = (path: string) => path.replace(/\/+$/, "") || "/";
