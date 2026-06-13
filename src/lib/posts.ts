@@ -1,40 +1,36 @@
 import type { PostFrontmatter } from "../types";
 
-import { getPostExcerpt } from "./getPostExcerpt";
 import { isPostVisible } from "./isPostVisible";
 
-const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
-  "../../posts/**/*.mdx",
-  { eager: true },
-);
-const rawModules = import.meta.glob<string>("../../posts/**/*.mdx", {
-  query: "?raw",
-  import: "default",
+/** A teaser component — the post's opening blocks, injected by recmaMdxExcerpt. */
+type ExcerptComponent = (props: { components?: unknown }) => unknown;
+
+interface PostModule {
+  frontmatter: PostFrontmatter;
+  Excerpt?: ExcerptComponent | undefined;
+}
+
+const postModules = import.meta.glob<PostModule>("../../posts/**/*.mdx", {
   eager: true,
 });
 
 export interface PostEntry {
   frontmatter: PostFrontmatter;
-  /** First blocks of the post rendered to HTML, for listing teasers. */
-  excerpt: string;
+  /** Opening blocks of the post as a component, for listing teasers. */
+  Excerpt?: ExcerptComponent | undefined;
 }
 
 let cache: PostEntry[] | undefined;
 
-/** Visible posts, newest first, each with a rendered excerpt. */
-export async function getPosts(): Promise<PostEntry[]> {
+/** Visible posts, newest first, each with its teaser component. */
+export function getPosts(): PostEntry[] {
   if (cache) return cache;
 
-  const entries = await Promise.all(
-    Object.entries(postModules)
-      .filter(([, m]) =>
-        isPostVisible(m.frontmatter, { isProd: import.meta.env.PROD }),
-      )
-      .map(async ([key, { frontmatter }]) => ({
-        frontmatter,
-        excerpt: await getPostExcerpt(rawModules[key] ?? "", { blocks: 2 }),
-      })),
-  );
+  const entries = Object.values(postModules)
+    .filter((m) =>
+      isPostVisible(m.frontmatter, { isProd: import.meta.env.PROD }),
+    )
+    .map((m) => ({ frontmatter: m.frontmatter, Excerpt: m.Excerpt }));
 
   entries.sort(
     (a, b) =>

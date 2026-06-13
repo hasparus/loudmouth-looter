@@ -6,7 +6,7 @@ import { getPosts, type PostEntry, tagSlug } from "../../lib/posts";
 import { SITE_NAME } from "../../lib/siteMeta";
 
 export async function getStaticPaths() {
-  const posts = await getPosts();
+  const posts = getPosts();
 
   const bySlug = new Map<string, { label: string; posts: PostEntry[] }>();
   for (const post of posts) {

@@ -1,5 +1,6 @@
 ---
 import { formatDate } from "./formatDate";
+import { mdxComponents } from "./mdxComponents";
 import type { PostEntry } from "./posts";
 import { tagSlug } from "./posts";
 
@@ -8,7 +9,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { frontmatter, excerpt } = post;
+const { frontmatter, Excerpt } = post;
 const date = new Date(frontmatter.date);
 ---
 
@@ -40,11 +41,10 @@ const date = new Date(frontmatter.date);
     </div>
 
     {
-      excerpt && (
-        <div
-          class="zaduma-prose zaduma-excerpt max-w-none text-stone-600 dark:text-stone-400"
-          set:html={excerpt}
-        />
+      Excerpt && (
+        <div class="zaduma-prose zaduma-excerpt max-w-none text-stone-600 dark:text-stone-400">
+          <Excerpt components={mdxComponents} />
+        </div>
       )
     }
 
