@@ -1,7 +1,8 @@
 import type { ReadTimeResults } from "reading-time";
 
 export interface PostFrontmatter {
-  tags: string[];
+  /** Optional list of tags, surfaced on the index page. */
+  tags?: string[];
   /**
    * Optional description for the post, visible in Open Graph cards.
    */

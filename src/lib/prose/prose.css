@@ -28,13 +28,7 @@
     font-weight: 700;
   }
 
-  & hr {
-    border-bottom: 2px solid var(--color-stone-100);
-
-    :global(.dark) & {
-      border-bottom-color: var(--color-stone-800);
-    }
-  }
+  /* hr inherits the ornamental rule from global-styles/skin.css. */
 
   & figcaption {
     @apply px-6;
