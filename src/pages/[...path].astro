@@ -10,6 +10,7 @@ import { Link } from "../lib/Link";
 import { Blockquote } from "../lib/prose/Blockquote";
 import { Code, Pre } from "../lib/prose/code-and-pre";
 import { createHeading } from "../lib/prose/Heading";
+import Hr from "../lib/prose/Hr.astro";
 import Image from "../lib/prose/Image.astro";
 import { Ol } from "../lib/prose/Ol";
 import { Paragraph } from "../lib/prose/Paragraph";
@@ -51,6 +52,7 @@ const mdxComponents = {
   h5: createHeading("h5"),
   h6: createHeading("h6"),
   img: Image,
+  hr: Hr,
   table: Table,
   ul: Ul,
   ol: Ol,
