@@ -30,3 +30,5 @@ playwright-report
 .env
 .env.*
 !.env.example
+
+test/__image_snapshots__
