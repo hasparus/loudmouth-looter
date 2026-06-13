@@ -18,7 +18,7 @@ const { href, class: className } = Astro.props;
   aria-hidden="true"
   tabindex="-1"
   class:list={[
-    "font-text group-hover :text-red-700 flex items-center whitespace-nowrap text-stone-500 italic no-underline transition-colors dark:text-stone-500 dark:group-hover:text-red-400",
+    "font-text flex items-center whitespace-nowrap text-stone-500 italic no-underline transition-colors group-hover:text-red-700 dark:text-stone-500 dark:group-hover:text-red-400",
     className,
   ]}
 >
@@ -87,8 +87,7 @@ const { href, class: className } = Astro.props;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :global(.group):hover .rm-arrow::before,
-    .rm-demo .rm-arrow::before {
+    :global(.group):hover .rm-arrow::before {
       animation: none;
     }
   }
