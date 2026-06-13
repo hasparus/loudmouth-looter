@@ -3,41 +3,45 @@ import { formatDate } from "./formatDate";
 import { mdxComponents } from "./mdxComponents";
 import type { PostEntry } from "./posts";
 import { tagSlug } from "./posts";
+import ReadMore from "./ReadMore.astro";
 
 interface Props {
   post: PostEntry;
 }
 
 const { post } = Astro.props;
-const { frontmatter, Excerpt } = post;
+const { frontmatter, Excerpt, sigil } = post;
 const date = new Date(frontmatter.date);
 ---
 
 <article class="group relative py-8">
-  {
-    /* Background link: the whole card is the click target. Content is
-      pointer-events:none so clicks anywhere (text, the gaps between blocks)
-      fall through to this link; only the real links below re-enable pointer
-      events. */
-  }
   <a
     href={frontmatter.path}
     aria-label={frontmatter.title}
     class="absolute inset-0 z-0 rounded-lg no-underline hover:bg-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400"
   ></a>
+  {
+    sigil && (
+      <span
+        aria-hidden="true"
+        set:html={sigil}
+        class="pointer-events-none absolute top-11 -left-10 z-10 hidden font-serif text-3xl leading-none text-red-800 select-none md:block lg:-left-12 dark:text-red-400 [&_svg]:h-[1.1em] [&_svg]:w-auto"
+      />
+    )
+  }
   <div class="pointer-events-none relative z-10 flex flex-col gap-3">
-    <div class="flex items-baseline justify-between gap-3">
-      <h2
-        class="font-serif font-bold text-stone-800 transition-colors [text-box:trim-end] group-hover:text-stone-950 dark:text-stone-300 dark:group-hover:text-stone-100"
-      >
-        {frontmatter.title}
-      </h2>
+    <div>
       <time
         datetime={date.toISOString()}
         class="shrink-0 text-sm tracking-tighter text-stone-500 tabular-nums dark:text-stone-400"
       >
         {formatDate(date)}
       </time>
+      <h2
+        class="font-serif font-bold text-stone-800 transition-colors [text-box:trim-end] group-hover:text-stone-950 dark:text-stone-300 dark:group-hover:text-stone-100"
+      >
+        {frontmatter.title}
+      </h2>
     </div>
 
     {
@@ -65,66 +69,7 @@ const date = new Date(frontmatter.date);
           </ul>
         ) : null
       }
-      {
-        /* Visible CTA; the background link already provides the action. On
-          card hover it reddens and the arrow cycles through funky arrows in a
-          fixed-width slot, so nothing reflows. */
-      }
-      <a
-        href={frontmatter.path}
-        aria-hidden="true"
-        tabindex="-1"
-        class="font-text ml-auto flex shrink-0 items-center text-base whitespace-nowrap text-stone-500 no-underline transition-colors group-hover:text-red-700 dark:text-stone-500 dark:group-hover:text-red-400"
-      >
-        <span>read more</span>
-        <span class="rm-arrow"></span>
-      </a>
+      <ReadMore href={frontmatter.path} class="ml-auto shrink-0 text-base" />
     </div>
   </div>
-
-  <style>
-    .rm-arrow {
-      display: inline-block;
-      width: 1.5em;
-      text-align: center;
-      text-box: trim-both;
-      gap: 0.5em;
-    }
-
-    .rm-arrow::before {
-      content: "→";
-    }
-
-    .group:hover .rm-arrow::before {
-      animation: rm-arrows 2s steps(1, end) infinite;
-    }
-
-    @keyframes rm-arrows {
-      0% {
-        content: "→";
-      }
-      20% {
-        content: "↝";
-        font-size: 1.5em;
-      }
-      40% {
-        content: "↣";
-        font-size: 1.5em;
-      }
-      60% {
-        content: "➜";
-        font-size: 1em;
-      }
-      80% {
-        content: "⇉";
-        font-size: 1.5em;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .group:hover .rm-arrow::before {
-        animation: none;
-      }
-    }
-  </style>
 </article>

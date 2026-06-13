@@ -4,6 +4,11 @@ export interface PostFrontmatter {
   /** Optional list of tags, surfaced on the index page. */
   tags?: string[];
   /**
+   * Optional mark shown in the card's left margin — emoji, a short string, or
+   * raw `<svg>` markup. Can also be provided as a named MDX export `sigil`.
+   */
+  sigil?: string;
+  /**
    * Optional description for the post, visible in Open Graph cards.
    */
   description?: string;

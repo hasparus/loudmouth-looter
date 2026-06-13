@@ -8,6 +8,8 @@ type ExcerptComponent = (props: { components?: unknown }) => unknown;
 interface PostModule {
   frontmatter: PostFrontmatter;
   Excerpt?: ExcerptComponent | undefined;
+  /** Named MDX export alternative to `frontmatter.sigil`. */
+  sigil?: string;
 }
 
 const postModules = import.meta.glob<PostModule>("../../posts/**/*.mdx", {
@@ -18,6 +20,8 @@ export interface PostEntry {
   frontmatter: PostFrontmatter;
   /** Opening blocks of the post as a component, for listing teasers. */
   Excerpt?: ExcerptComponent | undefined;
+  /** Left-margin mark — from `frontmatter.sigil` or a named `sigil` export. */
+  sigil?: string | undefined;
 }
 
 let cache: PostEntry[] | undefined;
@@ -30,7 +34,11 @@ export function getPosts(): PostEntry[] {
     .filter((m) =>
       isPostVisible(m.frontmatter, { isProd: import.meta.env.PROD }),
     )
-    .map((m) => ({ frontmatter: m.frontmatter, Excerpt: m.Excerpt }));
+    .map((m) => ({
+      frontmatter: m.frontmatter,
+      Excerpt: m.Excerpt,
+      sigil: m.frontmatter.sigil ?? m.sigil,
+    }));
 
   entries.sort(
     (a, b) =>

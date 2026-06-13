@@ -1,32 +1,57 @@
-<div
-  class="pointer-events-none fixed top-1/2 left-12 hidden -translate-y-1/2 flex-col items-center gap-12 text-stone-400 xl:flex dark:text-stone-600"
->
-  <a
-    href="https://dungeon-motion.haspar.us/"
-    class="pointer-events-auto rotate-180 font-serif text-xs tracking-[0.4em] lowercase no-underline opacity-50 transition-opacity [writing-mode:vertical-rl] hover:opacity-100"
-  >
-    dungeon motion
-  </a>
-  <span class="h-32 w-px bg-stone-300 dark:bg-stone-700"></span>
-  <span
-    class="rotate-180 font-serif text-[0.65rem] tracking-[0.4em] lowercase opacity-40 [writing-mode:vertical-rl]"
-  >
-    astra mortemque superare gradatim
-  </span>
-</div>
-<div
-  class="pointer-events-none fixed top-1/2 right-12 hidden -translate-y-1/2 flex-col items-center gap-12 text-stone-400 xl:flex dark:text-stone-600"
->
-  <span
-    class="font-serif text-[0.65rem] tracking-[0.4em] lowercase opacity-40 [writing-mode:vertical-rl]"
-  >
-    incipit liber
-  </span>
-  <span class="h-32 w-px bg-stone-300 dark:bg-stone-700"></span>
-  <a
-    href="https://lol.haspar.us/editor"
-    class="pointer-events-auto font-serif text-xs tracking-[0.4em] lowercase no-underline opacity-50 transition-opacity [writing-mode:vertical-rl] hover:opacity-100"
-  >
-    kajet
-  </a>
-</div>
+---
+interface MarginaliaItem {
+  label: string;
+  href?: string;
+}
+
+const rails: Record<"left" | "right", MarginaliaItem[]> = {
+  left: [
+    { label: "dungeon motion", href: "https://dungeon-motion.haspar.us/" },
+    { label: "astra mortemque superare gradatim" },
+  ],
+  right: [
+    { label: "incipit liber" },
+    { label: "kajet", href: "/editor" },
+    { label: "zaduma", href: "https://zaduma.haspar.us/" },
+  ],
+};
+
+const sides = ["left", "right"] as const;
+---
+
+{ 
+  sides.map((side) => (
+    <div
+      class:list={[
+        "pointer-events-none fixed top-1/2 hidden -translate-y-1/2 flex-col items-center gap-12 text-stone-400 xl:flex dark:text-stone-600",
+        side === "left" ? "left-12" : "right-12",
+      ]}
+    >
+      {rails[side].map((item, i) => (
+        <Fragment>
+          {i > 0 && <span class="h-32 w-px bg-stone-300 dark:bg-stone-700" />}
+          {item.href ? (
+            <a
+              href={item.href}
+              class:list={[
+                "pointer-events-auto font-serif text-xs tracking-[0.4em] lowercase no-underline opacity-50 transition-opacity [writing-mode:vertical-rl] hover:opacity-100",
+                side === "left" && "rotate-180",
+              ]}
+            >
+              {item.label}
+            </a>
+          ) : (
+            <span
+              class:list={[
+                "font-serif text-[0.65rem] tracking-[0.4em] lowercase opacity-40 [writing-mode:vertical-rl]",
+                side === "left" && "rotate-180",
+              ]}
+            >
+              {item.label}
+            </span>
+          )}
+        </Fragment>
+      ))}
+    </div>
+  ))
+}
