@@ -27,6 +27,7 @@ export const FONT_OPTIONS: FontOption[] = [
     label: "Director",
     stack: '"Director Variable", Georgia, serif',
   },
+  { id: "equateur", label: "Équateur", stack: '"Equateur", Georgia, serif' },
 ];
 
 const DEFAULT_STACK = FONT_OPTIONS[0]!.stack;

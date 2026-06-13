@@ -52,6 +52,13 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: "Equateur";
+  src: url("/fonts/Equateur-Regular.woff2") format("woff2");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* Crimson Text — @fontsource/crimson-text, latin subsets. */
 @font-face {
