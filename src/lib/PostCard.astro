@@ -74,7 +74,7 @@ const date = new Date(frontmatter.date);
         href={frontmatter.path}
         aria-hidden="true"
         tabindex="-1"
-        class="font-text ml-auto shrink-0 text-base whitespace-nowrap text-stone-500 italic no-underline transition-colors group-hover:text-red-700 dark:text-stone-500 dark:group-hover:text-red-400"
+        class="font-text ml-auto flex shrink-0 items-center text-base whitespace-nowrap text-stone-500 italic no-underline transition-colors group-hover:text-red-700 dark:text-stone-500 dark:group-hover:text-red-400"
       >
         <span>read more</span>
         <span class="rm-arrow translate-y-0.5"></span>
@@ -101,38 +101,52 @@ const date = new Date(frontmatter.date);
       content: "→";
       display: block;
       font-size: 1.12em;
+      transform: translateY(0.044em);
     }
 
     .group:hover .rm-arrow::before {
-      animation: rm-arrows 2.2s steps(1, end) infinite;
+      animation: rm-arrows 2.8s steps(1, end) infinite;
     }
 
+    /* font-size normalises each glyph's ink height; translateY aligns ink
+       centres (both measured per glyph) so the arrow neither grows nor drifts
+       as it cycles. */
     @keyframes rm-arrows {
       0%,
       100% {
         content: "→";
         font-size: 1.12em;
-        transform: translateY(-0.04em);
+        transform: translateY(0.044em);
       }
-      20% {
+      14.3% {
         content: "⇢";
         font-size: 1.12em;
-        transform: translateY(-0.04em);
+        transform: translateY(0.044em);
       }
-      40% {
-        content: "➞";
-        font-size: 1.07em;
-        transform: translateY(-0.02em);
-      }
-      60% {
+      28.6% {
         content: "⇒";
         font-size: 0.99em;
-        transform: translateY(0);
+        transform: translateY(-0.084em);
       }
-      80% {
+      42.9% {
         content: "⇉";
-        font-size: 1.17em;
-        transform: translateY(-0.02em);
+        font-size: 1.15em;
+        transform: translateY(-0.03em);
+      }
+      57.1% {
+        content: "↣";
+        font-size: 1.46em;
+        transform: translateY(0.03em);
+      }
+      71.4% {
+        content: "⇝";
+        font-size: 1.46em;
+        transform: translateY(0.03em);
+      }
+      85.7% {
+        content: "➞";
+        font-size: 1.07em;
+        transform: translateY(0.013em);
       }
     }
 
