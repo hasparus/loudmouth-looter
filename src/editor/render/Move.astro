@@ -2,8 +2,10 @@
 // Render-side counterpart to the editor's <Move> card. The moveCardPlugin
 // (build-time) lifts the wrapped heading into `title` / `id`, so here the title
 // is the card's heading and the id its anchor; the rest of the move is slotted.
-// Shares editor-atoms.css's .te-move so published cards match the editor.
+// Renders dungeon-motion's MoveCard verbatim so published cards match the main
+// compendium. A no-heading Move (no title) falls back to a bare .te-move block.
 import "../editor-atoms.css";
+import { MoveCard } from "../move-card";
 
 interface Props {
   title?: string;
@@ -13,7 +15,14 @@ interface Props {
 const { title, id } = Astro.props;
 ---
 
-<article class="te-move" id={id}>
-  {title && <h3>{title}</h3>}
-  <slot />
-</article>
+{
+  title ? (
+    <MoveCard title={title} id={id}>
+      <slot />
+    </MoveCard>
+  ) : (
+    <article class="te-move">
+      <slot />
+    </article>
+  )
+}

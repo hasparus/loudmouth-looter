@@ -113,27 +113,41 @@
   color: var(--color-stone-400, #a8a29e);
 }
 
-/* Move card: groups a move's heading + rules in a bordered block. The first
-   heading reads as the card's title (the render side lifts it to MoveCard's
-   title/id; here it's styled in place to keep the editor source-faithful). */
+/* Move card: a move's heading + rules. Mirrors dungeon-motion's MoveCard
+   (the render side, render/Move.astro, uses that React component verbatim) so
+   the live editor surface matches the published card: borderless, a bold
+   tracking-wide title preceded by a square checkbox marker. The first heading
+   reads as the card's title; here it's styled in place to stay source-faithful. */
 .te-move {
-  border: 1px solid var(--color-stone-300, #d6d3d1);
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.9rem 0.7rem;
-  margin: 1rem 0;
+  padding: 1rem 0;
+  margin: 0;
   break-inside: avoid;
 }
 .te-move > :first-child {
   margin-top: 0;
-  font-size: 1.15em;
-  font-weight: 600; /* only 400/600 Crimson faces ship */
-  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 1.25em;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  color: var(--color-stone-800, #292524);
+}
+/* Decorative square checkbox in front of the title — the editor's heading is
+   contentEditable text, so the box is a marker rather than a live input. */
+.te-move > :first-child::before {
+  content: "";
+  flex-shrink: 0;
+  width: 0.7em;
+  height: 0.7em;
+  border: 0.13em solid currentColor;
+  border-radius: 0.1em;
 }
 .te-move > :last-child {
   margin-bottom: 0;
 }
-.dark .te-move {
-  border-color: var(--color-stone-700, #44403c);
+.dark .te-move > :first-child {
+  color: var(--color-stone-100, #f5f5f4);
 }
 
 /* Task-list item: one clickable box followed by editable text. */
