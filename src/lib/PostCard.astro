@@ -14,12 +14,6 @@ const date = new Date(frontmatter.date);
 ---
 
 <article class="group relative py-8">
-  {
-    /* Background link: the whole card is the click target. Content is
-      pointer-events:none so clicks anywhere (text, the gaps between blocks)
-      fall through to this link; only the real links below re-enable pointer
-      events. */
-  }
   <a
     href={frontmatter.path}
     aria-label={frontmatter.title}
