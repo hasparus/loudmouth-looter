@@ -278,39 +278,6 @@
     cursor: pointer;
   }
 
-  /* Ornamental rule — a hairline broken by a centred floral heart, masked over
-     the page background. Used both between index entries and for `---` in
-     prose (.zaduma-prose hr inherits this). */
-  hr {
-    border: 0;
-    height: 1px;
-    margin: 2.5rem 0;
-    background: var(--color-stone-200);
-    position: relative;
-    overflow: visible;
-  }
-
-  hr::after {
-    content: "❦";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 0 0.75rem;
-    background: var(--grain-bg);
-    color: var(--color-stone-400);
-    font-size: 1rem;
-    line-height: 1;
-  }
-
-  html.dark hr {
-    background: var(--color-stone-800);
-  }
-
-  html.dark hr::after {
-    color: var(--color-stone-500);
-  }
-
   /* Faint dot-grid texture over the grain background. */
   body::before {
     content: "";
