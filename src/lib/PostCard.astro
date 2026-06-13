@@ -1,0 +1,130 @@
+---
+import { formatDate } from "./formatDate";
+import type { PostEntry } from "./posts";
+import { tagSlug } from "./posts";
+
+interface Props {
+  post: PostEntry;
+}
+
+const { post } = Astro.props;
+const { frontmatter, excerpt } = post;
+const date = new Date(frontmatter.date);
+---
+
+<article class="group relative py-8">
+  {
+    /* Background link: the whole card is the click target. Content is
+      pointer-events:none so clicks anywhere (text, the gaps between blocks)
+      fall through to this link; only the real links below re-enable pointer
+      events. */
+  }
+  <a
+    href={frontmatter.path}
+    aria-label={frontmatter.title}
+    class="absolute inset-0 z-0 rounded-lg no-underline hover:bg-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400"
+  ></a>
+  <div class="pointer-events-none relative z-10 flex flex-col gap-3">
+    <div class="flex items-baseline justify-between gap-3">
+      <h2
+        class="font-serif font-bold text-stone-800 transition-colors [text-box:trim-end] group-hover:text-stone-950 dark:text-stone-300 dark:group-hover:text-stone-100"
+      >
+        {frontmatter.title}
+      </h2>
+      <time
+        datetime={date.toISOString()}
+        class="shrink-0 text-sm tracking-tighter text-stone-500 tabular-nums dark:text-stone-400"
+      >
+        {formatDate(date)}
+      </time>
+    </div>
+
+    {
+      excerpt && (
+        <div
+          class="zaduma-prose zaduma-excerpt max-w-none text-stone-600 dark:text-stone-400"
+          set:html={excerpt}
+        />
+      )
+    }
+
+    <div class="mt-1 flex items-center gap-4">
+      {
+        frontmatter.tags?.length ? (
+          <ul class="flex flex-wrap gap-x-4 gap-y-1">
+            {frontmatter.tags.map((tag) => (
+              <li>
+                <a
+                  href={`/tags/${tagSlug(tag)}`}
+                  class="font-text pointer-events-auto text-sm tracking-wide text-stone-600 lowercase italic no-underline hover:text-stone-900 dark:text-stone-500 dark:hover:text-stone-200"
+                >
+                  § {tag}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : null
+      }
+      {
+        /* Visible CTA; the background link already provides the action. On
+          card hover it reddens and the arrow cycles through funky arrows in a
+          fixed-width slot, so nothing reflows. */
+      }
+      <a
+        href={frontmatter.path}
+        aria-hidden="true"
+        tabindex="-1"
+        class="font-text ml-auto flex shrink-0 items-center self-end text-base whitespace-nowrap text-stone-500 no-underline transition-colors group-hover:text-red-700 dark:text-stone-500 dark:group-hover:text-red-400"
+      >
+        <span>read more</span>
+        <span class="rm-arrow"></span>
+      </a>
+    </div>
+  </div>
+
+  <style>
+    .rm-arrow {
+      display: inline-block;
+      width: 1.5em;
+      text-align: center;
+      text-box: trim-both;
+      gap: 0.5em;
+    }
+
+    .rm-arrow::before {
+      content: "→";
+    }
+
+    .group:hover .rm-arrow::before {
+      animation: rm-arrows 2s steps(1, end) infinite;
+    }
+
+    @keyframes rm-arrows {
+      0% {
+        content: "→";
+      }
+      20% {
+        content: "↝";
+        font-size: 1.5em;
+      }
+      40% {
+        content: "↣";
+        font-size: 1.5em;
+      }
+      60% {
+        content: "➜";
+        font-size: 1em;
+      }
+      80% {
+        content: "⇉";
+        font-size: 1.5em;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .group:hover .rm-arrow::before {
+        animation: none;
+      }
+    }
+  </style>
+</article>
