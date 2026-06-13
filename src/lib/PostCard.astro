@@ -2,6 +2,7 @@
 import { formatDate } from "./formatDate";
 import type { PostEntry } from "./posts";
 import { tagSlug } from "./posts";
+import ReadMore from "./ReadMore.astro";
 
 interface Props {
   post: PostEntry;
@@ -65,96 +66,7 @@ const date = new Date(frontmatter.date);
           </ul>
         ) : null
       }
-      {
-        /* Visible CTA; the background link already provides the action. On
-          card hover it reddens and the arrow cycles through funky arrows in a
-          fixed-width slot, so nothing reflows. */
-      }
-      <a
-        href={frontmatter.path}
-        aria-hidden="true"
-        tabindex="-1"
-        class="font-text ml-auto flex shrink-0 items-center text-base whitespace-nowrap text-stone-500 italic no-underline transition-colors group-hover:text-red-700 dark:text-stone-500 dark:group-hover:text-red-400"
-      >
-        <span>read more</span>
-        <span class="rm-arrow translate-y-0.5"></span>
-      </a>
+      <ReadMore href={frontmatter.path} class="ml-auto shrink-0 text-base" />
     </div>
   </div>
-
-  <style>
-    /* Fixed-width slot keeps the row from reflowing as the glyph swaps. The
-       arrow stays put; only the glyph cycles on hover. */
-    .rm-arrow {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 1.4em;
-      margin-left: 0.15em;
-      line-height: 1;
-    }
-
-    /* Per-glyph font-size + translate optically centre each arrow. The
-       translate vectors are measured: a script renders each glyph in this slot,
-       finds its ink centroid, and shifts it to the slot centre (x) and the
-       "read more" optical middle (y). See /arrows. */
-    .rm-arrow::before {
-      content: "→";
-      display: block;
-      font-size: 1.01em;
-      transform: translate(-0.155em, -0.056em);
-    }
-
-    .group:hover .rm-arrow::before {
-      animation: rm-arrows 2.8s steps(1, end) infinite;
-    }
-
-    @keyframes rm-arrows {
-      0%,
-      100% {
-        content: "→";
-        font-size: 1.01em;
-        transform: translate(-0.155em, -0.056em);
-      }
-      14.3% {
-        content: "⇢";
-        font-size: 1.12em;
-        transform: translate(-0.195em, -0.016em);
-      }
-      28.6% {
-        content: "⇒";
-        font-size: 1.02em;
-        transform: translate(-0.09em, -0.09em);
-      }
-      42.9% {
-        content: "⇢";
-        font-size: 1.12em;
-        transform: translate(-0.195em, -0.016em);
-        /* content: "⇉";
-        font-size: 1.15em;
-        transform: translate(-0.034em, -0.092em); */
-      }
-      57.1% {
-        content: "↣";
-        font-size: 1.57em;
-        transform: translate(-0.01em, -0.08em);
-      }
-      71.4% {
-        content: "⇝";
-        font-size: 1.46em;
-        transform: translate(-0.027em, -0.11em);
-      }
-      85.7% {
-        content: "➞";
-        font-size: 1.05em;
-        transform: translate(-0.123em, -0.06em);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .group:hover .rm-arrow::before {
-        animation: none;
-      }
-    }
-  </style>
 </article>
