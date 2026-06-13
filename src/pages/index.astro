@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { formatDate } from "../lib/formatDate";
+import { getPostExcerpt } from "../lib/getPostExcerpt";
 import { isPostVisible } from "../lib/isPostVisible";
 import { Link } from "../lib/Link";
 import { Paragraph } from "../lib/prose/Paragraph";
@@ -11,16 +12,28 @@ const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
   "../../posts/**/*.mdx",
   { eager: true },
 );
-const posts = Object.values(postModules).filter((post) =>
-  isPostVisible(post.frontmatter, { isProd: import.meta.env.PROD }),
-);
-
-posts.sort((a, b) => {
-  return (
-    new Date(b.frontmatter.date).getTime() -
-    new Date(a.frontmatter.date).getTime()
-  );
+const rawModules = import.meta.glob<string>("../../posts/**/*.mdx", {
+  query: "?raw",
+  import: "default",
+  eager: true,
 });
+
+const posts = Object.entries(postModules)
+  .filter(([, post]) =>
+    isPostVisible(post.frontmatter, { isProd: import.meta.env.PROD }),
+  )
+  .map(([key, { frontmatter }]) => {
+    const excerpt = getPostExcerpt(rawModules[key] ?? "", { paragraphs: 2 });
+    if (!excerpt.length && frontmatter.description) {
+      excerpt.push(frontmatter.description);
+    }
+    return { frontmatter, excerpt };
+  })
+  .sort(
+    (a, b) =>
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime(),
+  );
 ---
 
 <BaseLayout title={SITE_NAME} description={SITE_BLURB}>
@@ -30,49 +43,93 @@ posts.sort((a, b) => {
   >
     {SITE_NAME}
   </h1>
+
+  {/* Semi-hidden marginalia: links to sibling apps + two Latin mottos. */}
+  <div
+    class="pointer-events-none fixed top-1/2 left-2 hidden -translate-y-1/2 flex-col items-center gap-12 text-stone-400 xl:flex dark:text-stone-600"
+    aria-hidden="false"
+  >
+    <a
+      href="https://dungeon-motion.haspar.us/"
+      class="pointer-events-auto rotate-180 font-serif text-xs tracking-[0.4em] uppercase no-underline opacity-50 transition-opacity [writing-mode:vertical-rl] hover:opacity-100"
+    >
+      dungeon motion
+    </a>
+    <span class="h-32 w-px bg-stone-300 dark:bg-stone-700"></span>
+    <span
+      class="rotate-180 text-[0.65rem] tracking-[0.4em] uppercase opacity-40 [writing-mode:vertical-rl]"
+    >
+      astra mortemque superare gradatim
+    </span>
+  </div>
+  <div
+    class="pointer-events-none fixed top-1/2 right-2 hidden -translate-y-1/2 flex-col items-center gap-12 text-stone-400 xl:flex dark:text-stone-600"
+  >
+    <span
+      class="text-[0.65rem] tracking-[0.4em] uppercase opacity-40 [writing-mode:vertical-rl]"
+    >
+      incipit liber
+    </span>
+    <span class="h-32 w-px bg-stone-300 dark:bg-stone-700"></span>
+    <a
+      href="https://lol.haspar.us/editor"
+      class="pointer-events-auto font-serif text-xs tracking-[0.4em] uppercase no-underline opacity-50 transition-opacity [writing-mode:vertical-rl] hover:opacity-100"
+    >
+      kajet
+    </a>
+  </div>
+
   <main class="zaduma-prose py-10">
     <Paragraph>
       Posts drafted in the <Link href="/editor">editor</Link> — built on{" "}
       <Link href="https://github.com/hasparus/zaduma">zaduma</Link>.
     </Paragraph>
   </main>
+
   <ul>
     {
-      posts.map(({ frontmatter }) => {
+      posts.map(({ frontmatter, excerpt }, i) => {
         const date = new Date(frontmatter.date);
 
         return (
           <li>
-            <Link
-              href={frontmatter.path}
-              class="flex flex-row justify-between gap-2"
-              noUnderline
-            >
-              <h2 class="font-serif font-bold text-stone-800 dark:text-stone-300">
-                {frontmatter.title}
-              </h2>
-              <time
-                datetime={date.toISOString()}
-                class="shrink-0 tracking-tighter text-stone-600 tabular-nums dark:text-stone-400"
-              >
-                {formatDate(date)}
-              </time>
-            </Link>
+            {i > 0 && <hr />}
+            <article class="group relative py-8">
+              {/* Background link: the whole card is the click target. */}
+              <a
+                href={frontmatter.path}
+                aria-label={frontmatter.title}
+                class="absolute inset-0 z-0 rounded-lg no-underline hover:bg-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400"
+              />
+              <div class="pointer-events-none relative z-10 flex flex-col gap-3">
+                <div class="flex items-baseline justify-between gap-3">
+                  <h2 class="font-serif font-bold text-stone-800 underline-offset-4 transition-colors group-hover:text-stone-950 group-hover:underline group-hover:decoration-stone-400 dark:text-stone-300 dark:group-hover:text-stone-100">
+                    {frontmatter.title}
+                  </h2>
+                  <time
+                    datetime={date.toISOString()}
+                    class="shrink-0 text-sm tracking-tighter text-stone-500 tabular-nums dark:text-stone-400"
+                  >
+                    {formatDate(date)}
+                  </time>
+                </div>
+
+                {excerpt}
+
+                {frontmatter.tags?.length ? (
+                  <ul class="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                    {frontmatter.tags.map((tag) => (
+                      <li class="font-text text-sm tracking-wide text-stone-600 lowercase italic dark:text-stone-500">
+                        § {tag}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            </article>
           </li>
         );
       })
     }
   </ul>
-  <style>
-    @reference "../global-styles/base.css";
-
-    ul:hover li:not(:hover) :where(h2, time) {
-      color: var(--color-stone-600);
-      transition: color 150ms;
-
-      :global(.dark) & {
-        color: var(--color-stone-500);
-      }
-    }
-  </style>
 </BaseLayout>
