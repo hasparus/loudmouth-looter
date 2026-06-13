@@ -170,6 +170,59 @@
     color: var(--color-stone-500);
   }
 
+  /* Prose bullet lists carry the diamond sigil; task lists (remark-gfm adds
+     .contains-task-list) show only the checkbox. Global + content-based so it
+     never depends on a CSS-module hash landing on the same element. */
+  .zaduma-prose ul:not(.contains-task-list) > li::before {
+    content: "◈";
+    color: var(--color-stone-400);
+    margin-right: 0.5rem;
+    position: relative;
+    top: -0.03em;
+  }
+
+  html.dark .zaduma-prose ul:not(.contains-task-list) > li::before {
+    color: var(--color-stone-500);
+  }
+
+  /* One checkbox for the whole site — GFM task lists, the Move card, anywhere.
+     Ported from dungeon-motion's index.css: currentColor border + clip-path
+     tick, so it tracks the text color in both themes with no dark variant.
+     Bare checkboxes get a default size; sized instances (Tailwind size-*)
+     override width/height. */
+  input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 0.92em;
+    height: 0.92em;
+    flex-shrink: 0;
+    margin: 0 0.45em 0 0;
+    padding: 0;
+    font: inherit;
+    color: currentColor;
+    border: 0.15em solid currentColor;
+    border-radius: 0.1em;
+    background-color: transparent;
+    display: inline-grid;
+    place-content: center;
+    vertical-align: -0.1em;
+    cursor: pointer;
+  }
+
+  input[type="checkbox"]::before {
+    content: "";
+    width: 0.62em;
+    height: 0.62em;
+    transform: scale(0);
+    transform-origin: center;
+    box-shadow: inset 1em 1em currentColor;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  }
+
+  input[type="checkbox"]:checked::before {
+    transform: scale(1);
+  }
+
   a {
     text-decoration: underline solid var(--color-stone-400) 1px;
     text-underline-offset: 4px;

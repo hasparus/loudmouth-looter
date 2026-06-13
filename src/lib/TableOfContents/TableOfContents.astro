@@ -20,7 +20,7 @@ const tocShown = headings.length > 2;
       <PostProgressBar client:media="(min-width: 1280px)">
         <ul
           id="table-of-contents"
-          class="text-sm leading-6 text-gray-700 dark:text-gray-400"
+          class="text-sm leading-6 text-stone-700 dark:text-stone-400"
         >
           {headings.map(({ text, depth, slug }) => {
             if (depth < 2 || depth > 3) return null;
@@ -57,15 +57,15 @@ JSX conditional expression. */
 
   #table-of-contents:hover {
     & a:not(:hover) {
-      @apply text-gray-600 transition-colors;
+      @apply text-stone-600 transition-colors;
       :global(.dark) & {
-        @apply text-gray-500;
+        @apply text-stone-500;
       }
     }
 
     & a:hover {
       :global(.dark) & {
-        @apply text-gray-300;
+        @apply text-stone-300;
       }
     }
   }

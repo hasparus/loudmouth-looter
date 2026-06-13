@@ -1,60 +1,15 @@
 @reference "../../global-styles/base.css";
 
+/* Structure only. The diamond bullet, task-list handling, and checkbox style
+   are global (src/global-styles/skin.css) so they can't break on a CSS-module
+   hash failing to land beside remark-gfm's .contains-task-list class. */
 .Ul {
-  /* Diamond bullets — match the editor's ul.diamond style from skin.css */
   list-style: none;
   padding-left: 0;
   margin-top: -0.5em;
 
   /* nested lists are the worse */
   text-indent: 0;
-
-  & > li::before {
-    content: "◈";
-    color: var(--color-stone-400);
-    margin-right: 0.5rem;
-    position: relative;
-    top: -0.03em;
-
-    :global(.dark) & {
-      color: var(--color-stone-500);
-    }
-  }
-
-  &.contains-task-list {
-    & > li::before {
-      /* task items use a checkbox — hide the diamond */
-      display: none;
-    }
-
-    & > li > input[type="checkbox"] {
-      /* Style like .te-toggle[data-shape=square] from editor-atoms.css */
-      appearance: none;
-      position: relative;
-      display: inline-block;
-      box-sizing: border-box;
-      width: 0.92em;
-      height: 0.92em;
-      flex-shrink: 0;
-      margin: 0 0.5em 0 0;
-      padding: 0;
-      font: inherit;
-      color: inherit;
-      border: 0.15em solid currentColor;
-      border-radius: 0.1em;
-      background: transparent;
-      vertical-align: -0.08em;
-      cursor: default;
-    }
-
-    & > li > input[type="checkbox"]:checked::before {
-      content: "";
-      position: absolute;
-      inset: 0.04em;
-      background-color: currentColor;
-      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-    }
-  }
 
   ul &,
   ol & {
