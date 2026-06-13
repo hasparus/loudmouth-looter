@@ -1,7 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { Link } from "../lib/Link";
-import Marginalia from "../lib/Marginalia.astro";
 import PostCard from "../lib/PostCard.astro";
 import { getPosts } from "../lib/posts";
 import { Paragraph } from "../lib/prose/Paragraph";
@@ -17,8 +16,6 @@ const posts = await getPosts();
   >
     {SITE_NAME}
   </h1>
-
-  <Marginalia />
 
   <main class="zaduma-prose py-10">
     <Paragraph>
