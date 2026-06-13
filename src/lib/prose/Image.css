@@ -6,19 +6,11 @@
 */
 .zaduma-image-box.zaduma-image-box {
   @apply inline-block rounded-sm;
-  max-width: unset;
-  transform: translateX(min(calc(-50% * var(--wide-breakout)), 0px));
-
-  @media (max-width: 774px) {
-    margin: 0 -1rem;
-  }
+  max-width: 100%;
 
   & img {
-    max-width: var(--wide-content-width);
-  }
-
-  & .zaduma-image-box {
-    transform: unset;
+    max-width: 100%;
+    height: auto;
   }
 
   &:is(a) {

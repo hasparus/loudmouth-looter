@@ -2,17 +2,11 @@
 
 :root {
   --container-width: 43rem;
-  --wide-content-width: min(var(--container-width), 100vw);
-}
-
-@media (min-width: 774px) {
-  :root {
-    --wide-breakout: 0.2;
-    --wide-content-width: min(
-      100vw,
-      calc(var(--container-width) * (1 + var(--wide-breakout)))
-    );
-  }
+  /* Images used to break out ~20% wider than the text; that math stopped
+     scaling once the prose font grew and overflowed the viewport. Images now
+     share the reading measure (see Image.css), so this is just an alias kept
+     so the ToC width math and Paragraph max-width stay valid. */
+  --wide-content-width: var(--container-width);
 }
 
 .zaduma-prose {
@@ -53,51 +47,54 @@
   }
 }
 
-/* Introduced in src/build-time/asidesPlugin.ts */
-.zaduma-aside {
-  --aside-width: 20em;
-  --gap: 1rem;
-  --divider-width: 1px;
+/* Post body grid (PostLayout adds .zaduma-prose-grid to the post <main> only —
+   the homepage keeps plain .zaduma-prose flow). The reading column keeps the
+   site's centered measure; on wide viewports a right margin column opens up and
+   <aside> elements flow into it, auto-aligned to the paragraph they follow.
+   CSS grid auto-placement does what the old asidesPlugin did by AST traversal:
+   a col-1 paragraph and the <aside> authored right after it land in the same
+   grid row. Images and other blocks stay in the reading column. */
+.zaduma-prose-grid {
+  --aside-w: 15rem;
+  --col-gap: 1.5rem;
 
-  display: flex;
-  flex-wrap: wrap;
-  width: calc(100% + var(--aside-width) + var(--gap) + var(--divider-width));
-  max-width: 100vw;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: var(--col-gap);
+  row-gap: var(--block-mb);
+  max-width: none;
 
-  & > :first-child {
-    @apply max-w-container w-full flex-shrink-0 flex-grow;
+  /* row-gap owns the vertical rhythm in grid mode; drop the flow margins so
+     blocks aren't double-spaced. */
+  & > :not(:last-child) {
+    margin-bottom: 0;
+  }
+
+  & > * {
+    grid-column: 1;
+    /* grid items default to min-width:auto, which lets wide <pre>/<table>
+       blow out the track — pin to 0 so they shrink to the column instead. */
+    min-width: 0;
   }
 
   & > aside {
-    @apply relative h-min flex-shrink-0 flex-grow text-sm;
-    width: var(--aside-width);
-    padding-left: var(--gap);
+    /* Last column: the single column when stacked (< xl), the margin column at
+       xl. -2 / -1 resolves correctly in both track counts. */
+    grid-column: -2 / -1;
+    @apply h-min text-sm;
+    padding-left: var(--col-gap);
+    border-left: 1px solid var(--color-stone-200);
 
-    &::before {
-      content: "";
-      @apply absolute -left-px h-full border-l;
-      border-color: var(--color-stone-200);
-
-      :global(.dark) & {
-        border-color: var(--color-stone-700);
-      }
+    :global(.dark) & {
+      border-left-color: var(--color-stone-700);
     }
   }
 
-  @media (max-width: 1280px) {
-    & {
-      width: 100%;
-    }
-
-    & > aside {
-      margin-top: var(--block-mb);
-
-      &::before {
-        /* The left border of `aside` will always be positioned inside of the
-           prose container. */
-        @apply left-0;
-      }
-    }
+  /* Matches the old asides breakpoint: below xl asides stack full-width; at xl
+     the grid widens past the centered wrapper into the right margin. */
+  @media (min-width: 1280px) {
+    grid-template-columns: minmax(0, 1fr) var(--aside-w);
+    width: calc(100% + var(--aside-w) + var(--col-gap));
   }
 }
 

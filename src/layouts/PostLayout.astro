@@ -45,7 +45,7 @@ const postSchema = blogPostingSchema({
   description={description}
 >
   <JsonLd data={postSchema} slot="head" />
-  <main class="zaduma-prose py-4">
+  <main class="zaduma-prose zaduma-prose-grid py-4">
     <header
       class="flex flex-col items-start justify-between sm:flex-row sm:items-center"
     >
@@ -75,10 +75,4 @@ const postSchema = blogPostingSchema({
     <slot />
   </main>
   <TableOfContents headings={headings} />
-  <style is:global>
-    /* make the spacing even when there's no callout nor image */
-    .zaduma-prose > header + :is(p, .zaduma-aside) {
-      margin-top: 2em;
-    }
-  </style>
 </BaseLayout>
