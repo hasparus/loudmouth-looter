@@ -47,6 +47,11 @@ export interface PostFrontmatter {
    * }
    */
   readingTime: ReadTimeResults;
+  /** Tune the listing teaser. */
+  excerpt?: {
+    /** Number of leading blocks shown. Defaults to 2. */
+    blocks?: number;
+  };
   /** Hidden in PROD, visible in dev. */
   draft?: boolean;
   /** Never rendered, including in dev. */

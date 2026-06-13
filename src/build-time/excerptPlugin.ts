@@ -9,22 +9,25 @@ import type {
   VariableDeclaration,
 } from "estree";
 import type { Plugin } from "unified";
+import type { VFile } from "vfile";
 
-/** Number of leading content blocks shown as a listing teaser. */
-const EXCERPT_BLOCKS = 2;
+import type { PostFrontmatter } from "../types";
+
+/** Number of leading blocks shown when a post doesn't set `excerpt.blocks`. */
+const DEFAULT_EXCERPT_BLOCKS = 2;
 
 /** Blocks that end the lede: a heading, a thematic break, or a code fence. */
 const LEDE_ENDERS = new Set(["h1", "h2", "h3", "h4", "h5", "h6", "hr", "pre"]);
-
-/** Blocks that count toward the excerpt budget. */
-const CONTENT_BLOCKS = new Set(["p", "blockquote", "ul", "ol", "table"]);
 
 type ChildNode = Expression | SpreadElement | null;
 
 /**
  * Adds `export function Excerpt(props)` to every compiled MDX module — the
- * first {@link EXCERPT_BLOCKS} content blocks of the post, ready to render on
- * the index and tag listings.
+ * post's first blocks, ready to render on the index and tag listings. A post
+ * can set `excerpt: { blocks }` in frontmatter to widen or narrow the teaser;
+ * it defaults to {@link DEFAULT_EXCERPT_BLOCKS}. Every block type is kept —
+ * paragraphs, lists, blockquotes, images, and editor atoms (Track/Line/Move)
+ * alike; nothing is filtered out.
  *
  * It runs at the recma (estree) stage, after MDX has rewritten `<p>` to
  * `<_components.p>` and lowered JSX to `_jsx(...)` calls, so the excerpt reuses
@@ -41,7 +44,9 @@ type ChildNode = Expression | SpreadElement | null;
  * heading, thematic break or code fence.
  */
 export const recmaMdxExcerpt: Plugin<[], Program> = () => {
-  return (tree: Program) => {
+  return (tree: Program, file: VFile) => {
+    const blocks = excerptBlocks(file);
+
     const createMdxContent = tree.body.find(
       (node): node is FunctionDeclaration =>
         node.type === "FunctionDeclaration" &&
@@ -57,7 +62,7 @@ export const recmaMdxExcerpt: Plugin<[], Program> = () => {
     const root = returnStatement?.argument;
     if (!root || root.type !== "CallExpression") return;
 
-    const excerptReturn = buildExcerptReturn(root);
+    const excerptReturn = buildExcerptReturn(root, blocks);
     if (!excerptReturn) return;
 
     // Reuse `const _components = { …, ...props.components }` verbatim so the
@@ -91,12 +96,24 @@ export const recmaMdxExcerpt: Plugin<[], Program> = () => {
   };
 };
 
+/** Per-post teaser size from `excerpt.blocks` frontmatter, or the default. */
+function excerptBlocks(file: VFile): number {
+  const data = file.data as { astro?: { frontmatter?: PostFrontmatter } };
+  const blocks = data.astro?.frontmatter?.excerpt?.blocks;
+  return typeof blocks === "number" && Number.isInteger(blocks) && blocks > 0
+    ? blocks
+    : DEFAULT_EXCERPT_BLOCKS;
+}
+
 /**
  * From `_createMdxContent`'s return (`_jsxs(_Fragment, {children})` or a single
  * block call), produce the lede as a cloned call expression — or null if the
  * post opens with no content before a heading.
  */
-function buildExcerptReturn(root: CallExpression): CallExpression | null {
+function buildExcerptReturn(
+  root: CallExpression,
+  blocks: number,
+): CallExpression | null {
   const typeArg = root.arguments[0];
   const isFragment =
     typeArg?.type === "Identifier" && typeArg.name === "_Fragment";
@@ -104,15 +121,14 @@ function buildExcerptReturn(root: CallExpression): CallExpression | null {
   if (!isFragment) {
     // Single top-level block: keep it unless it's a lede-ender.
     const name = blockName(root);
-    if (!name || LEDE_ENDERS.has(name) || !CONTENT_BLOCKS.has(name))
-      return null;
+    if (!name || LEDE_ENDERS.has(name)) return null;
     return clone(root);
   }
 
   const childrenProp = findChildren(root.arguments[1]);
   if (childrenProp?.type !== "ArrayExpression") return null;
 
-  const picked = pickLede(childrenProp.elements);
+  const picked = pickLede(childrenProp.elements, blocks);
   if (!picked.length) return null;
 
   const cloned = clone(root);
@@ -123,10 +139,10 @@ function buildExcerptReturn(root: CallExpression): CallExpression | null {
   return cloned;
 }
 
-function pickLede(children: ChildNode[]): CallExpression[] {
+function pickLede(children: ChildNode[], blocks: number): CallExpression[] {
   const picked: CallExpression[] = [];
   for (const child of children) {
-    if (picked.length >= EXCERPT_BLOCKS) break;
+    if (picked.length >= blocks) break;
     if (!child || child.type !== "CallExpression") continue; // skip "\n"
 
     const name = blockName(child);
@@ -137,10 +153,9 @@ function pickLede(children: ChildNode[]): CallExpression[] {
       continue;
     }
 
-    if (CONTENT_BLOCKS.has(name)) {
-      if (name === "p" && isEmptyParagraph(child)) continue;
-      picked.push(child);
-    }
+    // Every other block is shown — paragraphs, lists, blockquotes, images,
+    // and editor atoms alike. Nothing is filtered out.
+    picked.push(child);
   }
   return picked;
 }
@@ -159,27 +174,6 @@ function blockName(call: CallExpression): string | null {
   }
   if (typeArg.type === "Identifier") return typeArg.name;
   return null;
-}
-
-/** A paragraph whose only children are whitespace — no text, no nested call. */
-function isEmptyParagraph(call: CallExpression): boolean {
-  const children = findChildren(call.arguments[1]);
-  if (!children) return true;
-  if (isWhitespaceLiteral(children)) return true;
-  if (children.type === "ArrayExpression") {
-    return children.elements.every(
-      (el) => el != null && isWhitespaceLiteral(el),
-    );
-  }
-  return false;
-}
-
-function isWhitespaceLiteral(node: ChildNode): boolean {
-  return (
-    node?.type === "Literal" &&
-    typeof node.value === "string" &&
-    node.value.trim() === ""
-  );
 }
 
 /** The value of the `children` prop in a jsx call's props object. */

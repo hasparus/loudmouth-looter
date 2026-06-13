@@ -1,11 +1,22 @@
 import { compile } from "@mdx-js/mdx";
 import { describe, expect, test } from "bun:test";
+import { VFile } from "vfile";
 
 import { recmaMdxExcerpt } from "./excerptPlugin";
 
-/** Compile MDX the way Astro does (lowered `_jsx` calls) with our plugin. */
-async function excerptOf(src: string): Promise<string | null> {
-  const out = await compile(src, {
+/**
+ * Compile MDX the way Astro does (lowered `_jsx` calls) with our plugin.
+ * `frontmatter` is placed on `file.data.astro.frontmatter`, where Astro puts it.
+ */
+async function excerptOf(
+  src: string,
+  frontmatter?: Record<string, unknown>,
+): Promise<string | null> {
+  const file = new VFile({
+    value: src,
+    data: frontmatter ? { astro: { frontmatter } } : {},
+  });
+  const out = await compile(file, {
     jsxImportSource: "astro",
     recmaPlugins: [recmaMdxExcerpt],
   });
@@ -14,7 +25,7 @@ async function excerptOf(src: string): Promise<string | null> {
 }
 
 describe("recmaMdxExcerpt", () => {
-  test("picks the first two content blocks", async () => {
+  test("picks the first two blocks", async () => {
     const code = await excerptOf(
       `First paragraph.\n\n> A blockquote.\n\nThird paragraph (over budget).`,
     );
@@ -35,6 +46,21 @@ describe("recmaMdxExcerpt", () => {
     const code = await excerptOf(`# Title\n\nReal opening.\n\nSecond.`);
     expect(code).toContain("Real opening.");
     expect(code).toContain("Second.");
+  });
+
+  test("respects excerpt.blocks frontmatter", async () => {
+    const src = `One.\n\nTwo.\n\nThree.\n\nFour.`;
+    const code = await excerptOf(src, { excerpt: { blocks: 3 } });
+    expect(code).toContain("Three.");
+    expect(code).not.toContain("Four.");
+  });
+
+  test("keeps editor atoms in the lede instead of skipping them", async () => {
+    const code = await excerptOf(
+      `<Track title="x">x</Track>\n\nIntro paragraph.`,
+    );
+    expect(code).toContain("Track");
+    expect(code).toContain("Intro paragraph.");
   });
 
   test("resolves reference-style links in the excerpt", async () => {
