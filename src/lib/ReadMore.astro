@@ -1,0 +1,95 @@
+---
+interface Props {
+  href: string;
+  /** Extra classes for layout/size (e.g. "ml-auto text-base"). */
+  class?: string;
+}
+
+const { href, class: className } = Astro.props;
+---
+
+{
+  /* Decorative CTA — pairs with a card's background link. The arrow cycles
+    through funky arrows in a fixed-width slot, optically centred per glyph
+    (see the measuring script in git history) so nothing reflows or drifts. */
+}
+<a
+  href={href}
+  aria-hidden="true"
+  tabindex="-1"
+  class:list={[
+    "font-text group-hover :text-red-700 flex items-center whitespace-nowrap text-stone-500 italic no-underline transition-colors dark:text-stone-500 dark:group-hover:text-red-400",
+    className,
+  ]}
+>
+  <span>read more</span>
+  <span class="rm-arrow translate-y-0.5"></span>
+</a>
+
+<style>
+  .rm-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4em;
+    margin-left: 0.15em;
+    line-height: 1;
+  }
+
+  .rm-arrow::before {
+    content: "→";
+    display: block;
+    font-size: 1.01em;
+    transform: translate(-0.155em, -0.056em);
+  }
+
+  :global(.group):hover .rm-arrow::before {
+    animation: rm-arrows 2.8s steps(1, end) infinite;
+  }
+
+  @keyframes rm-arrows {
+    0%,
+    100% {
+      content: "→";
+      font-size: 1.01em;
+      transform: translate(-0.155em, -0.056em);
+    }
+    14.3% {
+      content: "⇢";
+      font-size: 1.12em;
+      transform: translate(-0.195em, -0.016em);
+    }
+    28.6% {
+      content: "⇒";
+      font-size: 1.02em;
+      transform: translate(-0.09em, -0.09em);
+    }
+    42.9% {
+      content: "⇉";
+      font-size: 1.15em;
+      transform: translate(-0.034em, -0.092em);
+    }
+    57.1% {
+      content: "↣";
+      font-size: 1.57em;
+      transform: translate(-0.01em, -0.08em);
+    }
+    71.4% {
+      content: "⇝";
+      font-size: 1.46em;
+      transform: translate(-0.027em, -0.11em);
+    }
+    85.7% {
+      content: "➞";
+      font-size: 1.05em;
+      transform: translate(-0.123em, -0.06em);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.group):hover .rm-arrow::before,
+    .rm-demo .rm-arrow::before {
+      animation: none;
+    }
+  }
+</style>
