@@ -1,0 +1,57 @@
+---
+import { FONT_OPTIONS } from "./index";
+---
+
+{/* Corner display-face switcher. Each button previews the face in its own
+    letters; the active one is highlighted. Hidden in print via `.fixed`. */}
+<aside
+  class="font-switcher fixed right-3 bottom-3 z-50 flex flex-col gap-0.5 rounded-xl border border-stone-200/80 bg-white/85 p-1.5 font-mono text-stone-700 shadow-lg ring-1 ring-black/5 backdrop-blur dark:border-stone-700/80 dark:bg-stone-950/85 dark:text-stone-300"
+  aria-label="Display font"
+>
+  <span
+    class="px-2 pt-0.5 pb-1 text-[10px] leading-none font-semibold tracking-widest text-stone-400 uppercase dark:text-stone-500"
+  >
+    Font
+  </span>
+  {
+    FONT_OPTIONS.map((option) => (
+      <button
+        type="button"
+        class="font-switcher__option zaduma-hover-before relative cursor-pointer rounded-md px-2 py-1 text-left text-base leading-tight aria-pressed:bg-stone-100 aria-pressed:text-stone-900 dark:aria-pressed:bg-stone-800/70 dark:aria-pressed:text-stone-100"
+        style={{ fontFamily: option.stack }}
+        data-stack={option.stack}
+        aria-pressed="false"
+      >
+        {option.label}
+      </button>
+    ))
+  }
+</aside>
+
+<script>
+  import { getStoredFont, setFont } from "./index";
+
+  const buttons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>(".font-switcher__option"),
+  );
+
+  const sync = (active: string) => {
+    for (const button of buttons) {
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.stack === active),
+      );
+    }
+  };
+
+  sync(getStoredFont());
+
+  for (const button of buttons) {
+    button.addEventListener("click", () => {
+      const stack = button.dataset.stack;
+      if (!stack) return;
+      setFont(stack);
+      sync(stack);
+    });
+  }
+</script>

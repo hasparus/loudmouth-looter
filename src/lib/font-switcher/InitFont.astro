@@ -1,0 +1,7 @@
+<script is:inline>
+  // Apply the stored display face before first paint to avoid a flash of Avara.
+  // The switcher (FontSwitcher.astro) writes the full CSS font stack here, so
+  // this stays a dumb one-liner with no font map to keep in sync.
+  const stack = localStorage.getItem("ⲍ 🔤");
+  if (stack) document.documentElement.style.setProperty("--font-serif", stack);
+</script>

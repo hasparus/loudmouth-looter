@@ -31,6 +31,28 @@
   font-display: block;
 }
 
+@font-face {
+  font-family: "IM Fell English SC";
+  src: url("/fonts/im-fell-english-sc-latin-400.woff2") format("woff2");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Trickster";
+  src: url("/fonts/Trickster-Regular.woff2") format("woff2");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Director Variable";
+  src: url("/fonts/Director-Variable.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Crimson Text — @fontsource/crimson-text, latin subsets. */
 @font-face {
   font-family: "Crimson Text";

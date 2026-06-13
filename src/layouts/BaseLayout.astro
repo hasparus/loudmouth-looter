@@ -4,6 +4,8 @@ import crimsonPath from "@fontsource/crimson-text/files/crimson-text-latin-400-n
 import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
 import { Commands } from "../lib/Commands";
 import CursorParty from "../lib/CursorParty.astro";
+import FontSwitcher from "../lib/font-switcher/FontSwitcher.astro";
+import InitFont from "../lib/font-switcher/InitFont.astro";
 import { isPostVisible } from "../lib/isPostVisible";
 import { Link } from "../lib/Link";
 import ScrollbarStyles from "../lib/ScrollbarStyles.astro";
@@ -108,6 +110,7 @@ const websiteData = websiteSchema({
     <JsonLd data={websiteData} />
     <slot name="head" />
     <InitColorScheme />
+    <InitFont />
   </head>
   <body>
     <div class="max-w-container mx-auto px-4">
@@ -123,6 +126,7 @@ const websiteData = websiteSchema({
       <slot />
     </div>
     <ScrollbarStyles />
+    <FontSwitcher />
     {cursors && <CursorParty />}
   </body>
 </html>
