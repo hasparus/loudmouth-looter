@@ -94,59 +94,60 @@ const date = new Date(frontmatter.date);
       line-height: 1;
     }
 
-    /* Per-glyph font-size + translate optically centre each arrow: the set is
-       chosen for similar ink size, then normalised (measured ink box per
-       glyph) so nothing grows/shifts as it cycles. */
+    /* Per-glyph font-size + translate optically centre each arrow. The
+       translate vectors are measured: a script renders each glyph in this slot,
+       finds its ink centroid, and shifts it to the slot centre (x) and the
+       "read more" optical middle (y). See /arrows. */
     .rm-arrow::before {
       content: "→";
       display: block;
-      font-size: 1.12em;
-      transform: translateY(0.044em);
+      font-size: 1.01em;
+      transform: translate(-0.155em, -0.056em);
     }
 
     .group:hover .rm-arrow::before {
       animation: rm-arrows 2.8s steps(1, end) infinite;
     }
 
-    /* font-size normalises each glyph's ink height; translateY aligns ink
-       centres (both measured per glyph) so the arrow neither grows nor drifts
-       as it cycles. */
     @keyframes rm-arrows {
       0%,
       100% {
         content: "→";
-        font-size: 1.12em;
-        transform: translateY(0.044em);
+        font-size: 1.01em;
+        transform: translate(-0.155em, -0.056em);
       }
       14.3% {
         content: "⇢";
         font-size: 1.12em;
-        transform: translateY(0.044em);
+        transform: translate(-0.195em, -0.016em);
       }
       28.6% {
         content: "⇒";
-        font-size: 0.99em;
-        transform: translateY(-0.084em);
+        font-size: 1.02em;
+        transform: translate(-0.09em, -0.09em);
       }
       42.9% {
-        content: "⇉";
+        content: "⇢";
+        font-size: 1.12em;
+        transform: translate(-0.195em, -0.016em);
+        /* content: "⇉";
         font-size: 1.15em;
-        transform: translateY(-0.03em);
+        transform: translate(-0.034em, -0.092em); */
       }
       57.1% {
         content: "↣";
-        font-size: 1.46em;
-        transform: translateY(0.03em);
+        font-size: 1.57em;
+        transform: translate(-0.01em, -0.08em);
       }
       71.4% {
         content: "⇝";
         font-size: 1.46em;
-        transform: translateY(0.03em);
+        transform: translate(-0.027em, -0.11em);
       }
       85.7% {
         content: "➞";
-        font-size: 1.07em;
-        transform: translateY(0.013em);
+        font-size: 1.05em;
+        transform: translate(-0.123em, -0.06em);
       }
     }
 
