@@ -1,0 +1,65 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { Link } from "../../lib/Link";
+import PostCard from "../../lib/PostCard.astro";
+import { getPosts, type PostEntry, tagSlug } from "../../lib/posts";
+import { SITE_NAME } from "../../lib/siteMeta";
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+
+  const bySlug = new Map<string, { label: string; posts: PostEntry[] }>();
+  for (const post of posts) {
+    for (const tag of post.frontmatter.tags ?? []) {
+      const slug = tagSlug(tag);
+      if (!slug) continue;
+      const entry = bySlug.get(slug) ?? { label: tag, posts: [] };
+      entry.posts.push(post);
+      bySlug.set(slug, entry);
+    }
+  }
+
+  return [...bySlug].map(([slug, { label, posts: tagged }]) => ({
+    params: { tag: slug },
+    props: { label, posts: tagged },
+  }));
+}
+
+interface Props {
+  label: string;
+  posts: PostEntry[];
+}
+
+const { label, posts } = Astro.props;
+---
+
+<BaseLayout
+  title={`§ ${label} — ${SITE_NAME}`}
+  description={`Posts tagged ${label}.`}
+>
+  <h1
+    slot="header-content"
+    class="font-serif font-bold text-stone-600 dark:text-stone-500"
+  >
+    <Link href="/" noUnderline class="text-stone-400 dark:text-stone-600"
+      >←</Link
+    > <span class="text-stone-400 dark:text-stone-600">§</span> {label}
+  </h1>
+
+  <main class="zaduma-prose py-10">
+    <p>
+      {posts.length}
+      {posts.length === 1 ? "post" : "posts"} tagged <em>{label}</em>.
+    </p>
+  </main>
+
+  <ul>
+    {
+      posts.map((post) => (
+        <li>
+          <PostCard post={post} />
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>
