@@ -1,3 +1,4 @@
+import { unified } from "@astrojs/markdown-remark";
 import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
@@ -57,13 +58,15 @@ export default defineConfig({
         }),
       ],
     },
-    gfm: true,
+    processor: unified({
+      remarkPlugins: remarkPlugins(__dirname),
+      rehypePlugins: rehypePlugins,
+      gfm: true,
+    }),
   },
   integrations: [
     mdx({
       extendMarkdownConfig: true,
-      remarkPlugins: remarkPlugins(__dirname),
-      rehypePlugins: rehypePlugins,
     }),
     react({ include: ["**/editor/**"] }),
     solidJs({ exclude: ["**/editor/**"] }),
