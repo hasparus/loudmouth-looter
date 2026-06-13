@@ -74,50 +74,65 @@ const date = new Date(frontmatter.date);
         href={frontmatter.path}
         aria-hidden="true"
         tabindex="-1"
-        class="font-text ml-auto flex shrink-0 items-center text-base whitespace-nowrap text-stone-500 no-underline transition-colors group-hover:text-red-700 dark:text-stone-500 dark:group-hover:text-red-400"
+        class="font-text ml-auto shrink-0 text-base whitespace-nowrap text-stone-500 italic no-underline transition-colors group-hover:text-red-700 dark:text-stone-500 dark:group-hover:text-red-400"
       >
         <span>read more</span>
-        <span class="rm-arrow"></span>
+        <span class="rm-arrow translate-y-0.5"></span>
       </a>
     </div>
   </div>
 
   <style>
+    /* Fixed-width slot keeps the row from reflowing as the glyph swaps. The
+       arrow stays put; only the glyph cycles on hover. */
     .rm-arrow {
-      display: inline-block;
-      width: 1.5em;
-      text-align: center;
-      text-box: trim-both;
-      gap: 0.5em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.4em;
+      margin-left: 0.15em;
+      line-height: 1;
     }
 
+    /* Per-glyph font-size + translate optically centre each arrow: the set is
+       chosen for similar ink size, then normalised (measured ink box per
+       glyph) so nothing grows/shifts as it cycles. */
     .rm-arrow::before {
       content: "→";
+      display: block;
+      font-size: 1.12em;
     }
 
     .group:hover .rm-arrow::before {
-      animation: rm-arrows 2s steps(1, end) infinite;
+      animation: rm-arrows 2.2s steps(1, end) infinite;
     }
 
     @keyframes rm-arrows {
-      0% {
+      0%,
+      100% {
         content: "→";
+        font-size: 1.12em;
+        transform: translateY(-0.04em);
       }
       20% {
-        content: "↝";
-        font-size: 1.5em;
+        content: "⇢";
+        font-size: 1.12em;
+        transform: translateY(-0.04em);
       }
       40% {
-        content: "↣";
-        font-size: 1.5em;
+        content: "➞";
+        font-size: 1.07em;
+        transform: translateY(-0.02em);
       }
       60% {
-        content: "➜";
-        font-size: 1em;
+        content: "⇒";
+        font-size: 0.99em;
+        transform: translateY(0);
       }
       80% {
         content: "⇉";
-        font-size: 1.5em;
+        font-size: 1.17em;
+        transform: translateY(-0.02em);
       }
     }
 
