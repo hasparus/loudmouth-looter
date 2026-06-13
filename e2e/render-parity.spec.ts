@@ -11,16 +11,19 @@ test.describe("published post render parity", () => {
     }
   });
 
-  test("renders a move card with its heading lifted to title/id", async ({
+  test("renders a move card (dungeon-motion MoveCard) with its heading lifted to title/id", async ({
     page,
   }) => {
-    const card = page.locator("article.te-move");
+    const card = page.locator("article.group", { hasText: "Learn and Grow" });
     await expect(card).toHaveCount(1);
-    await expect(card).toHaveAttribute("id", "learn-and-grow");
 
+    await expect(card.locator('input[type="checkbox"]')).toHaveAttribute(
+      "id",
+      "learn-and-grow",
+    );
     await expect(
       card.getByRole("heading", { name: "Learn and Grow" }),
-    ).toBeVisible();
+    ).toHaveAttribute("id", "learn-and-grow-title");
     await expect(card).toContainText(
       "discuss with the table what move or compendium fits",
     );
@@ -52,7 +55,9 @@ test.describe("published post render parity", () => {
   });
 
   test("renders GFM tasks with preserved checked state", async ({ page }) => {
-    const checkboxes = page.locator("main input[type=checkbox]");
+    const checkboxes = page.locator(
+      "ul.contains-task-list input[type=checkbox]",
+    );
     await expect(checkboxes).toHaveCount(3);
     await expect(checkboxes.nth(0)).toBeChecked();
     await expect(checkboxes.nth(1)).toBeChecked();
