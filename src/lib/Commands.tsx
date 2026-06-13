@@ -32,15 +32,22 @@ const INPUT_ID = "command-input";
 
 export function Commands({
   posts,
+  class: className,
 }: {
   posts: { title: string; href: string }[];
+  class?: string;
 }) {
   const [clientside, setClientside] = createSignal(false);
   onMount(() => setClientside(true)); // workaround for Astro + Solid Hydration issue
 
   return (
     <CommandCenter inputId={INPUT_ID}>
-      <CommandCenterTrigger class="zaduma-hover-before h-12 w-12 rounded-sm dark:text-stone-400 dark:hover:text-stone-300" />
+      <CommandCenterTrigger
+        classList={{
+          "zaduma-hover-before h-12 w-12 rounded-sm dark:text-stone-400 dark:hover:text-stone-300": true,
+          [className ?? ""]: true,
+        }}
+      />
       <Show when={clientside()} keyed>
         <CommandsPalette posts={posts} />
       </Show>
@@ -155,7 +162,7 @@ export function CommandsPalette({
       onClose={() => setPage(undefined)}
       ref={(ref) => (dialog = ref)}
       class={
-        "relative mx-auto w-96 max-w-full transform flex-col overflow-hidden rounded-xl bg-white p-0 font-mono shadow-2xl ring-1 ring-black/5 backdrop:bg-stone-900/30 transition-all dark:bg-stone-950 [&[open]]:flex"
+        "relative mx-auto w-96 max-w-full transform flex-col overflow-hidden rounded-xl bg-white p-0 font-mono shadow-2xl ring-1 ring-black/5 transition-all backdrop:bg-stone-900/30 dark:bg-stone-950 [&[open]]:flex"
       }
     >
       <div class="flex justify-end">

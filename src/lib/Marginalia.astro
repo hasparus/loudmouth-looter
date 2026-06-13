@@ -1,6 +1,4 @@
 ---
-// Semi-hidden vertical marginalia in the page gutters (xl+). Links point to
-// sibling apps; plain strings are Latin mottos. Add items by pushing to a side.
 interface MarginaliaItem {
   label: string;
   href?: string;
@@ -14,13 +12,14 @@ const rails: Record<"left" | "right", MarginaliaItem[]> = {
   right: [
     { label: "incipit liber" },
     { label: "kajet", href: "/editor" },
+    { label: "zaduma", href: "https://zaduma.haspar.us/" },
   ],
 };
 
 const sides = ["left", "right"] as const;
 ---
 
-{
+{ 
   sides.map((side) => (
     <div
       class:list={[
