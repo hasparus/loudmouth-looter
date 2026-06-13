@@ -20,7 +20,8 @@
 }
 
 .Pre {
-  @apply -mx-4 overflow-x-auto p-4 text-sm md:rounded-md;
+  @apply -mx-4 overflow-x-auto p-4 md:rounded-md;
+  font-size: 0.73em;
 
   /* Needed to fit 80 monospaced characters with Fira Code in 43rem space. */
   padding-right: calc(1rem - 1px);

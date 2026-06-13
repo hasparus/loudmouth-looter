@@ -80,6 +80,7 @@
        xl. -2 / -1 resolves correctly in both track counts. */
     grid-column: -2 / -1;
     @apply h-min text-sm;
+    font-family: var(--font-hand);
     padding-left: var(--col-gap);
     border-left: 1px solid var(--color-stone-200);
 
