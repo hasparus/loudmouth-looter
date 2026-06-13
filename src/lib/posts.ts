@@ -3,10 +3,11 @@ import type { PostFrontmatter } from "../types";
 import { getPostExcerpt } from "./getPostExcerpt";
 import { isPostVisible } from "./isPostVisible";
 
-const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
-  "../../posts/**/*.mdx",
-  { eager: true },
-);
+const postModules = import.meta.glob<{
+  frontmatter: PostFrontmatter;
+  /** Named MDX export alternative to `frontmatter.sigil`. */
+  sigil?: string;
+}>("../../posts/**/*.mdx", { eager: true });
 const rawModules = import.meta.glob<string>("../../posts/**/*.mdx", {
   query: "?raw",
   import: "default",
@@ -17,6 +18,8 @@ export interface PostEntry {
   frontmatter: PostFrontmatter;
   /** First blocks of the post rendered to HTML, for listing teasers. */
   excerpt: string;
+  /** Left-margin mark — from `frontmatter.sigil` or a named `sigil` export. */
+  sigil?: string | undefined;
 }
 
 let cache: PostEntry[] | undefined;
@@ -30,9 +33,10 @@ export async function getPosts(): Promise<PostEntry[]> {
       .filter(([, m]) =>
         isPostVisible(m.frontmatter, { isProd: import.meta.env.PROD }),
       )
-      .map(async ([key, { frontmatter }]) => ({
+      .map(async ([key, { frontmatter, sigil }]) => ({
         frontmatter,
         excerpt: await getPostExcerpt(rawModules[key] ?? "", { blocks: 2 }),
+        sigil: frontmatter.sigil ?? sigil,
       })),
   );
 
