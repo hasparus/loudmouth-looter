@@ -12,16 +12,18 @@ const posts = await getPosts();
 <BaseLayout title={SITE_NAME} description={SITE_BLURB}>
   <h1
     slot="header-content"
-    class="font-serif font-bold text-stone-600 dark:text-stone-500"
+    class="font-serif font-bold tracking-tighter text-stone-600 dark:text-stone-500"
   >
     {SITE_NAME}
   </h1>
 
   <main class="zaduma-prose py-10">
-    <Paragraph>
-      Posts drafted in the <Link href="/editor">editor</Link> — built on{" "}
-      <Link href="https://github.com/hasparus/zaduma">zaduma</Link>.
+    <Paragraph
+      >This is an archive of my edgy and opinionated alter ego.
     </Paragraph>
+    <aside>
+      <span class="font-hand">~Piotr</span>
+    </aside>
   </main>
 
   <ul>

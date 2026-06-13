@@ -88,11 +88,27 @@
     }
   }
 
-  /* Matches the old asides breakpoint: below xl asides stack full-width; at xl
-     the grid widens past the centered wrapper into the right margin. */
   @media (min-width: 1280px) {
-    grid-template-columns: minmax(0, 1fr) var(--aside-w);
-    width: calc(100% + var(--aside-w) + var(--col-gap));
+    grid-template-columns:
+      [bleed-start] var(--aside-w)
+      [main-start] minmax(0, 1fr) [main-end aside-start] var(--aside-w)
+      [bleed-end];
+    width: calc(100% + 2 * (var(--aside-w) + var(--col-gap)));
+    margin-left: calc(-1 * (var(--aside-w) + var(--col-gap)));
+
+    & > * {
+      grid-column: main-start / main-end;
+    }
+
+    & > p:has(> [zaduma-image]) {
+      grid-column: bleed-start / bleed-end;
+      display: flex;
+      justify-content: center;
+    }
+
+    & > p:has(> [zaduma-image]) [zaduma-image] {
+      max-width: calc(var(--container-width) + 8rem);
+    }
   }
 }
 
@@ -149,11 +165,9 @@
   @apply lg:-mx-16 xl:-mx-32;
 }
 
-/* Post body (the <span zaduma-image> wrapper): break out on lg, where the prose
-   grid is a single centred column. At xl the right margin holds the <aside>
-   column, so staying in the reading column avoids colliding with sidenotes. */
 .zaduma-prose p:has(> [zaduma-image]) {
   @apply lg:-mx-16 xl:mx-0;
+  max-width: none;
 }
 
 .zaduma-prose p:has(> [zaduma-image]) [zaduma-image],
