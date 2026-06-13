@@ -9,7 +9,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { frontmatter, excerpt } = post;
+const { frontmatter, excerpt, sigil } = post;
 const date = new Date(frontmatter.date);
 ---
 
@@ -19,6 +19,15 @@ const date = new Date(frontmatter.date);
     aria-label={frontmatter.title}
     class="absolute inset-0 z-0 rounded-lg no-underline hover:bg-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400"
   ></a>
+  {
+    sigil && (
+      <span
+        aria-hidden="true"
+        set:html={sigil}
+        class="pointer-events-none absolute top-11 -left-10 z-10 hidden font-serif text-3xl leading-none text-red-800 select-none md:block lg:-left-12 dark:text-red-400 [&_svg]:h-[1.1em] [&_svg]:w-auto"
+      />
+    )
+  }
   <div class="pointer-events-none relative z-10 flex flex-col gap-3">
     <div>
       <time
