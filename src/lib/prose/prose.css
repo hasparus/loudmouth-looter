@@ -13,18 +13,18 @@
   --serif: var(--font-text);
   --italic-serif: italic 444 1.15em var(--serif);
 
-  --block-mb: 1.5rem;
+  --block-mb: 0.75rem;
 
   @apply max-w-container;
 
-  & > :not(:last-child) {
+  &> :not(:last-child) {
     margin-bottom: var(--block-mb);
   }
 
   /* em inherits the dashed-underline style from skin.css for editor parity */
 
   & strong,
-  & strong > em {
+  & strong>em {
     font-weight: 700;
   }
 
@@ -56,7 +56,7 @@
    grid row. Images and other blocks stay in the reading column. */
 .zaduma-prose-grid {
   --aside-w: 15rem;
-  --col-gap: 1.5rem;
+  --col-gap: 1rem;
 
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -64,20 +64,18 @@
   row-gap: var(--block-mb);
   max-width: none;
 
-  /* row-gap owns the vertical rhythm in grid mode; drop the flow margins so
-     blocks aren't double-spaced. */
-  & > :not(:last-child) {
+  &> :not(:last-child) {
     margin-bottom: 0;
   }
 
-  & > * {
+  &>* {
     grid-column: 1;
     /* grid items default to min-width:auto, which lets wide <pre>/<table>
        blow out the track — pin to 0 so they shrink to the column instead. */
     min-width: 0;
   }
 
-  & > aside {
+  &>aside {
     /* Last column: the single column when stacked (< xl), the margin column at
        xl. -2 / -1 resolves correctly in both track counts. */
     grid-column: -2 / -1;
@@ -123,7 +121,7 @@ details {
     }
   }
 
-  & > * {
+  &>* {
     @apply !m-0 px-2;
   }
 
@@ -131,21 +129,21 @@ details {
     cursor: pointer;
     list-style: none;
 
-    & > p {
+    &>p {
       @apply !m-0 !px-0;
     }
 
     @apply relative before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded before:bg-transparent before:transition-colors before:content-[''];
+
     &:hover::before,
     &:focus::before,
     &[aria-selected="true"]::before {
       background-color: var(--color-stone-100);
+
       :global(.dark) & {
-        background-color: color-mix(
-          in srgb,
-          var(--color-stone-800) 60%,
-          transparent
-        );
+        background-color: color-mix(in srgb,
+            var(--color-stone-800) 60%,
+            transparent);
       }
     }
   }

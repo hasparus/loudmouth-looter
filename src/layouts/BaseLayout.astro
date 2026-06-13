@@ -1,6 +1,5 @@
 ---
 import crimsonPath from "@fontsource/crimson-text/files/crimson-text-latin-400-normal.woff2";
-import interPath from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2";
 
 import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
 import { Commands } from "../lib/Commands";
@@ -17,7 +16,6 @@ import type { PostFrontmatter } from "../types";
 import "../global-styles/base.css";
 import "../global-styles/controls.css";
 import "../global-styles/integrations.css";
-import "../global-styles/font.css";
 import "../lib/prose/prose.css";
 
 interface Props {
@@ -70,7 +68,7 @@ const websiteData = websiteSchema({
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     {
-      [interPath, crimsonPath].map((href) => (
+      [crimsonPath].map((href) => (
         <link
           rel="preload"
           href={href}

@@ -75,7 +75,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     ssr: {
-      noExternal: ["@fontsource-variable/inter"],
+      noExternal: ["@fontsource/crimson-text"],
     },
     define: {
       "import.meta.env.PUBLIC_URL": JSON.stringify(makePublicURL()),

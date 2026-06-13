@@ -10,7 +10,6 @@
         "@astrojs/react": "^4",
         "@astrojs/sitemap": "^3.7.2",
         "@astrojs/solid-js": "^5.1.3",
-        "@fontsource-variable/inter": "^5.2.8",
         "@fontsource/crimson-text": "5.2.7",
         "@mdx-js/mdx": "3.1.1",
         "@shikijs/twoslash": "^3.22.0",
@@ -238,8 +237,6 @@
     "@eslint/js": ["@eslint/js@8.57.1", "", {}, "sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q=="],
 
     "@fastify/busboy": ["@fastify/busboy@2.1.1", "", {}, "sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA=="],
-
-    "@fontsource-variable/inter": ["@fontsource-variable/inter@5.2.8", "", {}, "sha512-kOfP2D+ykbcX/P3IFnokOhVRNoTozo5/JxhAIVYLpea/UBmCQ/YWPBfWIDuBImXX/15KH+eKh4xpEUyS2sQQGQ=="],
 
     "@fontsource/crimson-text": ["@fontsource/crimson-text@5.2.7", "", {}, "sha512-hlUb/1GdXB2xc0usGMPp6qEI7Z4kQU1FEOYvozsN+cUC/Nh4kvEVVc0kHpj8B5G0hjZzfP+UmrLYHOaNAfMK5w=="],
 

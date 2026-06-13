@@ -52,7 +52,7 @@ export const MoveCard = ({
             />
           )}
           <h3
-            className={`tracking-wide font-bold text-stone-800 dark:text-stone-100 ${
+            className={`font-serif tracking-wide font-bold text-stone-800 dark:text-stone-100 ${
               isSmall ? "" : "text-xl [text-box-trim:trim-end]"
             }`}
             id={id ? `${id}-title` : undefined}

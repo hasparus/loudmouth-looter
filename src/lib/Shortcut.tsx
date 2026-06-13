@@ -23,18 +23,15 @@ export function Shortcut(props: ShortcutProps) {
     >
       <For each={props.shortcut.split("+")}>
         {(key) => {
-          let style = "";
-
           if (!IS_MAC && key === "cmd") {
             key = "ctrl";
           } else if (key === "shift") {
-            style = "font-family: Inter";
             key = "⇧";
           } else if (key === "slash") {
             key = "/";
           }
 
-          return <Kbd style={style}>{key}</Kbd>;
+          return <Kbd>{key}</Kbd>;
         }}
       </For>
     </span>

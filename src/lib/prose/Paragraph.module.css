@@ -1,21 +1,16 @@
 @reference "../../global-styles/base.css";
 
 .Paragraph {
-  @apply -m-2 max-w-prose p-2;
+  @apply max-w-prose;
 
-  line-height: 1.75;
+  line-height: 1.6;
   text-overflow: ellipsis;
-  overflow-x: hidden;
 
-  /* This is under assumption that `img` is full width image not just an icon. */
-  /* I can think of a reorganization using CSS Grid that would also work on Firefox,
-     but this seems sufficient for the time being. */
+  overflow: clip;
+  overflow-clip-margin: 0.5rem;
+
   &:has(img) {
-    overflow-x: visible;
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: 0;
-    margin-right: 0;
+    overflow: visible;
   }
 
   & a {

@@ -16,11 +16,11 @@ type Author = typeof author;
 
 export const config = { runtime: "edge" };
 
-const interRegular = fetchFont(
-  new URL("../assets/og/Inter-Regular.ttf", import.meta.url),
+const crimsonRegular = fetchFont(
+  new URL("../assets/og/CrimsonText-Regular.ttf", import.meta.url),
 );
-const interBlack = fetchFont(
-  new URL("../assets/og/Inter-Black.ttf", import.meta.url),
+const avaraBlack = fetchFont(
+  new URL("../assets/og/Avara-Black.ttf", import.meta.url),
 );
 
 const width = 1200;
@@ -43,9 +43,9 @@ export default async function og(req: Request) {
         {
           tw: `
             w-full h-full
-            font-Inter
             flex flex-col
           `,
+          style: { fontFamily: '"Crimson Text"' },
         },
         h(
           Illustration,
@@ -59,14 +59,14 @@ export default async function og(req: Request) {
         height,
         fonts: [
           {
-            name: "Inter",
-            data: await interRegular,
+            name: "Crimson Text",
+            data: await crimsonRegular,
             weight: 400,
             style: "normal",
           },
           {
-            name: "Inter",
-            data: await interBlack,
+            name: "Avara",
+            data: await avaraBlack,
             weight: 900,
             style: "normal",
           },
@@ -125,6 +125,7 @@ function Title({ title }: { title: string }) {
       tw: `
         text-white text-9xl font-black z-10
       `,
+      style: { fontFamily: "Avara" },
     },
     title,
   );

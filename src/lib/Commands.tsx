@@ -155,7 +155,7 @@ export function CommandsPalette({
       onClose={() => setPage(undefined)}
       ref={(ref) => (dialog = ref)}
       class={
-        "relative mx-auto w-96 max-w-full transform flex-col overflow-hidden rounded-xl bg-white p-0 shadow-2xl ring-1 ring-black/5 backdrop:bg-stone-900/30 transition-all dark:bg-stone-900 [&[open]]:flex"
+        "relative mx-auto w-96 max-w-full transform flex-col overflow-hidden rounded-xl bg-white p-0 font-mono shadow-2xl ring-1 ring-black/5 backdrop:bg-stone-900/30 transition-all dark:bg-stone-950 [&[open]]:flex"
       }
     >
       <div class="flex justify-end">
