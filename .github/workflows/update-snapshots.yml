@@ -1,6 +1,7 @@
 name: Update Snapshots
 on:
-  workflow_dispatch:
+  push:
+    branches: [reskin/drop-inter-typography]
 
 # Throwaway helper: regenerates visual-regression baselines on the same
 # ubuntu-latest renderer CI uses, then uploads them as an artifact. Remove
