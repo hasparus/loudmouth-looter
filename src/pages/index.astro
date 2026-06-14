@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { DialogueIntro } from "../lib/DialogueIntro";
 import PostCard from "../lib/PostCard.astro";
 import { getPosts } from "../lib/posts";
 import { Paragraph } from "../lib/prose/Paragraph";
@@ -17,12 +18,25 @@ const posts = getPosts();
   </h1>
 
   <main class="zaduma-prose py-10">
-    <Paragraph
-      >This is an archive of my edgy and opinionated alter ego.
-    </Paragraph>
-    <aside>
-      <span class="font-hand">~Piotr</span>
-    </aside>
+    <DialogueIntro client:idle>
+      {/* No-JS / pre-hydration fallback: the plain prose this dresses up. */}
+      <Paragraph>
+        This is an archive of my edgy and opinionated alter ego, a collection of
+        notes, and rants, kitbashes and experiments, perhaps a finished game or
+        two.
+      </Paragraph>
+      <Paragraph>
+        I find it interesting how systems shape the stories we tell, so I yoink
+        a bunch of things from different games, blabber something
+        incomprehensible about n-dimensional spaces, and make my friends play
+        it. They keep asking for more. Weirdos.
+      </Paragraph>
+      <Paragraph>
+        Hope you find something worth stealing. Regardless, you won't take me
+        alive.
+      </Paragraph>
+      <p class="font-hand text-right">~Piotrek</p>
+    </DialogueIntro>
   </main>
 
   <ul>
