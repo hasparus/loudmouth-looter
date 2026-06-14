@@ -112,59 +112,21 @@
   }
 }
 
-/* Listing teasers: the first blocks of a post rendered inline on the index and
-   tag pages. Mirrors the prose components (Blockquote/Image) closely enough for
-   a lede, since the injected HTML can't use the Solid/Astro components. */
-.zaduma-excerpt {
-  & blockquote {
-    @apply rounded-sm bg-stone-100 px-6 py-4;
-    font: 444 1.15em var(--serif);
-
-    :global(.dark) & {
-      @apply bg-stone-800;
-    }
-  }
-
-  /* Inline code: the injected HTML is bare <code>, so it can't pick up the
-     CSS-module .Code class the prose component uses. Mirror it here. */
-  & :not(pre)>code {
-    @apply font-mono;
-    letter-spacing: -0.02em;
-    font-size: 0.73em;
-
-    &::before,
-    &::after {
-      @apply font-black;
-      color: var(--color-stone-400);
-      content: "`";
-
-      :global(.dark) & {
-        color: var(--color-stone-600);
-      }
-    }
-  }
-
-  & img {
-    @apply block h-auto w-full rounded-sm;
-  }
-
-  /* The card is pointer-events:none so clicks reach the background link; real
-     links in the teaser opt back in. */
-  & a {
-    pointer-events: auto;
-  }
+/* Listing teasers render the post's opening blocks through the real prose
+   components (`Excerpt` from recmaMdxExcerpt), so they need no style shim. The
+   one card-specific rule: the card is pointer-events:none so clicks reach the
+   background link; real links in the teaser opt back in. */
+.zaduma-excerpt a {
+  pointer-events: auto;
 }
 
 /* Images blow out past the reading column on wide screens, the way mageworld's
    .Table does — negative margins on the (block) wrapper paragraph widen it, and
    the image stretches to fill. */
 
-/* Listing excerpts (bare <img>): the column is centred, so break out both
-   sides at every wide breakpoint. */
-.zaduma-prose p:has(> img) {
-  @apply lg:-mx-16 xl:-mx-32;
-}
-
+/* Post body (the <span zaduma-image> wrapper): break out on lg, where the prose
+   grid is a single centred column. At xl the right margin holds the <aside>
+   column, so staying in the reading column avoids colliding with sidenotes. */
 .zaduma-prose p:has(> [zaduma-image]) {
   @apply lg:-mx-16 xl:mx-0;
   max-width: none;

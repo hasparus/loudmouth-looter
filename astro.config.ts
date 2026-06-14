@@ -10,6 +10,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { rehypePlugins, remarkPlugins } from "./src/build-time";
+import { recmaMdxExcerpt } from "./src/build-time/excerptPlugin";
 import { getHiddenPostPaths } from "./src/build-time/hiddenPostPaths";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -67,6 +68,7 @@ export default defineConfig({
   integrations: [
     mdx({
       extendMarkdownConfig: true,
+      recmaPlugins: [recmaMdxExcerpt],
     }),
     react({ include: ["**/editor/**"] }),
     solidJs({ exclude: ["**/editor/**"] }),

@@ -1,12 +1,11 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { Link } from "../lib/Link";
 import PostCard from "../lib/PostCard.astro";
 import { getPosts } from "../lib/posts";
 import { Paragraph } from "../lib/prose/Paragraph";
 import { SITE_BLURB, SITE_NAME } from "../lib/siteMeta";
 
-const posts = await getPosts();
+const posts = getPosts();
 ---
 
 <BaseLayout title={SITE_NAME} description={SITE_BLURB}>
