@@ -1,4 +1,5 @@
 ---
+import { feastDate } from "./feastDate";
 import { formatDate } from "./formatDate";
 import { mdxComponents } from "./mdxComponents";
 import type { PostEntry } from "./posts";
@@ -31,11 +32,13 @@ const date = new Date(frontmatter.date);
   }
   <div class="pointer-events-none relative z-10 flex flex-col gap-3">
     <div>
+      {/* The feast day by default; the plain date on card hover. */}
       <time
         datetime={date.toISOString()}
-        class="shrink-0 text-sm tracking-tighter text-stone-500 tabular-nums dark:text-stone-400"
+        class="shrink-0 text-sm tracking-tighter text-stone-500 tabular-nums transition-colors group-hover:text-red-700 group-hover:duration-0 dark:text-stone-400 dark:group-hover:text-red-400"
       >
-        {formatDate(date)}
+        <span class="group-hover:hidden">{feastDate(date)}</span>
+        <span class="hidden group-hover:inline">{formatDate(date)}</span>
       </time>
       <h2
         class="font-serif font-bold text-stone-800 transition-colors [text-box:trim-end] group-hover:text-stone-950 dark:text-stone-300 dark:group-hover:text-stone-100"

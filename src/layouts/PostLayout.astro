@@ -2,6 +2,7 @@
 import type { MarkdownLayoutProps } from "astro";
 
 import { createOgImageLink } from "../lib/createOgImageLink";
+import { feastDate } from "../lib/feastDate";
 import { formatDate } from "../lib/formatDate";
 import Image from "../lib/prose/Image.astro";
 import { blogPostingSchema } from "../lib/seo/jsonLd";
@@ -59,11 +60,13 @@ const postSchema = blogPostingSchema({
             </>
           )
         }
+        {/* The feast day by default; the plain date when you hover it. */}
         <time
           datetime={date.toISOString()}
-          class="tracking-tighter tabular-nums"
+          class="group/feast tracking-tighter tabular-nums"
         >
-          {formatDate(date)}
+          <span class="group-hover/feast:hidden">{feastDate(date)}</span>
+          <span class="hidden group-hover/feast:inline">{formatDate(date)}</span>
         </time>
       </div>
     </header>

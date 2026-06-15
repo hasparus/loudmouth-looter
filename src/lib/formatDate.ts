@@ -1,6 +1,6 @@
 export const formatDate = (date: ConstructorParameters<typeof Date>[0]) =>
   new Date(date)
-    .toLocaleDateString("ja-JP-u-ca-japanese", {
+    .toLocaleDateString("en-GB", {
       day: "numeric",
       month: "short",
       year: "numeric",

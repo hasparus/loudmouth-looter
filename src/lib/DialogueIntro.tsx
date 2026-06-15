@@ -234,8 +234,6 @@ export function DialogueIntro(props: { children?: JSX.Element }) {
             </ul>
           )}
         </Show>
-
-        <p class="dlg-sign font-hand">~Piotrek</p>
       </div>
     </Show>
   );
