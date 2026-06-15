@@ -17,14 +17,14 @@
 
   @apply max-w-container;
 
-  &> :not(:last-child) {
+  & > :not(:last-child) {
     margin-bottom: var(--block-mb);
   }
 
   /* em inherits the dashed-underline style from skin.css for editor parity */
 
   & strong,
-  & strong>em {
+  & strong > em {
     font-weight: 700;
   }
 
@@ -58,18 +58,18 @@
   row-gap: var(--block-mb);
   max-width: none;
 
-  &> :not(:last-child) {
+  & > :not(:last-child) {
     margin-bottom: 0;
   }
 
-  &>* {
+  & > * {
     grid-column: 1;
     /* grid items default to min-width:auto, which lets wide <pre>/<table>
        blow out the track — pin to 0 so they shrink to the column instead. */
     min-width: 0;
   }
 
-  &>aside {
+  & > aside {
     /* Last column: the single column when stacked (< xl), the margin column at
        xl. -2 / -1 resolves correctly in both track counts. */
     grid-column: -2 / -1;
@@ -162,7 +162,7 @@ details {
     }
   }
 
-  &>* {
+  & > * {
     @apply !m-0 px-2;
   }
 
@@ -170,7 +170,7 @@ details {
     cursor: pointer;
     list-style: none;
 
-    &>p {
+    & > p {
       @apply !m-0 !px-0;
     }
 
@@ -182,9 +182,11 @@ details {
       background-color: var(--color-stone-100);
 
       :global(.dark) & {
-        background-color: color-mix(in srgb,
-            var(--color-stone-800) 60%,
-            transparent);
+        background-color: color-mix(
+          in srgb,
+          var(--color-stone-800) 60%,
+          transparent
+        );
       }
     }
   }

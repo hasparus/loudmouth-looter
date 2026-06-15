@@ -12,6 +12,10 @@
     :global(.dark) & {
       color: var(--color-stone-200);
     }
+
+    & > a:focus-visible {
+      outline: none;
+    }
   }
 
   & > a::after {

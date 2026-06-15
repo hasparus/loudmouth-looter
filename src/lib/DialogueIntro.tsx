@@ -177,7 +177,11 @@ export function DialogueIntro(props: { children?: JSX.Element }) {
         <div class="dlg-lines" aria-live="polite">
           <For each={node().lines}>
             {(line, i) => (
-              <p class="dlg-line" classList={{ in: shown() }} style={{ "--i": i() }}>
+              <p
+                class="dlg-line"
+                classList={{ in: shown() }}
+                style={{ "--i": i() }}
+              >
                 {line}
                 <Show when={i() === 0 && node().ask}>
                   {(ask) => (

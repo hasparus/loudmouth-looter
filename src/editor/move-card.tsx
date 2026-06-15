@@ -43,8 +43,8 @@ export const MoveCard = ({
             <input
               aria-describedby={`${id}-title`}
               className={cn(
-                "shrink-0 aspect-square",
-                isSmall ? "mt-[-3.5px] size-4" : "-mt-0.75 size-4.5"
+                "aspect-square shrink-0",
+                isSmall ? "mt-[-3.5px] size-4" : "-mt-0.75 size-4.5",
               )}
               id={id}
               name={id}
@@ -52,7 +52,7 @@ export const MoveCard = ({
             />
           )}
           <h3
-            className={`font-serif tracking-wide font-bold text-stone-800 dark:text-stone-100 ${
+            className={`font-serif font-bold tracking-wide text-stone-800 dark:text-stone-100 ${
               isSmall ? "" : "text-xl [text-box-trim:trim-end]"
             }`}
             id={id ? `${id}-title` : undefined}
@@ -60,16 +60,16 @@ export const MoveCard = ({
             {title}
           </h3>
           {!!resources && (
-            <div className="flex items-center gap-1 text-stone-500 dark:text-stone-400 text-sm ml-auto">
+            <div className="ml-auto flex items-center gap-1 text-sm text-stone-500 dark:text-stone-400">
               <span
                 className={cn(
-                  "tracking-wider [text-box-trim:trim-end] translate-y-px",
-                  isSmall ? "text-xs" : ""
+                  "translate-y-px tracking-wider [text-box-trim:trim-end]",
+                  isSmall ? "text-xs" : "",
                 )}
               >
                 {resourceName}
               </span>
-              <div className="flex gap-0.5 ml-1">
+              <div className="ml-1 flex gap-0.5">
                 {Array.from({ length: resources }).map((_, i) => (
                   <input
                     className={
@@ -85,11 +85,11 @@ export const MoveCard = ({
             </div>
           )}
           {!!checkboxes && (
-            <div className="flex items-center gap-1 text-stone-500 dark:text-stone-400 text-sm ml-auto">
-              <div className="flex gap-0.75 ml-1">
+            <div className="ml-auto flex items-center gap-1 text-sm text-stone-500 dark:text-stone-400">
+              <div className="ml-1 flex gap-0.75">
                 {Array.from({ length: checkboxes }).map((_, i) => (
                   <input
-                    className="size-3.5 aspect-square shrink-0"
+                    className="aspect-square size-3.5 shrink-0"
                     key={i}
                     name={`${id}-c-${i}`}
                     type="checkbox"
@@ -100,14 +100,14 @@ export const MoveCard = ({
           )}
         </div>
         {requirement && (
-          <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.75">
+          <p className="mt-0.75 text-sm text-stone-500 dark:text-stone-400">
             (Requires {requirement})
           </p>
         )}
         <div
           className={cn(
-            "text-stone-700 dark:text-stone-300 leading-relaxed",
-            isSmall ? "text-sm mt-1" : "mt-2"
+            "leading-relaxed text-stone-700 dark:text-stone-300",
+            isSmall ? "mt-1 text-sm" : "mt-2",
           )}
         >
           {children}

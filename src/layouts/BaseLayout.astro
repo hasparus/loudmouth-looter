@@ -61,6 +61,11 @@ const websiteData = websiteSchema({
   name: SITE_NAME,
   url: Astro.site ? Astro.site.href : Astro.url.origin + "/",
 });
+
+// Pages that supply their own header content (home, tags) render a title in
+// the content header. The rest (posts) get a floating back link mirroring the
+// Commands trigger in the opposite top corner.
+const hasHeaderContent = Astro.slots.has("header-content");
 ---
 
 <html lang="en">
@@ -116,11 +121,19 @@ const websiteData = websiteSchema({
       posts={posts}
       class="absolute! top-2 right-1.5 z-50 sm:top-4 sm:right-4 xl:top-8 xl:right-8"
     />
+    {
+      !hasHeaderContent && (
+        <Link
+          href="/"
+          class="absolute! top-2 left-1.5 z-50 opacity-80 sm:top-4 sm:left-4 xl:top-8 xl:left-8"
+        >
+          ← back
+        </Link>
+      )
+    }
     <div class="max-w-container mx-auto px-4">
       <header class="flex items-center" style={{ height: "37.5px" }}>
-        <slot name="header-content">
-          <Link href="/">← back</Link>
-        </slot>
+        <slot name="header-content" />
       </header>
       <slot />
     </div>
