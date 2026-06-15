@@ -312,3 +312,7 @@
     }
   }
 }
+
+@utility all-small-caps {
+  font-variant: all-small-caps;
+}

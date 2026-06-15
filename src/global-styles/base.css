@@ -75,7 +75,3 @@ body,
 html {
   overflow-x: hidden;
 }
-
-@utility small-caps {
-  font-variant: small-caps;
-}

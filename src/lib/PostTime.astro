@@ -1,0 +1,18 @@
+---
+import { feastDate } from "./feastDate";
+import { formatDate } from "./formatDate";
+
+interface Props {
+  date: Date;
+}
+
+const { date } = Astro.props;
+---
+
+<time
+  datetime={date.toISOString()}
+  class="all-small-caps shrink-0 text-sm font-medium tracking-wide text-stone-500 tabular-nums transition-colors group-hover:text-red-700 group-hover:duration-0 dark:text-stone-400 dark:group-hover:text-red-400"
+>
+  <span class="group-hover:hidden">{feastDate(date)}</span>
+  <span class="hidden group-hover:inline">{formatDate(date)}</span>
+</time>
