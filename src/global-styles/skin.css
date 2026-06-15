@@ -233,42 +233,95 @@
     color: var(--color-stone-500);
   }
 
-  /* One checkbox for the whole site — GFM task lists, the Move card, anywhere.
+  /* One checkbox for the whole site — GFM task lists, Move cards, editor atoms.
      Ported from dungeon-motion's index.css: currentColor border + clip-path
      tick, so it tracks the text color in both themes with no dark variant.
      Bare checkboxes get a default size; sized instances (Tailwind size-*)
      override width/height. */
-  input[type="checkbox"] {
+  :where(input[type="checkbox"], .te-toggle) {
     appearance: none;
     -webkit-appearance: none;
+    position: relative;
+    display: inline-grid;
+    box-sizing: border-box;
+    place-content: center;
     width: 0.92em;
     height: 0.92em;
     flex-shrink: 0;
-    margin: 0 0.45em 0 0;
+    margin: 0;
     padding: 0;
     font: inherit;
     color: currentColor;
     border: 0.15em solid currentColor;
-    border-radius: 0.1em;
     background-color: transparent;
-    display: inline-grid;
-    place-content: center;
     vertical-align: -0.1em;
     cursor: pointer;
   }
 
-  input[type="checkbox"]::before {
+  :where(input[type="checkbox"], .te-toggle)::before {
     content: "";
-    width: 0.62em;
-    height: 0.62em;
+    width: 0.65em;
+    height: 0.65em;
+    aspect-ratio: 1;
+    flex-shrink: 0;
     transform: scale(0);
-    transform-origin: center;
     box-shadow: inset 1em 1em currentColor;
+    transform-origin: bottom left;
     clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
   }
 
-  input[type="checkbox"]:checked::before {
+  :where(input[type="checkbox"]:checked,
+    .te-toggle[aria-checked="true"])::before {
     transform: scale(1);
+  }
+
+  :where(input[type="checkbox"][data-checkbox-marker="x"]:checked,
+    .te-toggle[data-shape="circle"][aria-checked="true"])::before {
+    content: "✗";
+    font-size: 1em;
+    font-weight: bold;
+    color: currentColor;
+    text-align: center;
+    line-height: 1;
+    box-shadow: none;
+    clip-path: none;
+    transform: translate(-0.03em, -0.07em);
+  }
+
+  :where(input[type="checkbox"], .te-toggle):focus-visible {
+    outline: max(2px, 0.15em) solid currentColor;
+    outline-offset: max(2px, 0.15em);
+  }
+
+  .te-toggle[data-shape="circle"] {
+    border-radius: 50%;
+  }
+
+  .te-toggle[data-shape="rhomb"] {
+    width: 0.74em;
+    height: 0.74em;
+    margin: 0 0.08em;
+    transform: rotate(45deg);
+  }
+
+  .te-toggle[data-shape="rhomb"]::before {
+    width: 0.36em;
+    height: 0.36em;
+    clip-path: none;
+  }
+
+  .contains-task-list input[type="checkbox"] {
+    margin-right: 0.45em;
+    transform: translateY(-0.5px);
+  }
+
+  input[type="checkbox"]:disabled {
+    cursor: default;
+  }
+
+  .task-list-item {
+    display: flex;
+    align-items: center;
   }
 
   a {

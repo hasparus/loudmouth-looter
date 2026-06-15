@@ -14,69 +14,6 @@
   user-select: none;
 }
 
-/* Toggles are real <button>s in the editor (see editor-atoms.tsx) so reset the
-   UA button chrome here; spans in TrackPreview inherit only the visual rules. */
-.te-toggle {
-  appearance: none;
-  position: relative;
-  display: inline-block;
-  box-sizing: border-box;
-  width: 0.92em;
-  height: 0.92em;
-  flex-shrink: 0;
-  margin: 0;
-  padding: 0;
-  font: inherit;
-  color: inherit;
-  /* Match the main page's native checkboxes (index.css uses 0.15em). */
-  border: 0.15em solid currentColor;
-  background: transparent;
-  cursor: pointer;
-  transition: background-color 0.12s ease;
-}
-
-.te-toggle:hover {
-  background-color: color-mix(in srgb, currentColor 16%, transparent);
-}
-
-.te-toggle:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-}
-
-.te-toggle[data-shape="square"] {
-  border-radius: 0.1em;
-}
-
-.te-toggle[data-shape="circle"] {
-  border-radius: 50%;
-}
-
-.te-toggle[data-shape="rhomb"] {
-  width: 0.74em;
-  height: 0.74em;
-  /* The rotated square's diagonal overruns its layout box, so add margin to
-     keep adjacent diamonds from touching. */
-  margin: 0 0.08em;
-  border-radius: 0.08em;
-  transform: rotate(45deg);
-}
-
-.te-toggle[data-shape="circle"][aria-checked="true"],
-.te-toggle[data-shape="rhomb"][aria-checked="true"] {
-  background-color: currentColor;
-}
-
-/* Filled checkbox: the same checkmark polygon used by the site's native
-   checkboxes (index.css), so editor and compendium checkboxes look alike. */
-.te-toggle[data-shape="square"][aria-checked="true"]::before {
-  content: "";
-  position: absolute;
-  inset: 0.04em;
-  background-color: currentColor;
-  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-}
-
 /* Help-modal / slash-menu previews are illustration only. */
 .te-track[data-preview] .te-toggle {
   cursor: default;
@@ -141,7 +78,6 @@
   width: 0.7em;
   height: 0.7em;
   border: 0.13em solid currentColor;
-  border-radius: 0.1em;
 }
 .te-move > :last-child {
   margin-bottom: 0;
