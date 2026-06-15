@@ -355,3 +355,11 @@
 @utility all-small-caps {
   font-variant: all-small-caps;
 }
+
+@utility trim-cap-alphabetic {
+  text-box: trim-both cap alphabetic;
+}
+
+@utility trim-end-alphabetic {
+  text-box: trim-end cap alphabetic;
+}
