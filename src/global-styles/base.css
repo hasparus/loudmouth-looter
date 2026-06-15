@@ -17,9 +17,7 @@
     "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", monospace;
 
-  /* `max-w-container`, from the v3 theme.extend.maxWidth.container. */
   --container-container: 43rem;
-
   --animate-scale-up: scale-up 150ms ease-in;
 
   @keyframes scale-up {
@@ -76,4 +74,8 @@ body {
 body,
 html {
   overflow-x: hidden;
+}
+
+@utility small-caps {
+  font-variant: small-caps;
 }

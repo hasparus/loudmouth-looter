@@ -32,3 +32,6 @@ playwright-report
 !.env.example
 
 test/__image_snapshots__
+
+# local scratch notes
+.notes

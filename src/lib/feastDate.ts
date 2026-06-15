@@ -42,11 +42,11 @@ const F: [number, string][] = `0101 Circumcisionis Domini
 
 const W = [
   "Dominica",
-  "feria secunda",
-  "feria tertia",
-  "feria quarta",
-  "feria quinta",
-  "feria sexta",
+  "fer. ii",
+  "fer. iii",
+  "fer. iv",
+  "fer. v",
+  "fer. vi",
   "sabbatum",
 ];
 
@@ -65,8 +65,8 @@ export const feastDate = (date: string | number | Date) => {
         ((n = d), (best = la));
     }
   if (n === 0) return `in festo ${best}`;
-  if (n === 1) return `in crastino ${best}`;
-  if (n === -1) return `in vigilia ${best}`;
+  if (n === 1) return `crastino ${best}`;
+  if (n === -1) return `vigilia ${best}`;
   const w = t.getDay();
-  return `${W[w]} ${n > 0 ? "post" : "ante"} festum ${best}`;
+  return `${W[w]} ${n > 0 ? "post" : "ante"} f. ${best}`;
 };
