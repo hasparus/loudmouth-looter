@@ -1,8 +1,10 @@
 export const formatDate = (date: ConstructorParameters<typeof Date>[0]) =>
   new Date(date)
     .toLocaleDateString("en-GB", {
+      weekday: "long",
       day: "numeric",
-      month: "short",
+      month: "long",
       year: "numeric",
+      era: "short",
     })
     .toLowerCase();

@@ -50,6 +50,17 @@ const W = [
   "sabbatum",
 ];
 
+const R = {
+  ones: ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"],
+  tens: ["", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"],
+  hundreds: ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"],
+};
+
+const romanYear = (year: number) => {
+  if (year < 1) return String(year);
+  return `${"M".repeat(Math.floor(year / 1000))}${R.hundreds[Math.floor((year % 1000) / 100)]}${R.tens[Math.floor((year % 100) / 10)]}${R.ones[year % 10]}`;
+};
+
 export const feastDate = (date: string | number | Date) => {
   const t = new Date(date);
   t.setHours(0, 0, 0, 0);
@@ -64,9 +75,10 @@ export const feastDate = (date: string | number | Date) => {
       if (Math.abs(d) < Math.abs(n) || (Math.abs(d) === Math.abs(n) && d > n))
         ((n = d), (best = la));
     }
-  if (n === 0) return `in festo ${best}`;
-  if (n === 1) return `crastino ${best}`;
-  if (n === -1) return `vigilia ${best}`;
-  const w = t.getDay();
-  return `${W[w]} ${n > 0 ? "post" : "ante"} f. ${best}`;
+  let feast: string;
+  if (n === 0) feast = `in festo ${best}`;
+  else if (n === 1) feast = `crastino ${best}`;
+  else if (n === -1) feast = `vigilia ${best}`;
+  else feast = `${W[t.getDay()]} ${n > 0 ? "post" : "ante"} f. ${best}`;
+  return `${feast} ${romanYear(y)}`;
 };

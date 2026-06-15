@@ -15,7 +15,7 @@ const plain = formatDate(date);
   datetime={date.toISOString()}
   data-post-time
   data-plain={plain}
-  class="post-time all-small-caps shrink-0 text-sm font-medium tracking-wide text-stone-500 tabular-nums transition-colors group-hover:text-red-700 group-hover:duration-0 dark:text-stone-400 dark:group-hover:text-red-400"
+  class="all-small-caps h-[1.5cap] shrink-0 text-sm font-medium tracking-wide text-stone-500 tabular-nums transition-colors group-hover:text-red-700 group-hover:duration-0 dark:text-stone-400 dark:group-hover:text-red-400"
 >
   {feast}
 </time>
@@ -24,14 +24,7 @@ const plain = formatDate(date);
   import { slotText, type SlotTextController } from "slot-text";
 
   import "slot-text/style.css";
-
-  const reduce =
-    typeof matchMedia !== "undefined" &&
-    matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  const opts = reduce
-    ? { duration: 0, stagger: 0 }
-    : { skipUnchanged: true, stagger: 24, duration: 280 };
+  import { SLOT_TEXT_OPTIONS } from "./animations";
 
   for (const el of document.querySelectorAll<HTMLTimeElement>(
     "time[data-post-time]",
@@ -41,7 +34,11 @@ const plain = formatDate(date);
     const roll: SlotTextController = slotText(el, feast);
     const trigger = el.closest<HTMLElement>("[data-feast-trigger]") ?? el;
 
-    trigger.addEventListener("mouseenter", () => roll.set(plain, opts));
-    trigger.addEventListener("mouseleave", () => roll.set(feast, opts));
+    trigger.addEventListener("mouseenter", () =>
+      roll.set(plain, SLOT_TEXT_OPTIONS),
+    );
+    trigger.addEventListener("mouseleave", () =>
+      roll.set(feast, SLOT_TEXT_OPTIONS),
+    );
   }
 </script>
