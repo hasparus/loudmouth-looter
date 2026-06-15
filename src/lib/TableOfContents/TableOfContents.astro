@@ -47,11 +47,6 @@ const tocShown = headings.length > 2;
   )
 }
 
-{
-  /* Hoisted out of the conditional <section> above: Astro hoists styles
-regardless, and prettier-plugin-astro can't parse a <style> nested inside a
-JSX conditional expression. */
-}
 <style>
   @reference "../../global-styles/base.css";
 

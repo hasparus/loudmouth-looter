@@ -2,8 +2,7 @@
 import type { MarkdownLayoutProps } from "astro";
 
 import { createOgImageLink } from "../lib/createOgImageLink";
-import { feastDate } from "../lib/feastDate";
-import { formatDate } from "../lib/formatDate";
+import PostTime from "../lib/PostTime.astro";
 import Image from "../lib/prose/Image.astro";
 import { blogPostingSchema } from "../lib/seo/jsonLd";
 import JsonLd from "../lib/seo/JsonLd.astro";
@@ -47,28 +46,20 @@ const postSchema = blogPostingSchema({
 >
   <JsonLd data={postSchema} slot="head" />
   <main class="zaduma-prose zaduma-prose-grid py-4">
-    <header
-      class="flex flex-col items-start justify-between sm:flex-row sm:items-center"
-    >
-      <h1 class="!my-0 font-serif font-bold">{frontmatter.title}</h1>
-      <div class="text-right text-stone-600 dark:text-stone-400">
+    <header>
+      <div
+        class="flex items-center justify-between text-stone-600 dark:text-stone-400"
+      >
         {
           readingTime.minutes > 1 && (
-            <>
-              <span>{readingTime.text}</span>
-              {" · "}
-            </>
+            <span class="all-small-caps h-[1.5cap] shrink-0 text-sm font-medium tracking-wide text-stone-500 tabular-nums">
+              {readingTime.text}
+            </span>
           )
         }
-        {/* The feast day by default; the plain date when you hover it. */}
-        <time
-          datetime={date.toISOString()}
-          class="group/feast tracking-tighter tabular-nums"
-        >
-          <span class="group-hover/feast:hidden">{feastDate(date)}</span>
-          <span class="hidden group-hover/feast:inline">{formatDate(date)}</span>
-        </time>
+        <PostTime date={date} />
       </div>
+      <h1 class="mt-4 font-serif text-6xl font-bold">{frontmatter.title}</h1>
     </header>
     {
       imgSrc && (

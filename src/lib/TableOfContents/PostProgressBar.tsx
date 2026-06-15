@@ -30,10 +30,10 @@ export function PostProgressBar(props: { children: JSX.Element }) {
 
   return (
     <div class="relative">
-      <div class="absolute -left-4 h-full w-[2px] overflow-hidden rounded-sm bg-stone-100 dark:bg-stone-800">
+      <div class="absolute -left-4 h-full w-[2px] overflow-hidden bg-stone-400/30 dark:bg-stone-800">
         <div
           class={
-            "absolute h-full w-full rounded-sm bg-stone-300 dark:bg-stone-700 " +
+            "absolute h-full w-full bg-stone-400 dark:bg-stone-700 " +
             "-translate-y-[var(--y,100%)] transition-transform duration-300 ease-linear"
           }
           ref={progressThumb}
