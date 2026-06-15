@@ -14,7 +14,7 @@ const { frontmatter, Excerpt, sigil } = post;
 const date = new Date(frontmatter.date);
 ---
 
-<article class="group relative py-8">
+<article class="group relative py-8" data-feast-trigger>
   <a
     href={frontmatter.path}
     aria-label={frontmatter.title}
