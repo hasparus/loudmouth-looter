@@ -12,9 +12,10 @@ export default defineConfig({
     trace: "retain-on-first-failure",
   },
   webServer: {
-    command: "bun run preview",
+    command: "python3 -m http.server 4321 --directory dist --bind 127.0.0.1",
     url: "http://localhost:4321",
     reuseExistingServer: !process.env.CI,
+    timeout: 30_000,
   },
   projects: [
     {
