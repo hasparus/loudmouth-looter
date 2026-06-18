@@ -15,7 +15,7 @@ export default defineConfig({
     command: "bun run preview",
     url: "http://localhost:4321",
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: 120000,
   },
   projects: [
     {
