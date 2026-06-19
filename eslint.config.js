@@ -270,12 +270,17 @@ const typescriptTypeCheckedRules = {
   "@typescript-eslint/unified-signatures": "warn",
 };
 
-// Shared plugin registry
+// Shared plugin registry — all plugins registered here are available to all
+// config blocks. Rules are still only enabled where explicitly configured.
 const plugins = {
   "@typescript-eslint": tsPlugin,
   "import": importPlugin,
   "simple-import-sort": simpleImportSortPlugin,
-  // sonarjs excluded: v0.19 crashes with ESLint 10's new CodePath API
+  // React/JSX plugins registered globally so ESLint 10 can resolve rule
+  // references even when the active rules are scoped to src/editor/**/*.tsx.
+  "react": reactPlugin,
+  "react-hooks": reactHooksPlugin,
+  "jsx-a11y": jsxA11yPlugin,
 };
 
 export default [
@@ -328,12 +333,7 @@ export default [
   // TSX files — add React/JSX rules (only editor, rest uses SolidJS)
   {
     files: ["src/editor/**/*.tsx"],
-    plugins: {
-      ...plugins,
-      "react": reactPlugin,
-      "react-hooks": reactHooksPlugin,
-      "jsx-a11y": jsxA11yPlugin,
-    },
+    plugins,
     settings: {
       react: { version: "999.999.999" },
     },
