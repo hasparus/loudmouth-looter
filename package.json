@@ -80,7 +80,7 @@
     "vercel": "^51.7.0"
   },
   "overrides": {
-    "vite": "^6.4.1"
+    "vite": "^7.3.2"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.9.5"
