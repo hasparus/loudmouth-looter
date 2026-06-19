@@ -20,6 +20,7 @@ import {
   type RemoteImageProps,
 } from "astro:assets";
 import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { getPlaiceholder } from "plaiceholder";
 
 import "./Image.css";
@@ -124,13 +125,16 @@ if (isRaw) {
     ? fetch(pathToImage).then(async (res) =>
         Buffer.from(await res.arrayBuffer()),
       )
-    : readFile(
-        new URL(
-          pathToImage.replace("../", ""),
-          // this normalizes the path between prod and dev
-          import.meta.url.replace("/src/", "/"),
-        ),
-      ));
+    : src.startsWith(SRC_IMAGES_PREFIX)
+      ? readFile(
+          join(process.cwd(), "src", "images", decodeURIComponent(src.slice(SRC_IMAGES_PREFIX.length))),
+        )
+      : readFile(
+          new URL(
+            pathToImage.replace("../", ""),
+            import.meta.url,
+          ),
+        ));
 
   const { metadata, css } = await getPlaiceholder(imageForPlaceholder, {
     size: 10,
