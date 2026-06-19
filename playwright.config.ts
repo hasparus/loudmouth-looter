@@ -12,7 +12,7 @@ export default defineConfig({
     trace: "retain-on-first-failure",
   },
   webServer: {
-    command: "bunx vite preview --outDir dist --port 4321 --host 127.0.0.1",
+    command: "bunx vite preview --port 4321 --host 127.0.0.1",
     url: "http://127.0.0.1:4321",
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
