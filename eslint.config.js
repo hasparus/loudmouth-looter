@@ -325,9 +325,9 @@ export default [
     },
   },
 
-  // TSX files — add React/JSX rules
+  // TSX files — add React/JSX rules (only editor, rest uses SolidJS)
   {
-    files: ["**/*.tsx"],
+    files: ["src/editor/**/*.tsx"],
     plugins: {
       ...plugins,
       "react": reactPlugin,
