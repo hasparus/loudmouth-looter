@@ -480,6 +480,7 @@ export function TextEditor() {
                 </button>
                 <span className="truncate px-1" title={file.name}>
                   {file.name}
+                  {file.status === "saved" && " · saved"}
                   {file.status === "saving" && " · saving…"}
                   {file.status === "error" && " · save failed"}
                 </span>

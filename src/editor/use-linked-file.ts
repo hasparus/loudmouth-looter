@@ -37,8 +37,8 @@ export function useLinkedFile(): LinkedFile {
     if (!handle.current || pending.current === null) return true;
 
     let activeHtml: string | null = null;
+    const slow = setTimeout(() => setStatus("saving"), 150);
     draining.current = (async () => {
-      setStatus("saving");
       try {
         while (handle.current && pending.current !== null) {
           const html = pending.current;
@@ -56,6 +56,7 @@ export function useLinkedFile(): LinkedFile {
         setStatus("error");
         return false;
       } finally {
+        clearTimeout(slow);
         draining.current = null;
       }
     })();
