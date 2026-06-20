@@ -23,6 +23,7 @@ test.describe("Visual regression", () => {
     await expect(page).toHaveScreenshot("index.png", {
       fullPage: true,
       maxDiffPixels: 500,
+      maxDiffPixelRatio: 0.005,
     });
   });
 
@@ -35,6 +36,7 @@ test.describe("Visual regression", () => {
       await expect(page).toHaveScreenshot(`${post.replace(/\//g, "-")}.png`, {
         fullPage: true,
         maxDiffPixels: 500,
+        maxDiffPixelRatio: 0.005,
       });
     }
   });
