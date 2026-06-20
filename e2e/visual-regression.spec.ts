@@ -29,7 +29,7 @@ test.describe("Visual regression", () => {
   test("blog posts match screenshots", async ({ page }) => {
     test.setTimeout(60_000);
     for (const post of postsInFS) {
-      await page.goto(`/${post}`);
+      await page.goto(`/${post}/`);
       await ensurePageStable(page);
 
       await expect(page).toHaveScreenshot(`${post.replace(/\//g, "-")}.png`, {
