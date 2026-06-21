@@ -23,13 +23,13 @@ const sides = ["left", "right"] as const;
   sides.map((side) => (
     <div
       class:list={[
-        "pointer-events-none fixed top-1/2 hidden -translate-y-1/2 flex-col items-center gap-12 text-stone-400 xl:flex dark:text-stone-600",
+        "pointer-events-none fixed top-1/2 hidden -translate-y-1/2 flex-col items-center gap-12 text-neu-400 xl:flex dark:text-neu-600",
         side === "left" ? "left-12" : "right-12",
       ]}
     >
       {rails[side].map((item, i) => (
         <Fragment>
-          {i > 0 && <span class="h-32 w-px bg-stone-300 dark:bg-stone-700" />}
+          {i > 0 && <span class="h-32 w-px bg-neu-300 dark:bg-neu-700" />}
           {item.href ? (
             <a
               href={item.href}

@@ -1,0 +1,47 @@
+---
+const palettes = ["bronze", "brown", "taupe"] as const;
+---
+
+<div
+  class="fixed top-2 left-1/2 z-50 flex -translate-x-1/2 gap-px rounded-full border border-neu-300 bg-neu-100/80 p-0.5 text-xs backdrop-blur sm:top-4 dark:border-neu-700 dark:bg-neu-900/80"
+  data-palette-switcher
+>
+  {
+    palettes.map((p) => (
+      <button
+        type="button"
+        data-palette-value={p}
+        class="rounded-full px-2.5 py-1 font-text lowercase text-neu-600 transition-colors hover:text-neu-900 aria-pressed:bg-neu-800 aria-pressed:text-neu-50 dark:text-neu-400 dark:hover:text-neu-100 dark:aria-pressed:bg-neu-200 dark:aria-pressed:text-neu-900"
+      >
+        {p}
+      </button>
+    ))
+  }
+</div>
+
+<script>
+  const KEY = "ⲍ 🎨🟤";
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll<HTMLButtonElement>(
+    "[data-palette-switcher] button",
+  );
+
+  const sync = () => {
+    const current = root.dataset.palette ?? "bronze";
+    for (const b of buttons)
+      b.setAttribute(
+        "aria-pressed",
+        String(b.dataset.paletteValue === current),
+      );
+  };
+
+  for (const b of buttons)
+    b.addEventListener("click", () => {
+      const value = b.dataset.paletteValue!;
+      root.dataset.palette = value;
+      localStorage.setItem(KEY, value);
+      sync();
+    });
+
+  sync();
+</script>

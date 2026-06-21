@@ -18,7 +18,7 @@ const date = new Date(frontmatter.date);
   <a
     href={frontmatter.path}
     aria-label={frontmatter.title}
-    class="absolute inset-0 z-0 rounded-lg no-underline hover:bg-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400"
+    class="focus-visible:outline-neu-400 absolute inset-0 z-0 rounded-lg no-underline hover:bg-none focus-visible:outline-2 focus-visible:outline-offset-2"
   ></a>
   {
     sigil && (
@@ -29,19 +29,20 @@ const date = new Date(frontmatter.date);
       />
     )
   }
+  <PostTime
+    date={date}
+    class="relative z-10 group-hover:text-red-700 dark:group-hover:text-red-400 [.group:has(:focus-visible)_&]:text-red-700 dark:[.group:has(:focus-visible)_&]:text-red-400"
+  />
   <div class="pointer-events-none relative z-10 flex flex-col gap-3">
-    <div>
-      <PostTime date={date} />
-      <h2
-        class="mt-1 font-serif font-bold text-stone-800 transition-colors [text-box:trim-end] group-hover:text-stone-950 dark:text-stone-300 dark:group-hover:text-stone-100"
-      >
-        {frontmatter.title}
-      </h2>
-    </div>
+    <h2
+      class="text-neu-800 group-focus-visible:text-neu-950 group-hover:text-neu-950 dark:text-neu-300 dark:group-hover:text-neu-100 mt-1 font-serif font-bold transition-colors [text-box:trim-end]"
+    >
+      {frontmatter.title}
+    </h2>
 
     {
       Excerpt && (
-        <div class="zaduma-prose zaduma-excerpt max-w-none text-stone-600 dark:text-stone-400">
+        <div class="zaduma-prose zaduma-excerpt text-neu-600 dark:text-neu-400 max-w-none">
           <Excerpt components={mdxComponents} />
         </div>
       )
@@ -55,7 +56,7 @@ const date = new Date(frontmatter.date);
               <li>
                 <a
                   href={`/tags/${tagSlug(tag)}`}
-                  class="font-text pointer-events-auto text-sm tracking-wide text-stone-600 lowercase italic no-underline hover:text-stone-900 dark:text-stone-500 dark:hover:text-stone-200"
+                  class="font-text text-neu-600 hover:text-neu-900 dark:text-neu-500 dark:hover:text-neu-200 dark:focus-visible:text-neu-200 focus-visible:text-neu-900 pointer-events-auto text-sm tracking-wide lowercase italic no-underline"
                 >
                   § {tag}
                 </a>

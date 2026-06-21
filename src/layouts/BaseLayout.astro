@@ -3,6 +3,8 @@ import crimsonPath from "@fontsource/crimson-text/files/crimson-text-latin-400-n
 
 import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
 import { Commands } from "../lib/Commands";
+import InitPalette from "../lib/palette/InitPalette.astro";
+import PaletteSwitcher from "../lib/palette/PaletteSwitcher.astro";
 import CursorParty from "../lib/CursorParty.astro";
 import { isPostVisible } from "../lib/isPostVisible";
 import { Link } from "../lib/Link";
@@ -114,8 +116,10 @@ const hasHeaderContent = Astro.slots.has("header-content");
     <JsonLd data={websiteData} />
     <slot name="head" />
     <InitColorScheme />
+    <InitPalette />
   </head>
   <body>
+    <PaletteSwitcher />
     <Commands
       client:idle
       posts={posts}

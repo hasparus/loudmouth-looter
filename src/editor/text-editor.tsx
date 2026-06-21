@@ -27,7 +27,6 @@ import {
   normalizeTrackTabindexes,
   readSlashState,
   restoreSelection,
-  sanitizeHtml,
   save,
   serializeDocument,
   SLASH_MENU_ID,
@@ -40,6 +39,7 @@ import {
   type UndoSnapshot,
 } from "./editor-dom";
 import { EditorHelpModal } from "./editor-help-modal";
+import { sanitizeHtml } from "./editor-sanitize";
 import { SlashMenu } from "./slash-menu";
 import styles from "./text-editor.module.css";
 import { useLinkedFile } from "./use-linked-file";
@@ -399,7 +399,7 @@ export function TextEditor() {
   }
 
   const controlButton =
-    "flex font-mono text-xs items-center justify-center px-1 py-0.5 text-stone-500 transition hover:duration-0 hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-50";
+    "flex font-mono text-xs items-center justify-center px-1 py-0.5 text-neu-500 transition hover:duration-0 hover:bg-neu-200/70 hover:text-neu-900 dark:text-neu-400 dark:hover:bg-neu-800 dark:hover:text-neu-50";
 
   return (
     <main className="min-h-screen">
@@ -443,7 +443,7 @@ export function TextEditor() {
       )}
 
       <footer className="mt-auto flex items-center justify-between gap-2 px-4 pb-5 print:hidden">
-        <div className="flex min-w-0 items-center gap-1 font-mono text-xs text-stone-500 dark:text-stone-400">
+        <div className="flex min-w-0 items-center gap-1 font-mono text-xs text-neu-500 dark:text-neu-400">
           {file.supported &&
             (file.name === null ? (
               <>

@@ -78,7 +78,7 @@ html.dark .dlg {
   align-items: baseline;
   gap: 0.5rem;
   padding: 0.1rem 0;
-  color: var(--color-stone-600);
+  color: var(--color-neu-600);
   background: none;
   border: 0;
   text-align: left;
@@ -86,7 +86,7 @@ html.dark .dlg {
   transition: color 0.15s;
 }
 html.dark .dlg-choice {
-  color: var(--color-stone-400);
+  color: var(--color-neu-400);
 }
 .dlg-choice:hover,
 .dlg-choice:focus-visible {
@@ -97,7 +97,7 @@ html.dark .dlg-choice {
 .dlg-num {
   font-style: normal;
   font-size: 0.8em;
-  color: var(--color-stone-400);
+  color: var(--color-neu-400);
   font-variant-numeric: tabular-nums;
 }
 .dlg-choice:hover .dlg-num,
@@ -110,7 +110,7 @@ html.dark .dlg-choice {
   font-style: italic;
   margin-top: 0.5rem;
   padding: 0;
-  color: var(--color-stone-400);
+  color: var(--color-neu-400);
   background: none;
   border: 0;
   cursor: pointer;
@@ -125,7 +125,7 @@ html.dark .dlg-choice {
 .dlg-sign {
   margin-top: 1rem;
   text-align: right;
-  color: var(--color-stone-500);
+  color: var(--color-neu-500);
 }
 
 @media (prefers-reduced-motion: reduce) {

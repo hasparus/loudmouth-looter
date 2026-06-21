@@ -20,7 +20,7 @@ const tocShown = headings.length > 2;
       <PostProgressBar client:media="(min-width: 1280px)">
         <ul
           id="table-of-contents"
-          class="text-sm leading-6 text-stone-700 dark:text-stone-400"
+          class="text-sm leading-6 text-neu-700 dark:text-neu-400"
         >
           {headings.map(({ text, depth, slug }) => {
             if (depth < 2 || depth > 3) return null;
@@ -52,15 +52,15 @@ const tocShown = headings.length > 2;
 
   #table-of-contents:has(a:hover) {
     & a:not(:hover) {
-      @apply text-stone-600 transition-colors;
+      @apply text-neu-600 transition-colors;
       :global(.dark) & {
-        @apply text-stone-500;
+        @apply text-neu-500;
       }
     }
 
     & a:hover {
       :global(.dark) & {
-        @apply text-stone-300;
+        @apply text-neu-300;
       }
     }
   }

@@ -46,7 +46,7 @@
 }
 
 .editor li::marker {
-  color: var(--color-stone-400);
+  color: var(--color-neu-400);
 }
 
 .editor strong {

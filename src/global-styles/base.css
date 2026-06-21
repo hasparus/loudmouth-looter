@@ -51,21 +51,21 @@ html {
   font-size: 15px;
   line-height: 1.6;
   min-height: 100%;
-  color: var(--color-stone-700);
+  color: var(--color-neu-700);
 
   &.dark {
     /* color-scheme set by skin.css; repeat color here for specificity */
-    color: var(--color-stone-300);
+    color: var(--color-neu-300);
   }
 }
 
 * {
-  @apply outline-black selection:bg-stone-200 selection:text-black dark:outline-white dark:selection:bg-stone-700 dark:selection:text-white;
+  @apply outline-black selection:bg-neu-200 selection:text-black dark:outline-white dark:selection:bg-neu-700 dark:selection:text-white;
 }
 
 body {
   /* bg-transparent lets the grain background on html show through.
-     text color inherits from html (stone-700 / stone-300 via skin.css). */
+     text color inherits from html (neu-700 / neu-300 via skin.css). */
   @apply relative min-h-screen bg-transparent px-0 pt-4 pb-20 sm:pt-10 md:px-4 md:pb-48;
 
   font-size: 18px;

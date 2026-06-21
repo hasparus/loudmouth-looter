@@ -52,7 +52,7 @@ export const MoveCard = ({
             />
           )}
           <h3
-            className={`font-serif font-bold tracking-wide text-stone-800 dark:text-stone-100 ${
+            className={`font-serif font-bold tracking-wide text-neu-800 dark:text-neu-100 ${
               isSmall ? "" : "text-xl [text-box-trim:trim-end]"
             }`}
             id={id ? `${id}-title` : undefined}
@@ -60,7 +60,7 @@ export const MoveCard = ({
             {title}
           </h3>
           {!!resources && (
-            <div className="ml-auto flex items-center gap-1 text-sm text-stone-500 dark:text-stone-400">
+            <div className="ml-auto flex items-center gap-1 text-sm text-neu-500 dark:text-neu-400">
               <span
                 className={cn(
                   "translate-y-px tracking-wider [text-box-trim:trim-end]",
@@ -85,7 +85,7 @@ export const MoveCard = ({
             </div>
           )}
           {!!checkboxes && (
-            <div className="ml-auto flex items-center gap-1 text-sm text-stone-500 dark:text-stone-400">
+            <div className="ml-auto flex items-center gap-1 text-sm text-neu-500 dark:text-neu-400">
               <div className="ml-1 flex gap-0.75">
                 {Array.from({ length: checkboxes }).map((_, i) => (
                   <input
@@ -100,13 +100,13 @@ export const MoveCard = ({
           )}
         </div>
         {requirement && (
-          <p className="mt-0.75 text-sm text-stone-500 dark:text-stone-400">
+          <p className="mt-0.75 text-sm text-neu-500 dark:text-neu-400">
             (Requires {requirement})
           </p>
         )}
         <div
           className={cn(
-            "leading-relaxed text-stone-700 dark:text-stone-300",
+            "leading-relaxed text-neu-700 dark:text-neu-300",
             isSmall ? "mt-1 text-sm" : "mt-2",
           )}
         >

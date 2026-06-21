@@ -10,10 +10,10 @@
     padding-left: 1.5em;
 
     &:before {
-      color: var(--color-stone-600);
+      color: var(--color-neu-600);
 
       :global(.dark) & {
-        color: var(--color-stone-400);
+        color: var(--color-neu-400);
       }
 
       counter-increment: ol;

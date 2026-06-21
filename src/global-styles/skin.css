@@ -1,11 +1,3 @@
-/* Shared skin module — Avara / Crimson Text / stone palette / grain / em / ul.diamond / a hover.
-   Imported by both:
-     - src/global-styles/base.css (site-wide)
-     - src/editor/editor-skin.css (standalone editor page)
-
-   @theme here defines the stone scale and --font-serif once; Tailwind v4's
-   Vite plugin merges @theme blocks from imported files into each entry bundle,
-   so both base.css and editor-skin.css pick them up without duplication. */
 
 /* Avara — Raphaël Bastide / Velvetyne, SIL Open Font License 1.1.
    See public/fonts/Avara-OFL.txt. Self-hosted from public/fonts. */
@@ -131,20 +123,45 @@
   --font-text: "Crimson Text", Georgia, serif;
   --font-hand: "Caveat", cursive;
 
-  /* Stone scale — canonical hex values (v3-stable). Both entry files
-     (@import "tailwindcss") will merge this block, so the vars are available
-     site-wide and in the editor bundle without any duplicate :root copies. */
-  --color-stone-50: #fafaf9;
-  --color-stone-100: #f5f5f4;
-  --color-stone-200: #e7e5e4;
-  --color-stone-300: #d6d3d1;
-  --color-stone-400: #a8a29e;
-  --color-stone-500: #78716c;
-  --color-stone-600: #57534e;
-  --color-stone-700: #44403c;
-  --color-stone-800: #292524;
-  --color-stone-900: #1c1917;
-  --color-stone-950: #0c0a09;
+  --color-neu-50: #fdfcfc;
+  --color-neu-100: #fdf7f5;
+  --color-neu-200: #f0e6e1;
+  --color-neu-300: #dfcdc5;
+  --color-neu-400: #c2a499;
+  --color-neu-500: #8a6a5d;
+  --color-neu-600: #5a4c47;
+  --color-neu-700: #493e3a;
+  --color-neu-800: #302a27;
+  --color-neu-900: #1c1917;
+  --color-neu-950: hsl(24 11% 5%);
+}
+
+:root[data-palette="brown"] {
+  --color-neu-50: #fefdfc;
+  --color-neu-100: #fcf9f6;
+  --color-neu-200: #f0e4d9;
+  --color-neu-300: #e4cdb7;
+  --color-neu-400: #cea37e;
+  --color-neu-500: #a07553;
+  --color-neu-600: #614a39;
+  --color-neu-700: #4d3c2f;
+  --color-neu-800: #322821;
+  --color-neu-900: #1c1816;
+  --color-neu-950: hsl(20 13% 5%);
+}
+
+:root[data-palette="taupe"] {
+  --color-neu-50: hsl(30 14% 98%);
+  --color-neu-100: hsl(30 12% 95%);
+  --color-neu-200: hsl(30 10% 90%);
+  --color-neu-300: hsl(32 9% 82%);
+  --color-neu-400: hsl(32 8% 64%);
+  --color-neu-500: hsl(33 7% 45%);
+  --color-neu-600: hsl(33 7% 34%);
+  --color-neu-700: hsl(33 8% 26%);
+  --color-neu-800: hsl(34 8% 16%);
+  --color-neu-900: hsl(34 9% 10%);
+  --color-neu-950: hsl(34 10% 5%);
 }
 
 :root {
@@ -157,7 +174,7 @@
 
 @layer base {
   html {
-    --grain-bg: var(--color-stone-200);
+    --grain-bg: var(--color-neu-200);
     --grain-fade: 1024px;
     --grain-blend: multiply;
     --grain-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.28' intercept='0.72'/%3E%3CfeFuncG type='linear' slope='0.28' intercept='0.72'/%3E%3CfeFuncB type='linear' slope='0.28' intercept='0.72'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -188,24 +205,24 @@
 
   em {
     font-style: normal;
-    color: var(--color-stone-900);
+    color: var(--color-neu-900);
     text-decoration: underline dashed
-      color-mix(in srgb, var(--color-stone-900) 25%, transparent);
+      color-mix(in srgb, var(--color-neu-900) 25%, transparent);
     letter-spacing: -0.01em;
     text-underline-offset: 2px;
   }
 
   strong {
-    color: var(--color-stone-800);
+    color: var(--color-neu-800);
   }
 
   html.dark em {
-    color: var(--color-stone-100);
-    text-decoration-color: var(--color-stone-600);
+    color: var(--color-neu-100);
+    text-decoration-color: var(--color-neu-600);
   }
 
   html.dark strong {
-    color: var(--color-stone-200);
+    color: var(--color-neu-200);
   }
 
   ul.diamond {
@@ -215,14 +232,14 @@
 
   ul.diamond > li::before {
     content: "◈";
-    color: var(--color-stone-400);
+    color: var(--color-neu-400);
     margin-right: 0.5rem;
     position: relative;
     top: -0.03em;
   }
 
   html.dark ul.diamond > li::before {
-    color: var(--color-stone-500);
+    color: var(--color-neu-500);
   }
 
   /* Prose bullet lists carry the diamond sigil; task lists (remark-gfm adds
@@ -230,14 +247,14 @@
      never depends on a CSS-module hash landing on the same element. */
   .zaduma-prose ul:not(.contains-task-list) > li::before {
     content: "◈";
-    color: var(--color-stone-400);
+    color: var(--color-neu-400);
     margin-right: 0.5rem;
     position: relative;
     top: -0.03em;
   }
 
   html.dark .zaduma-prose ul:not(.contains-task-list) > li::before {
-    color: var(--color-stone-500);
+    color: var(--color-neu-500);
   }
 
   /* One checkbox for the whole site — GFM task lists, Move cards, editor atoms.
@@ -336,7 +353,7 @@
   }
 
   p a {
-    text-decoration: underline solid var(--color-stone-400) 1px;
+    text-decoration: underline solid var(--color-neu-400) 1px;
     text-underline-offset: 4px;
   }
 
@@ -345,7 +362,7 @@
      to the bottom so it hugs the text on tall block links (e.g. the
      homepage's full-row links) instead of flooding the whole box. */
   a:hover {
-    color: var(--color-stone-900);
+    color: var(--color-neu-900);
     text-decoration-color: var(--color-blue-600);
     background-image: linear-gradient(
       to bottom,
@@ -358,11 +375,11 @@
   }
 
   html.dark a {
-    text-decoration-color: var(--color-stone-600);
+    text-decoration-color: var(--color-neu-600);
   }
 
   html.dark a:hover {
-    color: var(--color-stone-50);
+    color: var(--color-neu-50);
     text-decoration-color: var(--color-orange-400);
     background-image: linear-gradient(
       to bottom,
@@ -383,7 +400,7 @@
     z-index: -1;
     pointer-events: none;
     background-image: radial-gradient(
-      var(--color-stone-500) 0.5px,
+      var(--color-neu-500) 0.5px,
       transparent 0.5px
     );
     background-size: 5px 5px;
@@ -392,7 +409,7 @@
 
   html.dark body::before {
     background-image: radial-gradient(
-      var(--color-stone-300) 0.5px,
+      var(--color-neu-300) 0.5px,
       transparent 0.5px
     );
     opacity: 0.08;

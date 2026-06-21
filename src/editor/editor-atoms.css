@@ -34,7 +34,7 @@
 
 .te-chevron {
   font-style: italic;
-  color: var(--color-stone-600, #57534e);
+  color: var(--color-neu-600, #57534e);
 }
 
 .te-chevron::before {
@@ -47,7 +47,7 @@
 /* Class-based dark mode (zaduma toggles html.dark), rewritten from the
    editor's original prefers-color-scheme rule. */
 .dark .te-chevron {
-  color: var(--color-stone-400, #a8a29e);
+  color: var(--color-neu-400, #a8a29e);
 }
 
 /* Move card: a move's heading + rules. Mirrors dungeon-motion's MoveCard
@@ -68,7 +68,7 @@
   font-size: 1.25em;
   font-weight: 700;
   letter-spacing: 0.025em;
-  color: var(--color-stone-800, #292524);
+  color: var(--color-neu-800, #292524);
 }
 /* Decorative square checkbox in front of the title — the editor's heading is
    contentEditable text, so the box is a marker rather than a live input. */
@@ -83,7 +83,7 @@
   margin-bottom: 0;
 }
 .dark .te-move > :first-child {
-  color: var(--color-stone-100, #f5f5f4);
+  color: var(--color-neu-100, #f5f5f4);
 }
 
 /* Task-list item: one clickable box followed by editable text. */

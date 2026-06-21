@@ -32,7 +32,7 @@ export function SlashMenu({
 
   return (
     <div
-      className="font-text fixed z-40 overflow-hidden rounded-lg bg-white shadow-xl ring ring-stone-400/30 dark:bg-stone-900 dark:ring-stone-600/30"
+      className="font-text fixed z-40 overflow-hidden rounded-lg bg-white shadow-xl ring ring-neu-400/30 dark:bg-neu-900 dark:ring-neu-600/30"
       id={id}
       role="listbox"
       style={{
@@ -47,7 +47,7 @@ export function SlashMenu({
           className={cn(
             "flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-left",
             optionId(command.name) === activeId &&
-              "bg-stone-100 dark:bg-stone-800",
+              "bg-neu-100 dark:bg-neu-800",
           )}
           id={optionId(command.name)}
           key={command.name}
@@ -58,10 +58,10 @@ export function SlashMenu({
           }}
           role="option"
         >
-          <span className="w-28 shrink-0 font-mono text-xs text-stone-400 dark:text-stone-500">
+          <span className="w-28 shrink-0 font-mono text-xs text-neu-400 dark:text-neu-500">
             /{command.name}
           </span>
-          <span className="flex-1 text-sm text-stone-700 dark:text-stone-300">
+          <span className="flex-1 text-sm text-neu-700 dark:text-neu-300">
             {command.description}
           </span>
           {command.kind === "track" && command.shape && (

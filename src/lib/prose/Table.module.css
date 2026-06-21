@@ -6,10 +6,10 @@
 
   & thead {
     /* Explicit border color: v4's default border color is currentColor, not a gray default. */
-    border-bottom: 1px solid var(--color-stone-200);
+    border-bottom: 1px solid var(--color-neu-200);
 
     :global(.dark) & {
-      border-bottom-color: var(--color-stone-700);
+      border-bottom-color: var(--color-neu-700);
     }
   }
 

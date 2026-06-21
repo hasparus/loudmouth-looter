@@ -8,10 +8,10 @@ import "./editor-help-modal.css";
 function Row({ children, code }: { children: ReactNode; code: string }) {
   return (
     <div className="flex items-baseline gap-3 py-1">
-      <code className="shrink-0 rounded bg-stone-100 px-1.5 py-0.5 font-mono text-xs text-stone-600 dark:bg-stone-800 dark:text-stone-300">
+      <code className="shrink-0 rounded bg-neu-100 px-1.5 py-0.5 font-mono text-xs text-neu-600 dark:bg-neu-800 dark:text-neu-300">
         {code}
       </code>
-      <span className="flex-1 text-sm text-stone-700 dark:text-stone-300">
+      <span className="flex-1 text-sm text-neu-700 dark:text-neu-300">
         {children}
       </span>
     </div>
@@ -21,7 +21,7 @@ function Row({ children, code }: { children: ReactNode; code: string }) {
 function Section({ children, title }: { children: ReactNode; title: string }) {
   return (
     <section className="mt-5">
-      <h3 className="m-0 font-serif text-xs tracking-wide text-stone-500 uppercase dark:text-stone-400">
+      <h3 className="m-0 font-serif text-xs tracking-wide text-neu-500 uppercase dark:text-neu-400">
         {title}
       </h3>
       <div className="mt-1">{children}</div>
@@ -56,7 +56,7 @@ export function EditorHelpModal() {
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-label="Editor guide"
-        className="fixed top-3 right-3 z-30 flex size-9 items-center justify-center rounded-full text-stone-500 transition-colors hover:bg-stone-200/70 hover:text-stone-800 hover:duration-0 focus-visible:text-stone-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-200 dark:focus-visible:text-stone-200 print:hidden"
+        className="fixed top-3 right-3 z-30 flex size-9 items-center justify-center rounded-full text-neu-500 transition-colors hover:bg-neu-200/70 hover:text-neu-800 hover:duration-0 focus-visible:text-neu-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neu-400 dark:text-neu-400 dark:hover:bg-neu-800 dark:hover:text-neu-200 dark:focus-visible:text-neu-200 print:hidden"
         onClick={() => setOpen(true)}
         type="button"
       >
@@ -70,7 +70,7 @@ export function EditorHelpModal() {
 
       <dialog
         aria-label="Editor guide"
-        className="te-help-dialog w-[calc(100vw-2rem)] max-w-lg rounded-xl border border-stone-200 bg-white text-stone-900 shadow-2xl dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 print:hidden"
+        className="te-help-dialog w-[calc(100vw-2rem)] max-w-lg rounded-xl border border-neu-200 bg-white text-neu-900 shadow-2xl dark:border-neu-700 dark:bg-neu-900 dark:text-neu-100 print:hidden"
         // The inner div covers the whole visible card; a click outside it landed
         // on the ::backdrop (or the dialog's own margin), so dismiss.
         onClick={(event) => {
@@ -87,7 +87,7 @@ export function EditorHelpModal() {
             </h2>
             <button
               aria-label="Close"
-              className="-mt-2 -mr-2 flex size-8 shrink-0 items-center justify-center rounded-full text-stone-500 transition hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-50"
+              className="-mt-2 -mr-2 flex size-8 shrink-0 items-center justify-center rounded-full text-neu-500 transition hover:bg-neu-200/70 hover:text-neu-900 dark:text-neu-400 dark:hover:bg-neu-800 dark:hover:text-neu-50"
               onClick={() => setOpen(false)}
               type="button"
             >
@@ -99,9 +99,9 @@ export function EditorHelpModal() {
               </span>
             </button>
           </header>
-          <p className="font-text mt-4 text-lg text-stone-700 dark:text-stone-300">
+          <p className="font-text mt-4 text-lg text-neu-700 dark:text-neu-300">
             Type{" "}
-            <code className="bg-stone-100 px-1 py-0.5 font-mono text-sm text-stone-700 dark:bg-stone-800 dark:text-stone-300">
+            <code className="bg-neu-100 px-1 py-0.5 font-mono text-sm text-neu-700 dark:bg-neu-800 dark:text-neu-300">
               /
             </code>{" "}
             for the command menu. Click any square, circle or rhomb to fill it

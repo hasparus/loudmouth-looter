@@ -1,12 +1,12 @@
 @reference "./base.css";
 
 .zaduma-hover-before {
-  @apply selected:before:bg-stone-100 dark:selected:before:bg-stone-800/60 relative before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-md before:bg-transparent before:transition-colors before:content-[''] focus:before:bg-stone-100 dark:hover:before:bg-stone-800/60 dark:focus:before:bg-stone-800/60;
+  @apply selected:before:bg-neu-100 dark:selected:before:bg-neu-800/60 relative before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-md before:bg-transparent before:transition-colors before:content-[''] focus:before:bg-neu-100 dark:hover:before:bg-neu-800/60 dark:focus:before:bg-neu-800/60;
 }
 
 @media (hover: hover) {
   .zaduma-hover-before {
-    @apply hover:before:bg-stone-100;
+    @apply hover:before:bg-neu-100;
   }
 }
 

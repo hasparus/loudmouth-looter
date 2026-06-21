@@ -32,12 +32,12 @@
 
   & figcaption {
     @apply px-6;
-    color: var(--color-stone-600);
+    color: var(--color-neu-600);
     font: italic 400 1em var(--serif);
   }
 
   :where(html.dark) & figcaption {
-    color: var(--color-stone-400);
+    color: var(--color-neu-400);
   }
 }
 
@@ -81,10 +81,10 @@
       @apply italic;
     }
 
-    border-left: 1px solid var(--color-stone-200);
+    border-left: 1px solid var(--color-neu-200);
 
     :global(.dark) & {
-      border-left-color: var(--color-stone-700);
+      border-left-color: var(--color-neu-700);
     }
   }
 
@@ -139,10 +139,10 @@
 
 details {
   @apply -mx-4 rounded-lg border;
-  border-color: var(--color-stone-300);
+  border-color: var(--color-neu-300);
 
   :global(.dark) & {
-    border-color: color-mix(in srgb, var(--color-stone-700) 60%, transparent);
+    border-color: color-mix(in srgb, var(--color-neu-700) 60%, transparent);
   }
 
   & summary::after {
@@ -179,12 +179,12 @@ details {
     &:hover::before,
     &:focus::before,
     &[aria-selected="true"]::before {
-      background-color: var(--color-stone-100);
+      background-color: var(--color-neu-100);
 
       :global(.dark) & {
         background-color: color-mix(
           in srgb,
-          var(--color-stone-800) 60%,
+          var(--color-neu-800) 60%,
           transparent
         );
       }

@@ -3,7 +3,7 @@
    for the grain background, typography, and link styles; this file adds only
    editor-specific resets and layout.
 
-   color-scheme for html.dark lives in skin.css (inside @layer base). The stone
+   color-scheme for html.dark lives in skin.css (inside @layer base). The neu
    scale and --font-serif are declared in skin.css @theme and flow through to
    every bundle that imports tailwindcss + skin.css — no manual :root copies
    needed here. */
@@ -16,14 +16,14 @@
 
 html {
   font-family: var(--font-serif);
-  color: var(--color-stone-700);
+  color: var(--color-neu-700);
   min-height: 100%;
 }
 
 html.dark {
   /* color-scheme is set by skin.css @layer base; repeat color here for
      specificity inside the editor bundle. */
-  color: var(--color-stone-300);
+  color: var(--color-neu-300);
 }
 
 h5 {

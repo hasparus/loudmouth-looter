@@ -10,7 +10,7 @@ export function Blockquote(
       {...props}
       classList={{
         ...props.classList,
-        "bg-stone-100 dark:bg-stone-800 rounded-sm py-4 px-6": true,
+        "bg-neu-100 dark:bg-neu-800 rounded-sm py-4 px-6": true,
         [styles.Blockquote!]: true,
       }}
     />

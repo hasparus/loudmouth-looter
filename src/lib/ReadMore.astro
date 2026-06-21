@@ -18,7 +18,7 @@ const { href, class: className } = Astro.props;
   aria-hidden="true"
   tabindex="-1"
   class:list={[
-    "font-text flex items-center whitespace-nowrap text-stone-500 italic no-underline transition-colors group-hover:text-red-700 group-hover:duration-0 dark:text-stone-500 dark:group-hover:text-red-400",
+    "font-text text-neu-500 dark:text-neu-500 flex items-center whitespace-nowrap italic no-underline transition-colors group-hover:text-red-700 group-hover:duration-0 dark:group-hover:text-red-400 [.group:has(:focus-visible)_&]:text-red-700",
     className,
   ]}
 >
@@ -43,7 +43,7 @@ const { href, class: className } = Astro.props;
     transform: translate(-0.155em, -0.056em);
   }
 
-  :global(.group):hover .rm-arrow::before {
+  :global(.group):is(:hover, :has(:focus-visible)) .rm-arrow::before {
     animation: rm-arrows 2.8s steps(1, end) infinite;
   }
 
@@ -87,7 +87,7 @@ const { href, class: className } = Astro.props;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :global(.group):hover .rm-arrow::before {
+    :global(.group):is(:hover, :has(:focus-visible)) .rm-arrow::before {
       animation: none;
     }
   }

@@ -44,7 +44,7 @@ export function Commands({
     <CommandCenter inputId={INPUT_ID}>
       <CommandCenterTrigger
         classList={{
-          "zaduma-hover-before h-12 w-12 rounded-sm dark:text-stone-400 dark:hover:text-stone-300": true,
+          "zaduma-hover-before h-12 w-12 rounded-sm dark:text-neu-400 dark:hover:text-neu-300": true,
           [className ?? ""]: true,
         }}
       />
@@ -162,7 +162,7 @@ export function CommandsPalette({
       onClose={() => setPage(undefined)}
       ref={(ref) => (dialog = ref)}
       class={
-        "relative mx-auto w-96 max-w-full transform flex-col overflow-hidden rounded-xl bg-white p-0 font-mono shadow-2xl ring-1 ring-black/5 transition-all backdrop:bg-stone-900/30 dark:bg-stone-950 [&[open]]:flex"
+        "relative mx-auto w-96 max-w-full transform flex-col overflow-hidden rounded-xl bg-white p-0 font-mono shadow-2xl ring-1 ring-black/5 transition-all backdrop:bg-neu-900/30 dark:bg-neu-950 [&[open]]:flex"
       }
     >
       <div class="flex justify-end">
@@ -177,7 +177,7 @@ export function CommandsPalette({
         placeholder="What do you need?"
         autofocus
       />
-      <div class="mx-2 border-b border-stone-200 dark:border-stone-800" />
+      <div class="mx-2 border-b border-neu-200 dark:border-neu-800" />
       <CommandList class="overflow-scroll p-2">
         <Switch
           fallback={
@@ -258,7 +258,7 @@ function CommandItem(props: CommandItemProps) {
   return (
     <CommandCenterItem
       class={
-        "zaduma-hover-before relative flex w-full cursor-pointer justify-between p-2 text-stone-700 focus-visible:outline-black dark:text-stone-300"
+        "zaduma-hover-before relative flex w-full cursor-pointer justify-between p-2 text-neu-700 focus-visible:outline-black dark:text-neu-300"
       }
       tabIndex={-1}
       onClick={() => {
@@ -274,7 +274,7 @@ function CommandItem(props: CommandItemProps) {
 
 function GroupHeading(props: { children: JSX.Element }) {
   return (
-    <span class="p-2 text-xs leading-none font-semibold tracking-wider text-stone-400 uppercase dark:text-stone-500">
+    <span class="p-2 text-xs leading-none font-semibold tracking-wider text-neu-400 uppercase dark:text-neu-500">
       {props.children}
     </span>
   );

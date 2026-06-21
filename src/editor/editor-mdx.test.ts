@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
+import { formatInline } from "./editor-dom";
 import { htmlToMdx, mdxToHtml } from "./editor-mdx";
 
 describe("mdxToHtml", () => {
@@ -141,5 +142,28 @@ describe("htmlToMdx", () => {
   test("plain text unchanged (modulo trailing newline)", () => {
     const mdx = "Just plain text.\n";
     expect(htmlToMdx(mdxToHtml(mdx))).toBe(mdx);
+  });
+});
+
+describe("formatInline", () => {
+  test("link with underscores/asterisks in URL is not mangled", () => {
+    expect(formatInline("[doc](https://x.com/a_b_c)")).toBe(
+      '<a href="https://x.com/a_b_c" rel="noreferrer">doc</a>',
+    );
+    expect(formatInline("see [d](https://x.com/__init__.py) now")).toBe(
+      'see <a href="https://x.com/__init__.py" rel="noreferrer">d</a> now',
+    );
+  });
+
+  test("emphasis still applies outside links and in labels", () => {
+    expect(formatInline("a _b_ [**c**](https://x.com)")).toBe(
+      'a <i>b</i> <a href="https://x.com" rel="noreferrer"><strong>c</strong></a>',
+    );
+  });
+
+  test("unsafe href is left as literal text", () => {
+    expect(formatInline("[x](javascript:alert(1))")).toBe(
+      "[x](javascript:alert(1))",
+    );
   });
 });

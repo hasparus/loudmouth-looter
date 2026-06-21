@@ -4,9 +4,10 @@ import { formatDate } from "./formatDate";
 
 interface Props {
   date: Date;
+  class?: string;
 }
 
-const { date } = Astro.props;
+const { date, class: className } = Astro.props;
 const feast = feastDate(date);
 const plain = formatDate(date);
 ---
@@ -15,7 +16,10 @@ const plain = formatDate(date);
   datetime={date.toISOString()}
   data-post-time
   data-plain={plain}
-  class="all-small-caps relative inline-flex h-[1.5cap] w-full shrink-0 items-center align-bottom text-sm leading-[1.3] font-medium tracking-wide text-stone-500 tabular-nums transition-colors hover:text-red-700 hover:duration-0 before:absolute before:-inset-2 dark:text-stone-400 dark:hover:text-red-400"
+  class:list={[
+    "all-small-caps text-neu-500 dark:text-neu-400 relative inline-flex h-[1.5cap] w-full shrink-0 items-center align-bottom text-sm leading-[1.3] font-medium tracking-wide tabular-nums transition-colors select-none before:absolute before:-inset-2 hover:text-red-700 hover:duration-0 dark:hover:text-red-400",
+    className,
+  ]}
 >
   {feast}
 </time>
