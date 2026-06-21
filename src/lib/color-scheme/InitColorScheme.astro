@@ -7,7 +7,9 @@
   if (!scheme) {
     const mql = window.matchMedia("(prefers-color-scheme: dark)");
     setClass(mql.matches);
-    mql.addEventListener("change", (e) => setClass(e.matches));
+    const onSchemeChange = (e) => setClass(e.matches);
+    mql.addEventListener("change", onSchemeChange);
+    window.ⲍ_schemeMqlListener = onSchemeChange;
     window.ⲍ_schemeMql = mql;
   } else setClass(scheme === "dark");
 </script>
