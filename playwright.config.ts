@@ -8,13 +8,14 @@ export default defineConfig({
   ...(process.env.CI ? { workers: 1 } : {}),
   reporter: [["list", { printSteps: true }], ["html"]],
   use: {
-    baseURL: "http://localhost:4321",
+    baseURL: "http://127.0.0.1:4321",
     trace: "retain-on-first-failure",
   },
   webServer: {
-    command: "bun run preview",
-    url: "http://localhost:4321",
+    command: "bunx vite preview --port 4321 --host 127.0.0.1",
+    url: "http://127.0.0.1:4321",
     reuseExistingServer: !process.env.CI,
+    timeout: 60_000,
   },
   projects: [
     {

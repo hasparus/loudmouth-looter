@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test.describe("published post render parity", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/features/editor-atoms");
+    await page.goto("/features/editor-atoms/");
   });
 
   test("renders section headings", async ({ page }) => {
