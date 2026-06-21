@@ -76,6 +76,24 @@ describe("htmlToMdx", () => {
     );
   });
 
+  test("link round-trip", () => {
+    expect(
+      htmlToMdx('<p><a href="https://example.com">label</a></p>'),
+    ).toBe("[label](https://example.com)\n");
+    expect(mdxToHtml("[label](https://example.com)\n")).toBe(
+      '<p><a href="https://example.com">label</a></p>',
+    );
+  });
+
+  test("image round-trip", () => {
+    expect(
+      htmlToMdx('<p><img src="https://example.com/x.png" alt="cat"></p>'),
+    ).toBe("![cat](https://example.com/x.png)\n");
+    expect(mdxToHtml("![cat](https://example.com/x.png)\n")).toBe(
+      '<p><img src="https://example.com/x.png" alt="cat"></p>',
+    );
+  });
+
   test("GFM task list round-trip", () => {
     const taskHtml =
       "<ul>" +

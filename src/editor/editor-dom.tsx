@@ -46,16 +46,31 @@ function plainTextToHtml(text: string) {
 }
 
 const ALLOWED_TAGS = new Set([
+  "A",
   "BR",
   "H1",
   "H2",
   "I",
+  "IMG",
   "LI",
   "OL",
   "P",
   "STRONG",
   "UL",
 ]);
+
+function sanitizeUrl(url: string): string {
+  const trimmed = url.trim();
+  if (/^(https?:|mailto:)/i.test(trimmed)) return trimmed;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return "";
+  return trimmed;
+}
+
+function sanitizeImageSrc(src: string): string {
+  const trimmed = src.trim();
+  if (/^data:image\/(png|jpeg|gif|webp|avif);/i.test(trimmed)) return trimmed;
+  return sanitizeUrl(trimmed);
+}
 const BLOCK_TAGS = new Set(["H1", "H2", "OL", "P", "UL"]);
 // Dropped entirely — subtree is discarded. Includes foreign-namespace
 // containers (SVG, MATH) whose descendants have lowercase tagNames and
@@ -128,6 +143,29 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
       continue;
     }
 
+    if (tag === "A") {
+      const el = document.createElement("a");
+      const href = sanitizeUrl(child.getAttribute("href") ?? "");
+      if (href) {
+        el.setAttribute("href", href);
+        el.setAttribute("rel", "noreferrer");
+      }
+      target.append(el);
+      sanitizeInto(child, el);
+      continue;
+    }
+
+    if (tag === "IMG") {
+      const src = sanitizeImageSrc(child.getAttribute("src") ?? "");
+      if (!src) continue;
+      const el = document.createElement("img");
+      el.setAttribute("src", src);
+      const alt = child.getAttribute("alt");
+      if (alt) el.setAttribute("alt", alt);
+      target.append(el);
+      continue;
+    }
+
     if (ALLOWED_TAGS.has(tag)) {
       const el = document.createElement(tag.toLowerCase());
       target.append(el);
@@ -155,7 +193,21 @@ export function sanitizeHtml(html: string): string {
 function formatInline(text: string) {
   return escapeHtml(text)
     .replaceAll(/\*\*([^*]+)\*\*([.,!?])?/g, "<strong>$1$2</strong>")
-    .replaceAll(/_([^_]+)_([.,!?])?/g, "<i>$1$2</i>");
+    .replaceAll(/_([^_]+)_([.,!?])?/g, "<i>$1$2</i>")
+    .replaceAll(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, label, url) => {
+      const href = sanitizeUrl(unescapeHtml(url));
+      if (!href) return `[${label}](${url})`;
+      return `<a href="${escapeHtml(href)}" rel="noreferrer">${label}</a>`;
+    });
+}
+
+function unescapeHtml(text: string) {
+  return text
+    .replaceAll("&#39;", "'")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&gt;", ">")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&amp;", "&");
 }
 
 function normalizeEditableText(text: string) {
@@ -424,7 +476,8 @@ function transformInlineTextNodes(node: Node): boolean {
 
   if (node instanceof Text) {
     const raw = normalizeEditableText(node.textContent);
-    if (!raw.includes("**") && !raw.includes("_")) return false;
+    if (!raw.includes("**") && !raw.includes("_") && !raw.includes("]("))
+      return false;
 
     const wrapper = document.createElement("span");
     wrapper.innerHTML = formatInline(raw);
@@ -438,7 +491,8 @@ function transformInlineTextNodes(node: Node): boolean {
 
   if (!(node instanceof HTMLElement)) return false;
   if (node.dataset.caretMarker === "true") return false;
-  if (node.tagName === "STRONG" || node.tagName === "I") return false;
+  if (node.tagName === "STRONG" || node.tagName === "I" || node.tagName === "A")
+    return false;
 
   // Snapshot: recursion may replaceWith() on children and mutate the live list.
   for (const child of [...node.childNodes]) {
@@ -489,7 +543,11 @@ export function applyInlineTransform(root: HTMLElement) {
   const raw = normalizeEditableText(block.textContent);
   let changed = false;
 
-  if (/\*\*[^*]+\*\*/.test(raw) || /_[^_]+_/.test(raw)) {
+  if (
+    /\*\*[^*]+\*\*/.test(raw) ||
+    /_[^_]+_/.test(raw) ||
+    /\[[^\]]+\]\([^)\s]+\)/.test(raw)
+  ) {
     const marker = insertCaretMarker(root);
     changed = transformInlineTextNodes(block);
 
@@ -774,10 +832,46 @@ export function handleEnter(root: HTMLElement) {
 // is threaded between the halves of the current block to avoid invalid
 // nesting (e.g. <p>…<h1>…</h1>…</p>); a paste inside a list item is inserted
 // after the enclosing list so the item stays valid.
+function insertImageFile(editor: HTMLElement, file: File) {
+  const selection = globalThis.getSelection();
+  if (
+    !selection ||
+    selection.rangeCount === 0 ||
+    !editor.contains(selection.anchorNode)
+  )
+    return;
+  const range = selection.getRangeAt(0).cloneRange();
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const src = sanitizeImageSrc(String(reader.result));
+    if (!src) return;
+    const img = document.createElement("img");
+    img.setAttribute("src", src);
+
+    range.deleteContents();
+    range.insertNode(img);
+    range.setStartAfter(img);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    flushSave(editor);
+  };
+  reader.readAsDataURL(file);
+}
+
 export function handleEditorPaste(
   editor: HTMLElement,
   clipboard: DataTransfer,
 ) {
+  const imageFile = [...clipboard.files].find((f) =>
+    f.type.startsWith("image/"),
+  );
+  if (imageFile) {
+    insertImageFile(editor, imageFile);
+    return;
+  }
+
   const html = clipboard.getData("text/html");
   const text = clipboard.getData("text/plain");
   const cleanHtml = html ? sanitizeHtml(html) : plainTextToHtml(text);

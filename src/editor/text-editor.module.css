@@ -56,3 +56,14 @@
 .editor i {
   font-style: italic;
 }
+
+.editor a {
+  color: var(--color-blue-600);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.editor img {
+  max-width: 100%;
+  height: auto;
+}

@@ -15,7 +15,7 @@ const plain = formatDate(date);
   datetime={date.toISOString()}
   data-post-time
   data-plain={plain}
-  class="all-small-caps relative inline-flex h-[1.5cap] w-full shrink-0 items-center align-bottom text-sm leading-[1.3] font-medium tracking-wide text-stone-500 tabular-nums transition-colors group-hover:text-red-700 group-hover:duration-0 before:absolute before:-inset-2 dark:text-stone-400 dark:group-hover:text-red-400"
+  class="all-small-caps relative inline-flex h-[1.5cap] w-full shrink-0 items-center align-bottom text-sm leading-[1.3] font-medium tracking-wide text-stone-500 tabular-nums transition-colors hover:text-red-700 hover:duration-0 before:absolute before:-inset-2 dark:text-stone-400 dark:hover:text-red-400"
 >
   {feast}
 </time>
@@ -32,13 +32,8 @@ const plain = formatDate(date);
     const feast = (el.textContent ?? "").trim();
     const plain = el.dataset.plain ?? feast;
     const roll: SlotTextController = slotText(el, feast);
-    const trigger = el.closest<HTMLElement>("[data-feast-trigger]") ?? el;
 
-    trigger.addEventListener("mouseenter", () =>
-      roll.set(plain, SLOT_TEXT_OPTIONS),
-    );
-    trigger.addEventListener("mouseleave", () =>
-      roll.set(feast, SLOT_TEXT_OPTIONS),
-    );
+    el.addEventListener("mouseenter", () => roll.set(plain, SLOT_TEXT_OPTIONS));
+    el.addEventListener("mouseleave", () => roll.set(feast, SLOT_TEXT_OPTIONS));
   }
 </script>

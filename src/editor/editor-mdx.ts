@@ -144,6 +144,22 @@ function phrasingFrom(parent: HTMLElement): PhrasingContent[] {
       out.push(trackElement(node));
       continue;
     }
+    if (node.tagName === "A") {
+      out.push({
+        type: "link",
+        url: node.getAttribute("href") ?? "",
+        children: phrasingFrom(node),
+      });
+      continue;
+    }
+    if (node.tagName === "IMG") {
+      out.push({
+        type: "image",
+        url: node.getAttribute("src") ?? "",
+        alt: node.getAttribute("alt") ?? "",
+      });
+      continue;
+    }
     if (node.tagName === "STRONG") {
       out.push({ type: "strong", children: phrasingFrom(node) });
       continue;
@@ -298,6 +314,20 @@ function appendPhrasing(parent: HTMLElement, nodes: PhrasingContent[]): void {
       case "inlineCode":
         parent.append(document.createTextNode(node.value));
         break;
+      case "link": {
+        const el = document.createElement("a");
+        el.setAttribute("href", node.url);
+        appendPhrasing(el, node.children);
+        parent.append(el);
+        break;
+      }
+      case "image": {
+        const el = document.createElement("img");
+        el.setAttribute("src", node.url);
+        if (node.alt) el.setAttribute("alt", node.alt);
+        parent.append(el);
+        break;
+      }
       case "mdxJsxTextElement":
         if (node.name === "Track") parent.append(trackToDom(node));
         else appendPhrasing(parent, node.children);
