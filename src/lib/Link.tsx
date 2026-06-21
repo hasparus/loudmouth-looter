@@ -10,7 +10,6 @@ export function Link(props: LinkProps) {
   const childIsImg = isChildAnImage(rest.children);
 
   return (
-    // eslint-disable-next-line jsx-a11y/anchor-has-content
     <a
       classList={{
         ...own.classList,

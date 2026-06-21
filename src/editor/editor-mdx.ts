@@ -276,7 +276,7 @@ function appendBlocksInline(
       else if (child.name === "Line") parent.append(lineToDom(child));
       else appendBlocksInline(parent, child.children);
     } else if ("children" in child) {
-      appendBlocksInline(parent, child.children as RootContent[]);
+      appendBlocksInline(parent, child.children);
     } else if ("value" in child) {
       parent.append(document.createTextNode(child.value));
     }
