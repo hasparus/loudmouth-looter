@@ -2,13 +2,15 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { Dialogue } from "../lib/Dialogue";
 import introSrc from "../lib/intro.tree?raw";
+import itHappens from "../lib/it-happens.webp";
 import PostCard from "../lib/PostCard.astro";
 import { getPosts } from "../lib/posts";
 import { SITE_BLURB, SITE_NAME } from "../lib/siteMeta";
 import { parse } from "../lib/tree";
 
 const posts = getPosts();
-const introTree = parse(introSrc);
+// Resolve the bundled asset URL into the tree's logical image reference.
+const introTree = parse(introSrc.replace("it-happens.webp", itHappens.src));
 ---
 
 <BaseLayout title={SITE_NAME} description={SITE_BLURB}>
