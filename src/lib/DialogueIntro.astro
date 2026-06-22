@@ -1,0 +1,10 @@
+---
+import { Dialogue } from "./Dialogue";
+import introSrc from "./intro.tree?raw";
+import itHappens from "./it-happens.webp";
+import { parse } from "./tree";
+
+const tree = parse(introSrc.replace("it-happens.webp", itHappens.src));
+---
+
+<Dialogue tree={tree} client:idle />

@@ -1,16 +1,11 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { Dialogue } from "../lib/Dialogue";
-import introSrc from "../lib/intro.tree?raw";
-import itHappens from "../lib/it-happens.webp";
+import DialogueIntro from "../lib/DialogueIntro.astro";
 import PostCard from "../lib/PostCard.astro";
 import { getPosts } from "../lib/posts";
 import { SITE_BLURB, SITE_NAME } from "../lib/siteMeta";
-import { parse } from "../lib/tree";
 
 const posts = getPosts();
-// Resolve the bundled asset URL into the tree's logical image reference.
-const introTree = parse(introSrc.replace("it-happens.webp", itHappens.src));
 ---
 
 <BaseLayout title={SITE_NAME} description={SITE_BLURB}>
@@ -22,7 +17,7 @@ const introTree = parse(introSrc.replace("it-happens.webp", itHappens.src));
   </h1>
 
   <main class="zaduma-prose py-10">
-    <Dialogue tree={introTree} client:idle />
+    <DialogueIntro />
   </main>
 
   <ul>
