@@ -30,6 +30,7 @@ module.exports = {
     },
     {
       files: ["*.ts", "*.tsx"],
+      extends: ["plugin:solid/typescript"],
       parserOptions: {
         project: [
           require.resolve("./tsconfig.json"),

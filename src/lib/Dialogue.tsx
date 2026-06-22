@@ -42,7 +42,7 @@ const TRIGGER =
   "cursor-pointer border-0 bg-transparent p-0 text-inherit underline decoration-dotted decoration-accent-400/70 decoration-[1.5px] underline-offset-[0.2em] transition-colors duration-150 ease-out hover:text-accent-700 hover:decoration-accent-500 active:opacity-70 dark:decoration-accent-400/60 dark:hover:text-accent-400 dark:hover:decoration-accent-400";
 
 const OPEN =
-  "cursor-default border-0 bg-transparent p-0 text-neu-600 dark:text-neu-400";
+  "cursor-text select-text border-0 bg-transparent p-0 text-inherit";
 
 export function Dialogue(props: { tree: Tree }) {
   const [stack, setStack] = createSignal<string[]>([props.tree.root]);
@@ -118,7 +118,7 @@ export function Dialogue(props: { tree: Tree }) {
   return (
     <div ref={box}>
       <div
-        class="transition-[opacity,filter,transform] duration-[220ms] ease-[cubic-bezier(0.23,1,0.32,1)] data-[shown=false]:-translate-y-1 data-[shown=false]:opacity-0 data-[shown=false]:blur-[3px] data-[shown=false]:duration-[110ms]"
+        class="transition-[opacity,filter,transform] duration-220 ease-[cubic-bezier(0.23,1,0.32,1)] data-[shown=false]:-translate-y-1 data-[shown=false]:opacity-0 data-[shown=false]:blur-[3px] data-[shown=false]:duration-110"
         data-shown={shown() ? "true" : "false"}
       >
         <p class="text-neu-700 dark:text-neu-300 leading-relaxed">
@@ -305,7 +305,6 @@ function Expand(props: { ex: Ex; onNav: (node: string) => void }) {
       class={open() ? OPEN : TRIGGER}
       title={props.ex.q}
       aria-expanded={open()}
-      disabled={open()}
       onClick={() => setOpen(true)}
     >
       {props.ex.base}

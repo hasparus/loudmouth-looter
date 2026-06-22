@@ -189,7 +189,7 @@
     color: var(--color-neu-800);
     font-family: var(--font-serif);
     font-style: normal;
-    font-size: 0.78em;
+    font-size: 0.755em;
   }
 
   html.dark strong {
