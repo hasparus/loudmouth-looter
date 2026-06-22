@@ -19,7 +19,7 @@
 
 == start
 Hey, you there! You seen any outlaws around here?
-- "Uh, you look like one?" -> denial
+- "You look like one." -> denial
 - "No, haven't seen any outlaws lately." -> no-outlaws
 
 == denial

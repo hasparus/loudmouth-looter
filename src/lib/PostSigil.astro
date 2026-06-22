@@ -10,7 +10,7 @@ const { sigil } = Astro.props;
   aria-hidden="true"
   set:html={sigil}
   data-sigil
-  class="pointer-events-none absolute top-11 -left-10 z-10 hidden font-serif text-3xl leading-none text-red-800 select-none md:block lg:-left-12 dark:text-red-400 [&_svg]:h-[1.1em] [&_svg]:w-auto"
+  class="pointer-events-none absolute top-11 -left-10 z-10 hidden font-serif text-3xl leading-none text-accent-800 select-none md:block lg:-left-12 dark:text-accent-400 [&_svg]:h-[1.1em] [&_svg]:w-auto"
 />
 
 <script>
@@ -26,14 +26,20 @@ const { sigil } = Astro.props;
   const sigils = [
     ...document.querySelectorAll<HTMLElement>("[data-sigil]"),
   ].map((el) => ({ el, x: 0, y: 0, vx: 0, vy: 0 }));
+  const REST = 0.05; // px: below this a sigil is "at rest" and stops animating
+
   let mx = -1e4,
     my = -1e4;
-  addEventListener(
-    "pointermove",
-    (e: PointerEvent) => ((mx = e.clientX), (my = e.clientY)),
-  );
+  let running = false;
+  const wake = () => running || ((running = true), requestAnimationFrame(tick));
+  addEventListener("pointermove", (e: PointerEvent) => {
+    mx = e.clientX;
+    my = e.clientY;
+    wake();
+  });
 
-  (function tick() {
+  function tick() {
+    let awake = false;
     for (const s of sigils) {
       const r = s.el.getBoundingClientRect();
       const dx = mx - (r.left + r.width / 2 - s.x);
@@ -47,7 +53,16 @@ const { sigil } = Astro.props;
       s.x += s.vx;
       s.y += s.vy;
       s.el.style.translate = `${s.x}px ${s.y}px`;
+      // keep going while still moving OR not yet settled at the target
+      if (
+        Math.abs(s.vx) > REST ||
+        Math.abs(s.vy) > REST ||
+        Math.abs(tx - s.x) > REST ||
+        Math.abs(ty - s.y) > REST
+      )
+        awake = true;
     }
-    requestAnimationFrame(tick);
-  })();
+    running = awake;
+    if (awake) requestAnimationFrame(tick);
+  }
 </script>

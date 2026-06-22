@@ -115,6 +115,10 @@
   --font-text: "Crimson Text", Georgia, serif;
   --font-hand: "Caveat", cursive;
 
+  --color-*: initial;
+  --color-black: #000;
+  --color-white: #fff;
+
   --color-neu-50: #fdfcfc;
   --color-neu-100: #fdf7f5;
   --color-neu-200: #f0e6e1;
@@ -126,14 +130,30 @@
   --color-neu-800: #302a27;
   --color-neu-900: #1c1917;
   --color-neu-950: hsl(24 11% 5%);
-}
 
-:root {
-  /* Blue/orange accent vars. */
-  --color-blue-500: #3b82f6;
-  --color-blue-600: #2563eb;
-  --color-orange-400: #fb923c;
-  --color-orange-500: #f97316;
+  --color-accent-50: #fef2f2;
+  --color-accent-100: #fee2e2;
+  --color-accent-200: #fecaca;
+  --color-accent-300: #fca5a5;
+  --color-accent-400: #f87171;
+  --color-accent-500: #ef4444;
+  --color-accent-600: #dc2626;
+  --color-accent-700: #b91c1c;
+  --color-accent-800: #991b1b;
+  --color-accent-900: #7f1d1d;
+  --color-accent-950: #450a0a;
+
+  --color-link-50: #eff6ff;
+  --color-link-100: #dbeafe;
+  --color-link-200: #bfdbfe;
+  --color-link-300: #93c5fd;
+  --color-link-400: #60a5fa;
+  --color-link-500: #3b82f6;
+  --color-link-600: #2563eb;
+  --color-link-700: #1d4ed8;
+  --color-link-800: #1e40af;
+  --color-link-900: #1e3a8a;
+  --color-link-950: #172554;
 }
 
 @layer base {
@@ -278,6 +298,11 @@
     outline-offset: max(2px, 0.15em);
   }
 
+  .te-toggle:hover {
+    background-color: color-mix(in oklab, currentColor 10%, transparent);
+    box-shadow: 0 0 0 0.18em color-mix(in oklab, currentColor 15%, transparent);
+  }
+
   .te-toggle[data-shape="circle"] {
     border-radius: 50%;
   }
@@ -320,10 +345,10 @@
      homepage's full-row links) instead of flooding the whole box. */
   a:hover {
     color: var(--color-neu-900);
-    text-decoration-color: var(--color-blue-600);
+    text-decoration-color: var(--color-link-600);
     background-image: linear-gradient(to bottom,
         transparent 0%,
-        color-mix(in srgb, var(--color-blue-500) 10%, transparent 100%) 100%);
+        color-mix(in srgb, var(--color-link-500) 10%, transparent 100%) 100%);
     background-repeat: no-repeat;
     background-position: bottom;
     background-size: 100% min(100%, 1.6em);
@@ -335,10 +360,10 @@
 
   html.dark a:hover {
     color: var(--color-neu-50);
-    text-decoration-color: var(--color-orange-400);
+    text-decoration-color: var(--color-link-500);
     background-image: linear-gradient(to bottom,
         transparent 0%,
-        color-mix(in srgb, var(--color-orange-500) 18%, transparent 100%) 100%);
+        color-mix(in srgb, var(--color-link-500) 18%, transparent 100%) 100%);
   }
 
   button {

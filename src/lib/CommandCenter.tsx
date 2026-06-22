@@ -323,13 +323,13 @@ export function CommandCenterDialog(props: CommandCenterDialogProps) {
     <Dialog
       {...props}
       style={{
-        margin: "0 auto",
+        margin: 0,
         position: "fixed",
-        "max-height": "361px",
+        "max-height": "70vh",
       }}
       classList={{
         ...props.classList,
-        "top-18 sm:top-[calc(50%-180px)]": true,
+        "inset-x-0 top-0": true,
       }}
       ref={(dialog) => {
         ctx.setDialogRef(dialog);

@@ -58,7 +58,7 @@
 }
 
 .editor a {
-  color: var(--color-blue-600);
+  color: var(--color-link-600);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

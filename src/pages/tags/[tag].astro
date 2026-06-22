@@ -39,12 +39,10 @@ const { label, posts } = Astro.props;
 >
   <h1
     slot="header-content"
-    class="font-serif font-bold text-neu-600 dark:text-neu-500"
+    class="text-neu-600 dark:text-neu-400 font-serif font-bold"
   >
-    <Link href="/" noUnderline class="text-neu-400 dark:text-neu-600"
-      >←</Link
-    >
-    <span class="text-neu-400 dark:text-neu-600">§</span>
+    <Link href="/" noUnderline class="text-neu-400 dark:text-neu-600">←</Link>
+    <span class="text-neu-400 dark:text-neu-200">§</span>
     {label}
   </h1>
 

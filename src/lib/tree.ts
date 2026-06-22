@@ -97,7 +97,7 @@ export function parse(src: string): Tree {
       cur = { id: line.slice(3).trim(), say: [], answers: [] };
       continue;
     }
-    const m = line.match(ANSWER);
+    const m = ANSWER.exec(line);
     if (m && cur) {
       cur.answers.push({ say: m[1]!, to: m[2]!.trim() });
       continue;
@@ -107,37 +107,3 @@ export function parse(src: string): Tree {
   flush();
   return { root: root ?? Object.keys(nodes)[0] ?? "", nodes };
 }
-
-function demo() {
-  const a = (cond: boolean, msg: string) => {
-    if (!cond) throw new Error("FAIL: " + msg);
-  };
-
-  const nested = parseInline("see [[a | q1 | b [[c | q2 | d]] e]] ok");
-  const ex = nested[1] as Ex;
-  a(ex.base === "a" && ex.q === "q1", "outer base/q");
-  const inner = (ex.into as Inline[]).find(
-    (x): x is Ex => typeof x !== "string",
-  )!;
-  a(inner.base === "c" && inner.q === "q2", "nested expansion parsed");
-
-  const node = parseInline("[[the Looter | who?! | -> 7]]")[0] as Ex;
-  a((node.into as { node: string }).node === "7", "result -> node ref");
-
-  const t = parse(`@root 1
-== 1
-Hey there?
-- "yes" -> 2
-- "blog" -> https://haspar.us
-== 2
-This is [[the Looter | who?! | my alter ego]].`);
-  a(t.root === "1", "root");
-  a(t.nodes["1"]!.answers.length === 2, "two answers");
-  a(t.nodes["1"]!.answers[1]!.to === "https://haspar.us", "url target");
-  a((t.nodes["2"]!.say[1] as Ex).base === "the Looter", "node body expansion");
-  a(t.nodes["2"]!.answers.length === 0, "node 2 is a terminal");
-
-  console.log("ok — all checks pass");
-}
-
-if (import.meta.url === `file://${process.argv[1]}`) demo();

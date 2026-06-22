@@ -162,22 +162,43 @@ export function CommandsPalette({
       onClose={() => setPage(undefined)}
       ref={(ref) => (dialog = ref)}
       class={
-        "relative mx-auto w-96 max-w-full transform flex-col overflow-hidden rounded-xl bg-white p-0 font-mono shadow-2xl ring-1 ring-black/5 transition-all backdrop:bg-neu-900/30 dark:bg-neu-950 [&[open]]:flex"
+        "border-neu-300 bg-neu-50 font-text shadow-neu-950/40 backdrop:bg-neu-950/20 dark:border-neu-700 dark:bg-neu-900 relative w-full transform flex-col overflow-hidden border-b-2 p-0 shadow-2xl transition-all [&[open]]:flex"
       }
     >
-      <div class="flex justify-end">
-        <DialogCloseButton class="group cursor-pointer p-2 focus:outline-none">
+      <div class="flex items-center justify-between px-3 py-1.5">
+        <span class="all-small-caps text-neu-500 dark:text-neu-400 font-serif text-sm tracking-wider select-none">
+          <span aria-hidden class="text-accent-700/70 dark:text-accent-400/70">
+            ⚜
+          </span>{" "}
+          Command Center
+        </span>
+        <DialogCloseButton class="group cursor-pointer p-1 focus:outline-none">
           <Kbd aria-hidden>esc</Kbd>
           <span class="sr-only">Close</span>
         </DialogCloseButton>
       </div>
-      <CommandInput
-        aria-label="Commands"
-        class="relative w-full bg-transparent p-2 indent-2 focus:outline-none"
-        placeholder="What do you need?"
-        autofocus
-      />
-      <div class="mx-2 border-b border-neu-200 dark:border-neu-800" />
+      <div class="flex items-center gap-2 px-3">
+        <span
+          aria-hidden
+          class="text-accent-700 dark:text-accent-400 text-lg select-none"
+        >
+          ☞
+        </span>
+        <CommandInput
+          aria-label="Commands"
+          class="placeholder:text-neu-400 dark:placeholder:text-neu-500 relative w-full bg-transparent py-2.5 text-lg focus:outline-none"
+          placeholder="What do you seek?"
+          autofocus
+        />
+      </div>
+      <div
+        aria-hidden
+        class="text-neu-300 dark:text-neu-700 flex items-center gap-2 px-3 py-1"
+      >
+        <span class="h-px flex-1 bg-current" />
+        <span class="text-accent-700/70 dark:text-accent-400/70">❦</span>
+        <span class="h-px flex-1 bg-current" />
+      </div>
       <CommandList class="overflow-scroll p-2">
         <Switch
           fallback={
@@ -258,7 +279,7 @@ function CommandItem(props: CommandItemProps) {
   return (
     <CommandCenterItem
       class={
-        "zaduma-hover-before relative flex w-full cursor-pointer justify-between p-2 text-neu-700 focus-visible:outline-black dark:text-neu-300"
+        "zaduma-hover-before selected:text-accent-700 dark:selected:text-accent-400 text-neu-700 dark:text-neu-300 relative flex w-full cursor-pointer justify-between rounded-sm p-2 transition-colors focus-visible:outline-black"
       }
       tabIndex={-1}
       onClick={() => {
@@ -274,7 +295,10 @@ function CommandItem(props: CommandItemProps) {
 
 function GroupHeading(props: { children: JSX.Element }) {
   return (
-    <span class="p-2 text-xs leading-none font-semibold tracking-wider text-neu-400 uppercase dark:text-neu-500">
+    <span class="all-small-caps text-neu-500 dark:text-neu-400 flex items-center gap-1.5 p-2 font-serif text-xs leading-none tracking-widest">
+      <span aria-hidden class="text-accent-700/60 dark:text-accent-400/60">
+        ❧
+      </span>
       {props.children}
     </span>
   );

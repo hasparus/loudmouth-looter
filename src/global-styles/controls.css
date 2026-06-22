@@ -6,7 +6,7 @@
 
 @media (hover: hover) {
   .zaduma-hover-before {
-    @apply hover:before:bg-neu-100;
+    @apply hover:before:bg-neu-100 dark:hover:before:bg-neu-800/60;
   }
 }
 
