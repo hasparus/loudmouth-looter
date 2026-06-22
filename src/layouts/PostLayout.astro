@@ -48,11 +48,11 @@ const postSchema = blogPostingSchema({
   <div class="zaduma-prose zaduma-prose-grid py-4">
     <header>
       <div
-        class="flex items-center justify-between text-neu-600 dark:text-neu-400"
+        class="text-neu-600 dark:text-neu-400 flex items-center justify-between"
       >
         {
           readingTime.minutes > 1 && (
-            <span class="all-small-caps h-[1.5cap] shrink-0 text-sm font-medium tracking-wide text-neu-500 tabular-nums">
+            <span class="all-small-caps text-neu-500 h-[1.5cap] shrink-0 text-sm font-medium tracking-wide tabular-nums">
               {readingTime.text}
             </span>
           )

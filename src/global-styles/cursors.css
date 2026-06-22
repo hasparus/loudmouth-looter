@@ -1,0 +1,154 @@
+html {
+  cursor:
+    url("/cursors/default.png") 4 4,
+    auto;
+}
+
+a,
+button,
+summary,
+[role="button"],
+[type="button"],
+[type="submit"],
+[type="reset"] {
+  cursor:
+    url("/cursors/pointer.png") 16 4,
+    pointer;
+}
+
+a:active,
+button:active,
+summary:active,
+[role="button"]:active,
+[type="button"]:active,
+[type="submit"]:active,
+[type="reset"]:active {
+  cursor:
+    url("/cursors/pointer-active.png") 16 4,
+    pointer;
+}
+
+input:is(
+  :not([type]),
+  [type="date"],
+  [type="datetime-local"],
+  [type="email"],
+  [type="month"],
+  [type="number"],
+  [type="password"],
+  [type="search"],
+  [type="tel"],
+  [type="text"],
+  [type="time"],
+  [type="url"],
+  [type="week"]
+),
+textarea,
+[contenteditable="true"] {
+  cursor:
+    url("/cursors/text-select.png") 16 16,
+    text;
+}
+
+:disabled,
+[aria-disabled="true"] {
+  cursor:
+    url("/cursors/not-allowed.png") 16 16,
+    not-allowed;
+}
+
+[aria-busy="true"] {
+  cursor:
+    url("/cursors/wait.png") 16 16,
+    wait;
+}
+
+@utility cursor-pointer {
+  cursor:
+    url("/cursors/pointer.png") 16 4,
+    pointer;
+
+  &:active {
+    cursor:
+      url("/cursors/pointer-active.png") 16 4,
+      pointer;
+  }
+}
+
+@utility cursor-text {
+  cursor:
+    url("/cursors/text-select.png") 16 16,
+    text;
+}
+
+@utility cursor-not-allowed {
+  cursor:
+    url("/cursors/not-allowed.png") 16 16,
+    not-allowed;
+}
+
+@utility cursor-wait {
+  cursor:
+    url("/cursors/wait.png") 16 16,
+    wait;
+}
+
+@utility cursor-progress {
+  cursor:
+    url("/cursors/progress.png") 16 16,
+    progress;
+}
+
+@utility cursor-help {
+  cursor:
+    url("/cursors/help.png") 16 16,
+    help;
+}
+
+@utility cursor-crosshair {
+  cursor:
+    url("/cursors/precision-select.png") 16 16,
+    crosshair;
+}
+
+@utility cursor-move {
+  cursor:
+    url("/cursors/move.png") 16 16,
+    move;
+}
+
+@utility cursor-ew-resize {
+  cursor:
+    url("/cursors/horizontal-resize.png") 16 16,
+    ew-resize;
+}
+
+@utility cursor-ns-resize {
+  cursor:
+    url("/cursors/vertical-resize.png") 16 16,
+    ns-resize;
+}
+
+@utility cursor-col-resize {
+  cursor:
+    url("/cursors/column-resize.png") 16 16,
+    col-resize;
+}
+
+@utility cursor-row-resize {
+  cursor:
+    url("/cursors/row-resize.png") 16 16,
+    row-resize;
+}
+
+@utility cursor-nwse-resize {
+  cursor:
+    url("/cursors/diagonal-resize-1.png") 16 16,
+    nwse-resize;
+}
+
+@utility cursor-nesw-resize {
+  cursor:
+    url("/cursors/diagonal-resize-2.png") 16 16,
+    nesw-resize;
+}

@@ -186,11 +186,9 @@
   }
 
   em {
+    font-family: var(--font-serif);
     font-style: normal;
-    color: var(--color-neu-900);
-    text-decoration: underline dashed color-mix(in srgb, var(--color-neu-900) 25%, transparent);
-    letter-spacing: -0.01em;
-    text-underline-offset: 2px;
+    font-size: 0.78em;
   }
 
   strong {
