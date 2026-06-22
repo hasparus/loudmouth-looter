@@ -9,7 +9,13 @@ export const setScheme = (scheme: ColorScheme): void => {
   {
     let isDark: boolean;
     if (scheme) {
-      if (window.ⲍ_schemeMql) window.ⲍ_schemeMql.onchange = null;
+      if (window.ⲍ_schemeMql && window.ⲍ_schemeMqlListener) {
+        window.ⲍ_schemeMql.removeEventListener(
+          "change",
+          window.ⲍ_schemeMqlListener,
+        );
+        delete window.ⲍ_schemeMqlListener;
+      }
 
       isDark = scheme === "dark";
     } else {
@@ -19,7 +25,9 @@ export const setScheme = (scheme: ColorScheme): void => {
         "(prefers-color-scheme: dark)",
       ));
 
-      mql.onchange = (e) => setClass(e.matches);
+      const onSchemeChange = (e: MediaQueryListEvent) => setClass(e.matches);
+      mql.addEventListener("change", onSchemeChange);
+      window.ⲍ_schemeMqlListener = onSchemeChange;
       isDark = mql.matches;
     }
 
@@ -46,5 +54,6 @@ export const getEffectiveScheme = (): "dark" | "light" => {
 declare global {
   interface Window {
     ⲍ_schemeMql?: MediaQueryList;
+    ⲍ_schemeMqlListener?: (e: MediaQueryListEvent) => void;
   }
 }
