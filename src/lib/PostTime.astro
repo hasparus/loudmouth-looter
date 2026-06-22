@@ -30,7 +30,7 @@ const plain = formatDate(date);
   import { slotText, type SlotTextController } from "slot-text";
 
   import "slot-text/style.css";
-  import { SLOT_TEXT_OPTIONS } from "./animations";
+  import { SLOT_TEXT_OPTIONS } from "./animations"; 
 
   for (const el of document.querySelectorAll<HTMLTimeElement>(
     "time[data-post-time]",
@@ -39,7 +39,13 @@ const plain = formatDate(date);
     const plain = el.dataset.plain ?? feast;
     const roll: SlotTextController = slotText(el, feast);
 
-    el.addEventListener("mouseenter", () => roll.set(plain, SLOT_TEXT_OPTIONS));
-    el.addEventListener("mouseleave", () => roll.set(feast, SLOT_TEXT_OPTIONS));
+    let timer: ReturnType<typeof setTimeout>;
+    el.addEventListener("mouseenter", () => {
+      timer = setTimeout(() => roll.set(plain, SLOT_TEXT_OPTIONS), 100);
+    });
+    el.addEventListener("mouseleave", () => {
+      clearTimeout(timer);
+      roll.set(feast, SLOT_TEXT_OPTIONS);
+    });
   }
 </script>
