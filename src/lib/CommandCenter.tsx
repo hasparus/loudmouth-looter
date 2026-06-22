@@ -323,7 +323,8 @@ export function CommandCenterDialog(props: CommandCenterDialogProps) {
     <Dialog
       {...props}
       style={{
-        margin: 0,
+        "margin-block": 0,
+        "margin-inline": "auto",
         position: "fixed",
         "max-height": "70vh",
       }}

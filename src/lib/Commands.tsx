@@ -162,22 +162,10 @@ export function CommandsPalette({
       onClose={() => setPage(undefined)}
       ref={(ref) => (dialog = ref)}
       class={
-        "border-neu-300 bg-neu-50 font-text shadow-neu-950/40 backdrop:bg-neu-950/20 dark:border-neu-700 dark:bg-neu-900 relative w-full transform flex-col overflow-hidden border-b-2 p-0 shadow-2xl transition-all [&[open]]:flex"
+        "border-neu-300 bg-neu-50 font-text shadow-neu-950/40 backdrop:bg-neu-950/20 dark:border-neu-700 dark:bg-neu-900 max-w-container relative w-full transform flex-col overflow-hidden p-0 transition-all [&[open]]:flex"
       }
     >
-      <div class="flex items-center justify-between px-3 py-1.5">
-        <span class="all-small-caps text-neu-500 dark:text-neu-400 font-serif text-sm tracking-wider select-none">
-          <span aria-hidden class="text-accent-700/70 dark:text-accent-400/70">
-            ⚜
-          </span>{" "}
-          Command Center
-        </span>
-        <DialogCloseButton class="group cursor-pointer p-1 focus:outline-none">
-          <Kbd aria-hidden>esc</Kbd>
-          <span class="sr-only">Close</span>
-        </DialogCloseButton>
-      </div>
-      <div class="flex items-center gap-2 px-3">
+      <div class="flex items-center gap-2 px-3 pt-3">
         <span
           aria-hidden
           class="text-accent-700 dark:text-accent-400 text-lg select-none"
@@ -190,6 +178,10 @@ export function CommandsPalette({
           placeholder="What do you seek?"
           autofocus
         />
+        <DialogCloseButton class="group cursor-pointer p-1 focus:outline-none">
+          <Kbd aria-hidden>esc</Kbd>
+          <span class="sr-only">Close</span>
+        </DialogCloseButton>
       </div>
       <div
         aria-hidden
@@ -279,7 +271,7 @@ function CommandItem(props: CommandItemProps) {
   return (
     <CommandCenterItem
       class={
-        "zaduma-hover-before selected:text-accent-700 dark:selected:text-accent-400 text-neu-700 dark:text-neu-300 relative flex w-full cursor-pointer justify-between rounded-sm p-2 transition-colors focus-visible:outline-black"
+        "zaduma-hover-before selected:text-neu-900 dark:selected:text-neu-100 text-neu-700 dark:text-neu-300 relative flex w-full cursor-pointer justify-between rounded-sm p-2 transition-colors focus-visible:outline-black"
       }
       tabIndex={-1}
       onClick={() => {
@@ -296,9 +288,7 @@ function CommandItem(props: CommandItemProps) {
 function GroupHeading(props: { children: JSX.Element }) {
   return (
     <span class="all-small-caps text-neu-500 dark:text-neu-400 flex items-center gap-1.5 p-2 font-serif text-xs leading-none tracking-widest">
-      <span aria-hidden class="text-accent-700/60 dark:text-accent-400/60">
-        ❧
-      </span>
+      <span aria-hidden class="text-neu-400 dark:text-neu-500">❧</span>
       {props.children}
     </span>
   );

@@ -3,22 +3,71 @@ import { Portal } from "solid-js/web";
 
 import type { Answer, Ex, Inline, Tree } from "./tree";
 
+import "./Dialogue.css";
+
 const renderEm = (md: string) => md.replace(/[_*]([^_*]+)[_*]/g, "<em>$1</em>");
 const TOKEN = /(!\[[^\]]*\]\([^)]+\)|\[[^\]]+\]\([^)]+\))/g;
 const isUrl = (s: string) => /^https?:\/\//.test(s);
 const isNodeRef = (into: Ex["into"]): into is { node: string } =>
   !Array.isArray(into);
 
+const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
+const reduceMotion = () =>
+  typeof matchMedia !== "undefined" &&
+  matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 const TRIGGER =
   "cursor-pointer border-0 bg-transparent p-0 text-inherit underline decoration-neu-400 decoration-dotted underline-offset-2 transition-colors hover:text-accent-700 dark:hover:text-accent-400";
 
-// ponytail: positional state, no history. Back/restart is a string stack — add when needed (see TODO.md).
 export function Dialogue(props: { tree: Tree }) {
-  const [id, setId] = createSignal(props.tree.root);
+  const [stack, setStack] = createSignal<string[]>([props.tree.root]);
+  const id = () => stack()[stack().length - 1]!;
   const node = () => props.tree.nodes[id()]!;
 
-  const go = (a: Answer) =>
-    isUrl(a.to) ? (window.location.href = a.to) : setId(a.to);
+  let box!: HTMLDivElement;
+  const [shown, setShown] = createSignal(true);
+  const [animate, setAnimate] = createSignal(false);
+  let busy = false;
+
+  const navigate = (mutate: () => void) => {
+    if (busy) return;
+    if (reduceMotion()) {
+      mutate();
+      return;
+    }
+    busy = true;
+    const from = box.offsetHeight;
+    setShown(false);
+    window.setTimeout(() => {
+      setAnimate(true);
+      mutate();
+      requestAnimationFrame(() => {
+        const to = box.offsetHeight;
+        if (from !== to) {
+          box.style.overflow = "hidden";
+          const anim = box.animate(
+            [{ height: `${from}px` }, { height: `${to}px` }],
+            { duration: 240, easing: EASE_OUT },
+          );
+          anim.onfinish = () => (box.style.overflow = "");
+        }
+        requestAnimationFrame(() => {
+          setShown(true);
+          busy = false;
+        });
+      });
+    }, 110);
+  };
+
+  const select = (to: string) => {
+    if (isUrl(to)) {
+      window.location.href = to;
+      return;
+    }
+    navigate(() => setStack([...stack(), to]));
+  };
+  const back = () => navigate(() => setStack(stack().slice(0, -1)));
+  const restart = () => navigate(() => setStack([props.tree.root]));
 
   onMount(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -35,31 +84,59 @@ export function Dialogue(props: { tree: Tree }) {
       const n = Number(event.key);
       if (!Number.isInteger(n) || n < 1 || n > answers.length) return;
       event.preventDefault();
-      go(answers[n - 1]!);
+      select(answers[n - 1]!.to);
     };
     window.addEventListener("keydown", onKey);
     onCleanup(() => window.removeEventListener("keydown", onKey));
   });
 
   return (
-    <div>
-      <p class="text-neu-700 dark:text-neu-300 leading-relaxed">
-        <Prose say={node().say} onNav={setId} />
-      </p>
-      <ol class="mt-5 flex list-none flex-col gap-1 pl-0">
-        <For each={node().answers}>
-          {(a, i) => (
-            <li class="m-0">
-              <Choice n={i() + 1} answer={a} onNav={setId} />
-            </li>
-          )}
-        </For>
-      </ol>
+    <div ref={box}>
+      <div
+        class="dlg-content"
+        data-shown={shown() ? "true" : "false"}
+        data-animate={animate() ? "" : undefined}
+      >
+        <p class="text-neu-700 dark:text-neu-300 leading-relaxed">
+          <Prose say={node().say} onNav={select} />{" "}
+          <Show when={stack().length > 1}>
+            <div class="text-neu-500 dark:text-neu-400 ml-4 inline-flex gap-2">
+              <button
+                type="button"
+                class="hover:text-accent-700 dark:hover:text-accent-400 flex cursor-pointer items-center gap-1 transition-colors"
+                onClick={back}
+              >
+                <span aria-hidden>⇜</span>
+                <span class="sr-only">back</span>
+              </button>
+              <Show when={stack().length > 2}>
+                <button
+                  type="button"
+                  class="hover:text-accent-700 dark:hover:text-accent-400 flex cursor-pointer items-center gap-1 transition-colors"
+                  onClick={restart}
+                >
+                  <span aria-hidden>↺</span>
+                  <span class="sr-only">back to start</span>
+                </button>
+              </Show>
+            </div>
+          </Show>
+        </p>
+        <ol class="mt-5 flex list-none flex-col gap-1 pl-0">
+          <For each={node().answers}>
+            {(a, i) => (
+              <li class="dlg-option m-0" style={{ "--i": i() }}>
+                <Choice n={i() + 1} answer={a} onNav={select} />
+              </li>
+            )}
+          </For>
+        </ol>
+      </div>
     </div>
   );
 }
 
-/** One answer row — number marker turns accent on hover. */
+/** One answer row — number marker turns accent on hover; label renders _em_. */
 function Choice(props: {
   n: number;
   answer: Answer;
@@ -67,12 +144,13 @@ function Choice(props: {
 }) {
   const cls =
     "group flex w-full items-center gap-3 py-0.5 text-left text-neu-700 no-underline transition-colors hover:text-accent-700 hover:duration-0 dark:text-neu-300 dark:hover:text-accent-400";
+
   const inner = (
     <>
       <span class="text-neu-500 dark:text-neu-400 group-hover:text-accent-700 dark:group-hover:text-accent-400 shrink-0 tabular-nums transition-colors">
         {props.n}
       </span>
-      <span>{props.answer.say}</span>
+      <span innerHTML={renderEm(props.answer.say)} />
     </>
   );
 

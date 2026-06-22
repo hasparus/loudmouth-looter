@@ -33,6 +33,7 @@ const { sigil } = Astro.props;
   let running = false;
   const wake = () => running || ((running = true), requestAnimationFrame(tick));
   addEventListener("pointermove", (e: PointerEvent) => {
+    if (document.querySelector("dialog[open]")) return; // dialog backdrop covers the sigil
     mx = e.clientX;
     my = e.clientY;
     wake();
