@@ -21,8 +21,6 @@
     margin-bottom: var(--block-mb);
   }
 
-  /* em inherits the dashed-underline style from skin.css for editor parity */
-
   & strong,
   & strong > em {
     font-weight: 700;

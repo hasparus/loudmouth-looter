@@ -74,47 +74,16 @@ input:is(
   cursor:
     image-set(var(--cur-pointer)) 13 3,
     pointer;
-}
 
-a[href]:active,
-button:active,
-summary:active,
-label:active,
-select:active,
-input:is(
-    [type="button"],
-    [type="checkbox"],
-    [type="color"],
-    [type="file"],
-    [type="radio"],
-    [type="range"],
-    [type="reset"],
-    [type="submit"]
-  ):active,
-[role="button"]:active,
-[role="checkbox"]:active,
-[role="link"]:active,
-[role="menuitem"]:active,
-[role="option"]:active,
-[role="radio"]:active,
-[role="switch"]:active,
-[role="tab"]:active,
-[onclick]:active {
-  cursor:
-    -webkit-image-set(var(--cur-pointer-active)) 13 3,
-    pointer;
-  cursor:
-    image-set(var(--cur-pointer-active)) 13 3,
-    pointer;
-}
-
-[data-cursor-pressed] {
-  cursor:
-    -webkit-image-set(var(--cur-pointer-active)) 13 3,
-    pointer !important;
-  cursor:
-    image-set(var(--cur-pointer-active)) 13 3,
-    pointer !important;
+  &:active,
+  &[data-cursor-pressed] {
+    cursor:
+      -webkit-image-set(var(--cur-pointer-active)) 13 3,
+      pointer;
+    cursor:
+      image-set(var(--cur-pointer-active)) 13 3,
+      pointer;
+  }
 }
 
 input:is(

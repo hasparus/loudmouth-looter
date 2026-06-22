@@ -26,7 +26,7 @@ const date = new Date(frontmatter.date);
   <PostTime
     date={date}
     class="group-link-hocus:text-accent-700 dark:group-link-hocus:text-accent-400 relative z-10 cursor-pointer"
-    onclick={`location.href='${frontmatter.path}'`}
+    href={frontmatter.path}
   />
   <div class="pointer-events-none relative z-10 mt-1 flex flex-col gap-3">
     <h2

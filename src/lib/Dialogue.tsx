@@ -1,12 +1,34 @@
-import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import { slotText } from "slot-text";
+import {
+  createEffect,
+  createSignal,
+  For,
+  onCleanup,
+  onMount,
+  Show,
+} from "solid-js";
 import { Portal } from "solid-js/web";
 
+import { SLOT_TEXT_OPTIONS } from "./animations";
 import styles from "./Dialogue.module.css";
 import { Link } from "./Link";
-import type { Answer, Ex, Inline, Tree } from "./tree";
+import type { Answer, Ex, Inline, Mark, Tree } from "./tree";
 
-const renderEm = (md: string) => md.replace(/[_*]([^_*]+)[_*]/g, "<em>$1</em>");
-const TOKEN = /(!\[[^\]]*\]\([^)]+\)|\[[^\]]+\]\([^)]+\))/g;
+import "slot-text/style.css";
+
+const inlineToText = (part: Inline): string =>
+  typeof part === "string"
+    ? part
+    : "em" in part
+      ? part.em
+      : "strong" in part
+        ? part.strong
+        : "link" in part
+          ? part.link
+          : "img" in part
+            ? part.img
+            : part.base;
+
 const isUrl = (s: string) => /^https?:\/\//.test(s);
 const isNodeRef = (into: Ex["into"]): into is { node: string } =>
   !Array.isArray(into);
@@ -17,7 +39,10 @@ const reduceMotion = () =>
   matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const TRIGGER =
-  "cursor-pointer border-0 bg-transparent p-0 text-inherit underline decoration-neu-400 decoration-dotted underline-offset-2 transition-colors hover:text-accent-700 dark:hover:text-accent-400";
+  "cursor-pointer border-0 bg-transparent p-0 text-inherit underline decoration-dotted decoration-accent-400/70 decoration-[1.5px] underline-offset-[0.2em] transition-colors duration-150 ease-out hover:text-accent-700 hover:decoration-accent-500 active:opacity-70 dark:decoration-accent-400/60 dark:hover:text-accent-400 dark:hover:decoration-accent-400";
+
+const OPEN =
+  "cursor-default border-0 bg-transparent p-0 text-neu-600 dark:text-neu-400";
 
 export function Dialogue(props: { tree: Tree }) {
   const [stack, setStack] = createSignal<string[]>([props.tree.root]);
@@ -99,10 +124,10 @@ export function Dialogue(props: { tree: Tree }) {
         <p class="text-neu-700 dark:text-neu-300 leading-relaxed">
           <Prose say={node().say} onNav={select} />{" "}
           <Show when={stack().length > 1}>
-            <div class="text-neu-500 dark:text-neu-400 ml-4 inline-flex gap-2">
+            <div class="text-neu-500 dark:text-neu-400 ml-3 inline-flex">
               <button
                 type="button"
-                class="hover:text-accent-700 dark:hover:text-accent-400 flex cursor-pointer items-center gap-1 transition-colors"
+                class="hover:text-accent-700 dark:hover:text-accent-400 flex cursor-pointer items-center p-1 transition-colors"
                 onClick={back}
               >
                 <span aria-hidden>⇜</span>
@@ -111,7 +136,7 @@ export function Dialogue(props: { tree: Tree }) {
               <Show when={stack().length > 2}>
                 <button
                   type="button"
-                  class="hover:text-accent-700 dark:hover:text-accent-400 flex cursor-pointer items-center gap-1 transition-colors"
+                  class="hover:text-accent-700 dark:hover:text-accent-400 flex cursor-pointer items-center p-1 transition-colors"
                   onClick={restart}
                 >
                   <span aria-hidden>↺</span>
@@ -153,7 +178,9 @@ function Choice(props: {
       <span class="text-neu-500 dark:text-neu-400 group-hover:text-accent-700 dark:group-hover:text-accent-400 shrink-0 tabular-nums transition-colors">
         {props.n}
       </span>
-      <span innerHTML={renderEm(props.answer.say)} />
+      <span>
+        <For each={props.answer.say}>{(m) => <MarkView mark={m} />}</For>
+      </span>
     </>
   );
 
@@ -176,52 +203,29 @@ function Prose(props: { say: Inline[]; onNav: (node: string) => void }) {
   return (
     <For each={props.say}>
       {(part) =>
-        typeof part === "string" ? (
-          <InlineString text={part} />
-        ) : (
+        typeof part !== "string" && "base" in part ? (
           <Expand ex={part} onNav={props.onNav} />
+        ) : (
+          <MarkView mark={part} />
         )
       }
     </For>
   );
 }
 
-/** Render a prose string: text (with _em_), [links], and ![image] memes. */
-function InlineString(props: { text: string }) {
-  const segments = () => {
-    const out: {
-      html?: string;
-      label?: string;
-      href?: string;
-      img?: boolean;
-    }[] = [];
-    let last = 0;
-    for (const m of props.text.matchAll(TOKEN)) {
-      if (m.index > last)
-        out.push({ html: renderEm(props.text.slice(last, m.index)) });
-      const img = /^!\[([^\]]*)\]\(([^)]+)\)$/.exec(m[0]);
-      const link = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(m[0]);
-      if (img) out.push({ label: img[1]!, href: img[2]!, img: true });
-      else if (link) out.push({ label: link[1]!, href: link[2]! });
-      last = m.index + m[0].length;
-    }
-    if (last < props.text.length)
-      out.push({ html: renderEm(props.text.slice(last)) });
-    return out;
-  };
-
-  return (
-    <For each={segments()}>
-      {(s) =>
-        s.html !== undefined ? (
-          <span innerHTML={s.html} />
-        ) : s.img ? (
-          <MemeLink alt={s.label!} src={s.href!} />
-        ) : (
-          <Link href={s.href}>{s.label}</Link>
-        )
-      }
-    </For>
+/** Render one inline mark: text, _em_, a [link], or an ![image] meme. */
+function MarkView(props: { mark: Mark }) {
+  const m = props.mark;
+  return typeof m === "string" ? (
+    <>{m}</>
+  ) : "em" in m ? (
+    <em>{m.em}</em>
+  ) : "strong" in m ? (
+    <strong>{m.strong}</strong>
+  ) : "img" in m ? (
+    <MemeLink alt={m.img} src={m.href} />
+  ) : (
+    <Link href={m.href}>{m.link}</Link>
   );
 }
 
@@ -244,7 +248,8 @@ function MemeLink(props: { alt: string; src: string }) {
         href={props.src}
         target="_blank"
         rel="noopener noreferrer"
-        class={TRIGGER}
+        class="decoration-neu-400 dark:decoration-neu-500 text-inherit underline decoration-dotted decoration-[1.5px] underline-offset-[0.2em]"
+        style={{ cursor: "image-set(var(--cur-help)) 16 16, help" }}
         onMouseEnter={track}
         onMouseMove={track}
         onMouseLeave={() => setPos(null)}
@@ -269,35 +274,41 @@ function MemeLink(props: { alt: string; src: string }) {
 }
 
 function Expand(props: { ex: Ex; onNav: (node: string) => void }) {
+  const into = props.ex.into;
+
+  if (isNodeRef(into)) {
+    return (
+      <button
+        type="button"
+        class={TRIGGER}
+        title={props.ex.q}
+        onClick={() => props.onNav(into.node)}
+      >
+        {props.ex.base}
+      </button>
+    );
+  }
+
   const [open, setOpen] = createSignal(false);
+  let btn!: HTMLButtonElement;
+  onMount(() => {
+    const roll = slotText(btn, props.ex.base);
+    createEffect(() => {
+      if (open()) roll.set(into.map(inlineToText).join(""), SLOT_TEXT_OPTIONS);
+    });
+    onCleanup(() => roll.destroy());
+  });
   return (
-    <Show
-      when={!isNodeRef(props.ex.into)}
-      fallback={
-        <button
-          type="button"
-          class={TRIGGER}
-          title={props.ex.q}
-          onClick={() => props.onNav((props.ex.into as { node: string }).node)}
-        >
-          {props.ex.base}
-        </button>
-      }
+    <button
+      ref={btn}
+      type="button"
+      class={open() ? OPEN : TRIGGER}
+      title={props.ex.q}
+      aria-expanded={open()}
+      disabled={open()}
+      onClick={() => setOpen(true)}
     >
-      <span>
-        <button
-          type="button"
-          class={TRIGGER}
-          title={props.ex.q}
-          onClick={() => setOpen(!open())}
-        >
-          {props.ex.base}
-        </button>
-        <Show when={open()}>
-          {" — "}
-          <Prose say={props.ex.into as Inline[]} onNav={props.onNav} />
-        </Show>
-      </span>
-    </Show>
+      {props.ex.base}
+    </button>
   );
 }

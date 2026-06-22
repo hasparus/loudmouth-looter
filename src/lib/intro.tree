@@ -11,7 +11,8 @@
 //     question  tooltip on hover
 //     result    inline text (may nest more [[ ]])  OR  -> nodeName (reuse graph)
 //
-//   Prose is inline markdown: _em_, *em*, [text](url) all render.
+//   Prose is inline markdown: _em_/*em*, **bold**/__bold__, [text](url),
+//   ![alt](img) all render.
 //
 //   Everything recurses: results nest, results point at nodes, answers cycle.
 
@@ -42,7 +43,7 @@ Well, not like _that_. I build software. This actually isn't even my website, go
 == pitch
 I find interesting how systems shape the stories we tell, so I yoink a bunch of things from different games, blabber something incomprehensible about n-dimensional spaces, and make my friends play it. They keep asking for more. Weirdos!
 - "I'll take a look." -> friendly
-- "So why'd *you* ask me about outlaws?" -> bug
+- "So why would **you** ask me about outlaws?" -> bug
 - "Surrender or die!" -> hostile
 
 == friendly

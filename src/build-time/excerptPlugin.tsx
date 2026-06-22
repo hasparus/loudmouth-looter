@@ -16,8 +16,11 @@ import type { PostFrontmatter } from "../types";
 /** Number of leading blocks shown when a post doesn't set `excerpt.blocks`. */
 const DEFAULT_EXCERPT_BLOCKS = 2;
 
-/** Blocks that end the lede: a heading, a thematic break, or a code fence. */
-const LEDE_ENDERS = new Set(["h1", "h2", "h3", "h4", "h5", "h6", "hr", "pre"]);
+/** Blocks that end the lede: a heading or a code fence. */
+const LEDE_ENDERS = new Set(["h1", "h2", "h3", "h4", "h5", "h6", "pre"]);
+
+/** Blocks dropped from the excerpt without ending the lede. */
+const LEDE_SKIPS = new Set(["hr"]);
 
 type ChildNode = Expression | SpreadElement | null;
 
@@ -41,7 +44,7 @@ type ChildNode = Expression | SpreadElement | null;
  * call and swap in only the lede blocks — reusing whatever jsx runtime fn the
  * module already imported (`_jsxs` in build, `_jsxDEV` in dev), so it works in
  * both modes. The lede is the opening blocks up to (but not including) the first
- * heading, thematic break or code fence.
+ * heading or code fence; thematic breaks (`hr`) are dropped but don't end it.
  */
 export const recmaMdxExcerpt: Plugin<[], Program> = () => {
   return (tree: Program, file: VFile) => {
@@ -121,7 +124,7 @@ function buildExcerptReturn(
   if (!isFragment) {
     // Single top-level block: keep it unless it's a lede-ender.
     const name = blockName(root);
-    if (!name || LEDE_ENDERS.has(name)) return null;
+    if (!name || LEDE_ENDERS.has(name) || LEDE_SKIPS.has(name)) return null;
     return clone(root);
   }
 
@@ -147,6 +150,8 @@ function pickLede(children: ChildNode[], blocks: number): CallExpression[] {
 
     const name = blockName(child);
     if (!name) continue;
+
+    if (LEDE_SKIPS.has(name)) continue;
 
     if (LEDE_ENDERS.has(name)) {
       if (picked.length) break;

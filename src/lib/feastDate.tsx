@@ -63,14 +63,14 @@ const romanYear = (year: number) => {
 
 export const feastDate = (date: string | number | Date) => {
   const t = new Date(date);
-  t.setHours(0, 0, 0, 0);
-  const y = t.getFullYear();
+  t.setUTCHours(0, 0, 0, 0);
+  const y = t.getUTCFullYear();
   let best,
     n = Infinity;
   for (const [md, la] of F)
     for (const yr of [y - 1, y, y + 1]) {
       const d = Math.round(
-        (+t - +new Date(yr, ((md / 100) | 0) - 1, md % 100)) / 864e5,
+        (+t - +new Date(Date.UTC(yr, ((md / 100) | 0) - 1, md % 100))) / 864e5,
       );
       if (Math.abs(d) < Math.abs(n) || (Math.abs(d) === Math.abs(n) && d > n))
         ((n = d), (best = la));
@@ -79,6 +79,6 @@ export const feastDate = (date: string | number | Date) => {
   if (n === 0) feast = `in festo ${best}`;
   else if (n === 1) feast = `crastino ${best}`;
   else if (n === -1) feast = `vigilia ${best}`;
-  else feast = `${W[t.getDay()]} ${n > 0 ? "post" : "ante"} f. ${best}`;
+  else feast = `${W[t.getUTCDay()]} ${n > 0 ? "post" : "ante"} f. ${best}`;
   return `${feast} ${romanYear(y)}`;
 };

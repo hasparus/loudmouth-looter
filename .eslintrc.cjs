@@ -13,11 +13,8 @@ module.exports = {
       {
         ignore: [
           "^zaduma-",
-          "^dlg",
           "^te-",
           "^rm-arrow$",
-          "^is-leaving$",
-          "^in$",
           "^contains-task-list$",
         ],
       },
