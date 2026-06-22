@@ -9,7 +9,6 @@ interface Props {
 }
 
 const { kind = "arrow" } = Astro.props;
-const cls = kind === "chevron" ? "te-chevron" : "te-arrow";
 ---
 
-<p class={cls}><slot /></p>
+<p class={kind === "chevron" ? "te-chevron" : "te-arrow"}><slot /></p>

@@ -118,6 +118,12 @@ export function CommandsPalette({
         }
       },
     ],
+    [
+      "alt+h",
+      () => {
+        document.documentElement.classList.toggle("high-contrast");
+      },
+    ],
     ["1", () => setColorScheme("light")],
     ["2", () => setColorScheme("dark")],
     ["3", () => setColorScheme(null)],
@@ -203,6 +209,9 @@ export function CommandsPalette({
                 onClick={handleShortcut}
               >
                 Set Theme
+              </CommandItem>
+              <CommandItem shortcut="alt+h" onClick={handleShortcut}>
+                Toggle High Contrast
               </CommandItem>
               <CommandGroup heading={<GroupHeading>Posts</GroupHeading>}>
                 <CommandItem shortcut="alt+slash" onClick={handleShortcut}>

@@ -29,8 +29,11 @@
 
 .te-arrow::before {
   content: "➤";
+  font-size: 0.8em;
   margin-right: 0.55em;
+  margin-bottom: 0.1em;
 }
+
 
 .te-chevron {
   font-style: italic;
@@ -60,7 +63,8 @@
   margin: 0;
   break-inside: avoid;
 }
-.te-move > :first-child {
+
+.te-move> :first-child {
   margin-top: 0;
   display: flex;
   align-items: center;
@@ -70,19 +74,22 @@
   letter-spacing: 0.025em;
   color: var(--color-neu-800, #292524);
 }
+
 /* Decorative square checkbox in front of the title — the editor's heading is
    contentEditable text, so the box is a marker rather than a live input. */
-.te-move > :first-child::before {
+.te-move> :first-child::before {
   content: "";
   flex-shrink: 0;
   width: 0.7em;
   height: 0.7em;
   border: 0.13em solid currentColor;
 }
-.te-move > :last-child {
+
+.te-move> :last-child {
   margin-bottom: 0;
 }
-.dark .te-move > :first-child {
+
+.dark .te-move> :first-child {
   color: var(--color-neu-100, #f5f5f4);
 }
 
@@ -91,7 +98,7 @@
   list-style: none;
 }
 
-.te-task > .te-toggle {
+.te-task>.te-toggle {
   margin-right: 0.5em;
   vertical-align: -0.08em;
 }

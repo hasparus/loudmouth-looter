@@ -11,8 +11,6 @@ html {
   --cur-not-allowed:
     url("/cursors/not-allowed.png") 1x, url("/cursors/not-allowed@2x.png") 2x;
   --cur-wait: url("/cursors/wait.png") 1x, url("/cursors/wait@2x.png") 2x;
-  --cur-progress:
-    url("/cursors/progress.png") 1x, url("/cursors/progress@2x.png") 2x;
   --cur-help: url("/cursors/help.png") 1x, url("/cursors/help@2x.png") 2x;
   --cur-crosshair:
     url("/cursors/precision-select.png") 1x,
@@ -178,10 +176,10 @@ textarea,
 
   .cursor-progress {
     cursor:
-      -webkit-image-set(var(--cur-progress)) 16 16,
+      -webkit-image-set(var(--cur-wait)) 16 16,
       progress;
     cursor:
-      image-set(var(--cur-progress)) 16 16,
+      image-set(var(--cur-wait)) 16 16,
       progress;
   }
 

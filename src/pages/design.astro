@@ -19,7 +19,7 @@ const cursors = [
   ["text", "cursor-text", "text-select.png", "text"],
   ["not-allowed", "cursor-not-allowed", "not-allowed.png", "not-allowed"],
   ["wait", "cursor-wait", "wait.png", "wait"],
-  ["progress", "cursor-progress", "progress.png", "progress"],
+  ["progress", "cursor-progress", "wait.png", "progress"],
   ["help", "cursor-help", "help.png", "help"],
   ["crosshair", "cursor-crosshair", "precision-select.png", "crosshair"],
   ["move", "cursor-move", "move.png", "move"],
@@ -94,7 +94,7 @@ const fonts = [
         {
           cursors.map(([label, cls, png, native]) => (
             <li
-              class={`${cls} border-neu-300 bg-neu-50 flex flex-col items-center gap-2 rounded border p-4`}
+              class={`${cls} border-neu-300 bg-neu-50 dark:bg-neu-800 flex flex-col items-center gap-2 rounded border p-4`}
               style={
                 cls ? undefined : `cursor: url("/cursors/${png}"), ${native}`
               }

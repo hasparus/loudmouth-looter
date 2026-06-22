@@ -67,6 +67,11 @@ html {
   @apply selection:bg-link-700/15 dark:selection:bg-link-400/30 outline-black selection:text-black dark:outline-white dark:selection:text-white;
 }
 
+html.high-contrast,
+html.high-contrast * {
+  color: light-dark(black, white) !important;
+}
+
 body {
   /* bg-transparent lets the grain background on html show through.
      text color inherits from html (neu-700 / neu-300 via skin.css). */

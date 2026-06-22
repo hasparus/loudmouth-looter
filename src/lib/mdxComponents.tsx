@@ -12,6 +12,7 @@ import { Paragraph } from "./prose/Paragraph";
 import { Table } from "./prose/Table";
 import { Ul } from "./prose/Ul";
 import { Link } from "./Link";
+import { Tooltip } from "./Tooltip";
 
 /**
  * Component map for rendering post MDX — the full post (`[...path].astro`) and
@@ -44,4 +45,5 @@ export const mdxComponents = {
   Track,
   Line,
   Move,
+  Tooltip,
 };
