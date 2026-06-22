@@ -2,6 +2,7 @@
 import { mdxComponents } from "./mdxComponents";
 import type { PostEntry } from "./posts";
 import { tagSlug } from "./posts";
+import PostSigil from "./PostSigil.astro";
 import PostTime from "./PostTime.astro";
 import ReadMore from "./ReadMore.astro";
 
@@ -20,15 +21,7 @@ const date = new Date(frontmatter.date);
     aria-label={frontmatter.title}
     class="focus-visible:outline-neu-400 absolute inset-0 z-0 rounded-lg no-underline hover:bg-none focus-visible:outline-2 focus-visible:outline-offset-2"
   ></a>
-  {
-    sigil && (
-      <span
-        aria-hidden="true"
-        set:html={sigil}
-        class="pointer-events-none absolute top-11 -left-10 z-10 hidden font-serif text-3xl leading-none text-red-800 select-none md:block lg:-left-12 dark:text-red-400 [&_svg]:h-[1.1em] [&_svg]:w-auto"
-      />
-    )
-  }
+  {sigil && <PostSigil sigil={sigil} />}
   <PostTime
     date={date}
     class="relative z-10 cursor-pointer group-hover:text-red-700 dark:group-hover:text-red-400 [.group:has(:focus-visible)_&]:text-red-700 dark:[.group:has(:focus-visible)_&]:text-red-400"

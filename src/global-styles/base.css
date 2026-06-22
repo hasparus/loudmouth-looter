@@ -60,7 +60,7 @@ html {
 }
 
 * {
-  @apply outline-black selection:bg-neu-200 selection:text-black dark:outline-white dark:selection:bg-neu-700 dark:selection:text-white;
+  @apply outline-black selection:bg-blue-700/15 selection:text-black dark:outline-white dark:selection:bg-blue-400/30 dark:selection:text-white;
 }
 
 body {

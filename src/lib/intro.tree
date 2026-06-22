@@ -1,0 +1,55 @@
+// .tree DSL — the Looter intro.  Grammar lives in tree.ts (the parser).
+//
+//   @root NAME                    entry node
+//   == NAME                       node header (semantic name)
+//   <prose…>                      what the Looter says; may contain [[ ]]
+//   - "player line" -> target     an answer; target = node name | url
+//   no answers                    → terminal
+//
+//   [[ base | question | result ]]   inline expansion
+//     base      word shown in the sentence
+//     question  tooltip on hover
+//     result    inline text (may nest more [[ ]])  OR  -> nodeName (reuse graph)
+//
+//   Prose is inline markdown: _em_, *em*, [text](url) all render.
+//
+//   Everything recurses: results nest, results point at nodes, answers cycle.
+
+@root start
+
+== start
+Hey, you there! You seen any outlaws around here?
+- "Uh, you look like one?" -> denial
+- "No, haven't seen any outlaws lately." -> no-outlaws
+
+== denial
+Preposterous! I'm a serious guy, an engineer, a lecturer.
+- "Yeah, right. What is this place?" -> reveal
+- "Engineer? You build roads or something?" -> roads
+
+== no-outlaws
+They're holed up in this country like rats, but we'll smoke them out yet.
+- "Is this their hideout?" -> reveal
+
+== reveal
+This is an archive of [[the Looter | who?! | my edgy and opinionated alter ego]], [[a collection | of what? | of notes, rants, kitbashes and experiments, perhaps a finished game or two]].
+- "Okay, so what do you actually do here?" -> pitch
+
+== roads
+Well, not like _that_. I build software. This actually isn't even my website, go read [my blog](https://haspar.us) instead.
+- "Okay, so who's the Looter? What is this place?" -> reveal
+
+== pitch
+I find it interesting how systems shape the stories we tell, so I yoink a bunch of things from different games, blabber something incomprehensible about n-dimensional spaces, and make my friends play it. They keep asking for more. Weirdos!
+- "I'll take a look." -> friendly
+- "So why'd *you* ask me about outlaws?" -> bug
+- "Surrender or die!" -> hostile
+
+== friendly
+Hope you find something worth stealing.
+
+== hostile
+You'll never take me alive!
+
+== bug
+[It happens.](https://i.imgur.com/hzKOvy8.jpeg)
