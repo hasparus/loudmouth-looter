@@ -2,6 +2,7 @@ import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import styles from "./Dialogue.module.css";
+import { Link } from "./Link";
 import type { Answer, Ex, Inline, Tree } from "./tree";
 
 const renderEm = (md: string) => md.replace(/[_*]([^_*]+)[_*]/g, "<em>$1</em>");
@@ -217,7 +218,7 @@ function InlineString(props: { text: string }) {
         ) : s.img ? (
           <MemeLink alt={s.label!} src={s.href!} />
         ) : (
-          <a href={s.href}>{s.label}</a>
+          <Link href={s.href}>{s.label}</Link>
         )
       }
     </For>

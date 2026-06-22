@@ -1,31 +1,120 @@
 html {
+  --cur-default:
+    url("/cursors/default.png") 1x, url("/cursors/default@2x.png") 2x;
+  --cur-pointer:
+    url("/cursors/pointer.png") 1x, url("/cursors/pointer@2x.png") 2x;
+  --cur-pointer-active:
+    url("/cursors/pointer-active.png") 1x,
+    url("/cursors/pointer-active@2x.png") 2x;
+  --cur-text:
+    url("/cursors/text-select.png") 1x, url("/cursors/text-select@2x.png") 2x;
+  --cur-not-allowed:
+    url("/cursors/not-allowed.png") 1x, url("/cursors/not-allowed@2x.png") 2x;
+  --cur-wait: url("/cursors/wait.png") 1x, url("/cursors/wait@2x.png") 2x;
+  --cur-progress:
+    url("/cursors/progress.png") 1x, url("/cursors/progress@2x.png") 2x;
+  --cur-help: url("/cursors/help.png") 1x, url("/cursors/help@2x.png") 2x;
+  --cur-crosshair:
+    url("/cursors/precision-select.png") 1x,
+    url("/cursors/precision-select@2x.png") 2x;
+  --cur-move: url("/cursors/move.png") 1x, url("/cursors/move@2x.png") 2x;
+  --cur-ew-resize:
+    url("/cursors/horizontal-resize.png") 1x,
+    url("/cursors/horizontal-resize@2x.png") 2x;
+  --cur-ns-resize:
+    url("/cursors/vertical-resize.png") 1x,
+    url("/cursors/vertical-resize@2x.png") 2x;
+  --cur-col-resize:
+    url("/cursors/column-resize.png") 1x,
+    url("/cursors/column-resize@2x.png") 2x;
+  --cur-row-resize:
+    url("/cursors/row-resize.png") 1x, url("/cursors/row-resize@2x.png") 2x;
+  --cur-nwse-resize:
+    url("/cursors/diagonal-resize-1.png") 1x,
+    url("/cursors/diagonal-resize-1@2x.png") 2x;
+  --cur-nesw-resize:
+    url("/cursors/diagonal-resize-2.png") 1x,
+    url("/cursors/diagonal-resize-2@2x.png") 2x;
+
   cursor:
-    url("/cursors/default.png") 4 4,
+    -webkit-image-set(var(--cur-default)) 5 5,
+    auto;
+  cursor:
+    image-set(var(--cur-default)) 5 5,
     auto;
 }
 
-a,
+a[href],
 button,
 summary,
+label,
+select,
+input:is(
+  [type="button"],
+  [type="checkbox"],
+  [type="color"],
+  [type="file"],
+  [type="radio"],
+  [type="range"],
+  [type="reset"],
+  [type="submit"]
+),
 [role="button"],
-[type="button"],
-[type="submit"],
-[type="reset"] {
+[role="checkbox"],
+[role="link"],
+[role="menuitem"],
+[role="option"],
+[role="radio"],
+[role="switch"],
+[role="tab"],
+[onclick] {
   cursor:
-    url("/cursors/pointer.png") 16 4,
+    -webkit-image-set(var(--cur-pointer)) 13 3,
+    pointer;
+  cursor:
+    image-set(var(--cur-pointer)) 13 3,
     pointer;
 }
 
-a:active,
+a[href]:active,
 button:active,
 summary:active,
+label:active,
+select:active,
+input:is(
+    [type="button"],
+    [type="checkbox"],
+    [type="color"],
+    [type="file"],
+    [type="radio"],
+    [type="range"],
+    [type="reset"],
+    [type="submit"]
+  ):active,
 [role="button"]:active,
-[type="button"]:active,
-[type="submit"]:active,
-[type="reset"]:active {
+[role="checkbox"]:active,
+[role="link"]:active,
+[role="menuitem"]:active,
+[role="option"]:active,
+[role="radio"]:active,
+[role="switch"]:active,
+[role="tab"]:active,
+[onclick]:active {
   cursor:
-    url("/cursors/pointer-active.png") 16 4,
+    -webkit-image-set(var(--cur-pointer-active)) 13 3,
     pointer;
+  cursor:
+    image-set(var(--cur-pointer-active)) 13 3,
+    pointer;
+}
+
+[data-cursor-pressed] {
+  cursor:
+    -webkit-image-set(var(--cur-pointer-active)) 13 3,
+    pointer !important;
+  cursor:
+    image-set(var(--cur-pointer-active)) 13 3,
+    pointer !important;
 }
 
 input:is(
@@ -46,109 +135,165 @@ input:is(
 textarea,
 [contenteditable="true"] {
   cursor:
-    url("/cursors/text-select.png") 16 16,
+    -webkit-image-set(var(--cur-text)) 16 16,
+    text;
+  cursor:
+    image-set(var(--cur-text)) 16 16,
     text;
 }
 
 :disabled,
 [aria-disabled="true"] {
   cursor:
-    url("/cursors/not-allowed.png") 16 16,
+    -webkit-image-set(var(--cur-not-allowed)) 16 16,
+    not-allowed;
+  cursor:
+    image-set(var(--cur-not-allowed)) 16 16,
     not-allowed;
 }
 
 [aria-busy="true"] {
   cursor:
-    url("/cursors/wait.png") 16 16,
+    -webkit-image-set(var(--cur-wait)) 16 16,
+    wait;
+  cursor:
+    image-set(var(--cur-wait)) 16 16,
     wait;
 }
 
-@utility cursor-pointer {
-  cursor:
-    url("/cursors/pointer.png") 16 4,
-    pointer;
-
-  &:active {
+@layer utilities {
+  .cursor-pointer {
     cursor:
-      url("/cursors/pointer-active.png") 16 4,
+      -webkit-image-set(var(--cur-pointer)) 13 3,
+      pointer;
+    cursor:
+      image-set(var(--cur-pointer)) 13 3,
       pointer;
   }
-}
 
-@utility cursor-text {
-  cursor:
-    url("/cursors/text-select.png") 16 16,
-    text;
-}
+  .cursor-pointer:active {
+    cursor:
+      -webkit-image-set(var(--cur-pointer-active)) 13 3,
+      pointer;
+    cursor:
+      image-set(var(--cur-pointer-active)) 13 3,
+      pointer;
+  }
 
-@utility cursor-not-allowed {
-  cursor:
-    url("/cursors/not-allowed.png") 16 16,
-    not-allowed;
-}
+  .cursor-text {
+    cursor:
+      -webkit-image-set(var(--cur-text)) 16 16,
+      text;
+    cursor:
+      image-set(var(--cur-text)) 16 16,
+      text;
+  }
 
-@utility cursor-wait {
-  cursor:
-    url("/cursors/wait.png") 16 16,
-    wait;
-}
+  .cursor-not-allowed {
+    cursor:
+      -webkit-image-set(var(--cur-not-allowed)) 16 16,
+      not-allowed;
+    cursor:
+      image-set(var(--cur-not-allowed)) 16 16,
+      not-allowed;
+  }
 
-@utility cursor-progress {
-  cursor:
-    url("/cursors/progress.png") 16 16,
-    progress;
-}
+  .cursor-wait {
+    cursor:
+      -webkit-image-set(var(--cur-wait)) 16 16,
+      wait;
+    cursor:
+      image-set(var(--cur-wait)) 16 16,
+      wait;
+  }
 
-@utility cursor-help {
-  cursor:
-    url("/cursors/help.png") 16 16,
-    help;
-}
+  .cursor-progress {
+    cursor:
+      -webkit-image-set(var(--cur-progress)) 16 16,
+      progress;
+    cursor:
+      image-set(var(--cur-progress)) 16 16,
+      progress;
+  }
 
-@utility cursor-crosshair {
-  cursor:
-    url("/cursors/precision-select.png") 16 16,
-    crosshair;
-}
+  .cursor-help {
+    cursor:
+      -webkit-image-set(var(--cur-help)) 16 16,
+      help;
+    cursor:
+      image-set(var(--cur-help)) 16 16,
+      help;
+  }
 
-@utility cursor-move {
-  cursor:
-    url("/cursors/move.png") 16 16,
-    move;
-}
+  .cursor-crosshair {
+    cursor:
+      -webkit-image-set(var(--cur-crosshair)) 16 16,
+      crosshair;
+    cursor:
+      image-set(var(--cur-crosshair)) 16 16,
+      crosshair;
+  }
 
-@utility cursor-ew-resize {
-  cursor:
-    url("/cursors/horizontal-resize.png") 16 16,
-    ew-resize;
-}
+  .cursor-move {
+    cursor:
+      -webkit-image-set(var(--cur-move)) 16 16,
+      move;
+    cursor:
+      image-set(var(--cur-move)) 16 16,
+      move;
+  }
 
-@utility cursor-ns-resize {
-  cursor:
-    url("/cursors/vertical-resize.png") 16 16,
-    ns-resize;
-}
+  .cursor-ew-resize {
+    cursor:
+      -webkit-image-set(var(--cur-ew-resize)) 16 16,
+      ew-resize;
+    cursor:
+      image-set(var(--cur-ew-resize)) 16 16,
+      ew-resize;
+  }
 
-@utility cursor-col-resize {
-  cursor:
-    url("/cursors/column-resize.png") 16 16,
-    col-resize;
-}
+  .cursor-ns-resize {
+    cursor:
+      -webkit-image-set(var(--cur-ns-resize)) 16 16,
+      ns-resize;
+    cursor:
+      image-set(var(--cur-ns-resize)) 16 16,
+      ns-resize;
+  }
 
-@utility cursor-row-resize {
-  cursor:
-    url("/cursors/row-resize.png") 16 16,
-    row-resize;
-}
+  .cursor-col-resize {
+    cursor:
+      -webkit-image-set(var(--cur-col-resize)) 16 16,
+      col-resize;
+    cursor:
+      image-set(var(--cur-col-resize)) 16 16,
+      col-resize;
+  }
 
-@utility cursor-nwse-resize {
-  cursor:
-    url("/cursors/diagonal-resize-1.png") 16 16,
-    nwse-resize;
-}
+  .cursor-row-resize {
+    cursor:
+      -webkit-image-set(var(--cur-row-resize)) 16 16,
+      row-resize;
+    cursor:
+      image-set(var(--cur-row-resize)) 16 16,
+      row-resize;
+  }
 
-@utility cursor-nesw-resize {
-  cursor:
-    url("/cursors/diagonal-resize-2.png") 16 16,
-    nesw-resize;
+  .cursor-nwse-resize {
+    cursor:
+      -webkit-image-set(var(--cur-nwse-resize)) 16 16,
+      nwse-resize;
+    cursor:
+      image-set(var(--cur-nwse-resize)) 16 16,
+      nwse-resize;
+  }
+
+  .cursor-nesw-resize {
+    cursor:
+      -webkit-image-set(var(--cur-nesw-resize)) 16 16,
+      nesw-resize;
+    cursor:
+      image-set(var(--cur-nesw-resize)) 16 16,
+      nesw-resize;
+  }
 }

@@ -190,7 +190,7 @@ export function CommandsPalette({
         class="text-neu-300 dark:text-neu-700 flex items-center gap-2 px-3 py-1"
       >
         <span class="h-px flex-1 bg-current" />
-        <span class="text-accent-700/70 dark:text-accent-400/70">❦</span>
+        <span class="text-accent-700 dark:text-accent-400">❦</span>
         <span class="h-px flex-1 bg-current" />
       </div>
       <CommandList class="overflow-scroll p-2">
@@ -293,10 +293,7 @@ function CommandItem(props: CommandItemProps) {
 
 function GroupHeading(props: { children: JSX.Element }) {
   return (
-    <span class="all-small-caps text-neu-500 dark:text-neu-400 flex items-center gap-1.5 p-2 font-serif text-xs leading-none tracking-widest">
-      <span aria-hidden class="text-neu-400 dark:text-neu-500">
-        ❧
-      </span>
+    <span class="all-small-caps text-neu-500 dark:text-neu-400 flex items-center gap-1.5 p-2 font-serif text-sm leading-none tracking-wide">
       {props.children}
     </span>
   );

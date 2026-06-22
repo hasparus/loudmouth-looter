@@ -1,0 +1,302 @@
+---
+date: "2026-06-06"
+title: Why Would You Fight a Dragon?
+---
+
+tldr: I wrote a small game kinda by accident
+
+---
+
+I signed up to run [1 HP Dragon] at a convention in a \<2 hour time window.
+Yeah. Pulling off something good in less than 2 hours is gonna require some
+effort.
+
+[1 HP dragon]: https://www.explorersdesign.com/the-1-hp-dragon
+
+I need something **accessible**, **fast** and **small**.
+
+I feel like you could play [1 HP Dragon] as a standalone ruleset, with no dice,
+just with
+
+> "if you can do it, do it; if you can't do it, plan better or do something
+> else"
+
+Many players come to the hobby because they like the dice and how randomness and
+game mechanics help us tell stories more interesting than we'd be able to tell
+without them.
+
+So, some dice resolution will be more accessible than no dice. Principle of
+Least Surprise, huh?
+
+I'm definitely taking a PbtA standard 2d6. Player-facing symmetric dice rolls
+are fast, no turns, no action economy, DM doesn't roll. I know it sounds stupid,
+but assume all dice rolls take constant time to roll, read the result and
+narrate. This makes us more than twice as fast as D&D!
+
+<aside>DM = Dragon Minder, obviously</aside>
+
+If it's PbtA, I'm gonna need some moves. I'm not taking Homebrew World or One
+Shot World, both really good games, because I won't have much time for character
+creation and building the world based on the playbooks.
+
+## Mechanics
+
+We'll play with tiny playbooks. You make up your own Class: "Bard", "Wyvern
+Lancer", whatever. It creates fictional positioning, and once per game it lets
+you _roar_.
+
+<Move>
+
+### Hear Me Roar
+
+Once per session introduce a fact or narrative detail from your past life,
+related to your Class, but not to the dragon. The Dragon Minder and other
+players can ask you to adapt it.
+
+> A Bard: "I sang for the duke and then we partied way too much. The guy loves
+> me. He'll help us for sure."
+
+</Move>
+
+<aside>I considered naming it "Class Action".</aside>
+
+### Goals
+
+I wanna focus on the player characters' connection to their dragon. We call them
+Hunters and each of them has a Goal: Vengeance, Power, Greed, Glory, Knowledge,
+Oath.
+
+A Goal can be relinquished, of course. Character development, hell yeah!
+
+<Move>
+
+### Relinquish Your Goal
+
+When you _give up on your original motivation_,
+
+- describe why you forsake your goal,
+- you are visibly changed: it's the way you walk, your facial expression, maybe
+  discard a symbol of your previous motivation.
+
+You may lift one dice roll by a level, happening just now, or in the future.
+From failure to partial success, from partial success to full success. Maybe you
+sacrifice your goal to help your friends, or the newfound clarity helps you in
+your actions.
+
+</Move>
+
+But even before you get rid of it, the pursuit of it lets you affect the game.
+
+<Move>
+
+### Stoke the Fire
+
+When you _chase your Goal with abandon_, reroll a die, but **mark Pyre**.\
+When your Goal _leads you into danger or costs you_ something, take **1 XP**.
+
+</Move>
+
+### Pyre
+
+The **Pyre** is your doom track. Think inverse health pool. Fill the fourth box
+and you're **consumed**, dead or worse.
+
+<Track name="Pyre" value={2} max={4} />
+
+<aside>
+  **Consumed** doesn't mean "out of the game". If dying is boring, maybe you
+  turn against your friends as corrupted villains or undead servants of the
+  dracolich. The DM will feel responsible for time management, so we leave the
+  exact timing and nature of your fall to them. This is usually an "opportunity
+  for a cost" moment.
+</aside>
+
+The game is about the dragon, tactical storytelling and problem-solving, sure,
+but also about the relation of our heroes with the monster and what they are
+willing to sacrifice to defeat it.
+
+That's goals, but we need some baseline dice resolution, stats and a catch-all
+move.
+
+I'm taking 3 stats, Body, Wits and Soul. I reserve the right to attack them as a
+DM move if it doesn't make sense to bump **Pyre**, or the time management of the
+game demands that. From the perspective of the genre, fighting a dragon is
+_exhausting_.
+
+> Distribute values from -2 to +2 so that their total equals +1.
+>
+> `ignoring order: (+2, 0, -1); (+1, +1, -1); (+1, 0, 0); (+2, +1, -2)`
+>
+> Body: Physical strength and stamina.\
+> Wits: Mental acuity and perception.\
+> Soul: Arcane potency and spiritual force.
+
+Of course I'm gonna base a catch-all on Jeremy Strandberg's [Defy Danger,
+Restated]. In our small little village called ~~Stonetop~~ CC BY-SA 4.0, sharing
+is caring.
+
+[Defy Danger, Restated]:
+  https://spoutinglore.blogspot.com/2019/05/defy-danger-restated.html
+
+<Move>
+
+### Face Fury
+
+When the _stakes are dire, danger is imminent, and you act anyway_, roll:
+
+- **+Body** to endure, act fast or with finesse
+- **+Wits** to apply expertise, diplomacy, enact a clever plan, or rely on
+  senses
+- **+Soul** to invoke the arcane, unleash mystical forces, resist esoteric
+  energies
+
+**On a 10+**, you pull it off as well as one could hope.\
+**On a 7-9**, the DM will present a partial success, a tradeoff, or a
+complication.
+
+</Move>
+
+In all moves calling for a roll: **On 6-**, the player marks **1 XP** and the DM
+makes a move.
+
+<Move>
+
+### Jump Into Flames
+
+When you _throw yourself in to help another Hunter after their roll_, they
+reroll one die, but you share the consequences. More than one person can jump in
+on the same action.
+
+</Move>
+
+<aside>
+  If **Jump Into Flames** or [**Relinquish Your Goal**](#relinquish-your-goal)
+  change a roll so it's no longer a miss, the miss XP and the DM move are
+  cancelled. If it didn't play out as a miss in fiction, it was not a miss.
+</aside>
+
+<Move>
+
+### Throw Sand
+
+When you _interfere with another Hunter's action_, [**Face Fury**](#face-fury).\
+**On 7+** you impose -2 to their roll or diminish their effect. They may choose
+to stop what they're doing and get 1 XP.\
+**On 10+** you also avoid the consequences.
+
+</Move>
+
+<Move>
+
+### Level Up
+
+When you _have **4 XP** or more, and a moment of rest_, spend **4 XP** to raise
+one of your stats by **+1** (up to **+3**) or clear **1 Pyre**.
+
+</Move>
+
+<Move>
+
+### Aftermath
+
+When the game ends, go around the table.
+
+Take **1 XP** if you have defeated the dragon.\
+Take **1 XP** if you highlight something another Hunter did that you like, which
+wasn't mentioned before.
+
+For each unspent **XP** you hold, choose one from the following:
+
+- **Fulfill your Goal.** Describe how getting what you wanted changes your life.
+- **Clear 1 Pyre**. Time and distance heal your wounds.
+- **Claim a piece of the dragon** that wasn't destroyed, like the dragon's
+  adamantium scales, its hoard, or its dormant horde of undead.
+
+Choices are repeatable. If you [Relinquished your Goal](#relinquish-your-goal),
+describe the life you found in its place.
+
+Then, go around the table once again.
+
+If you're **consumed** and dead, describe the legend told about you. If you're
+**consumed**, but alive, describe your grim future. Otherwise, for each marked
+**Pyre**, another Hunter describes a shadow over your future.
+
+The DM looks at the remaining pieces of the dragon and narrates their future.
+Maybe, even with the dragon defeated, the story isn't over? Maybe the Wyrmlings
+have fled? Maybe someone has come to the battlefield after the Hunters left.
+
+When it's all over, for the last time, go around the table.
+
+Say one Wish, something that could've been handled better or differently, in
+fiction or at the table; and Highlight one thing you liked in the game.
+
+</Move>
+
+<aside>
+  The DM should crumple all post-it notes with destroyed Legendary & [Permanent
+  Armor][1 HP Dragon] of the dragon by this moment, so it's easier for players
+  to claim the remaining pieces.
+</aside>
+
+## DM Moves
+
+I'm leaving the DM moves, agenda and principles as an exercise to the reader.
+Tis but a write-up for people who already played a lot of games. I'm playing
+this with a list yoinked from Stonetop, because I have it engraved in my brain.
+_"Reveal an unwelcome truth"_ creates a new situational armor or tells us
+something about existing legendary armor. "Hurt someone" allows me to hurt them
+narratively and also mark _**Pyre**_.
+
+<aside>
+  If you've read this far without reading [1 HP Dragon], "Armor" is an obstacle,
+  a puzzle to solve narratively to defeat the boss.
+</aside>
+
+You can use any other list that kinda fits, like
+[the one in MotW](https://evilhat.com/wp-content/uploads/2022/01/Monster-of-the-Week-Revised-Keeper-Reference-Sheets.pdf)
+or Apocalypse World. Barf forth apocalyptica, if you so please.
+
+The dragon is by definition big and scary, so feel free to use multiple hard
+moves at once. Separate and hurt them. Break their stuff and soar into the sky.
+Or, inspired by MotW: **Boast and gloat, revealing a secret** and then
+**Escape**.
+
+## Narrative Structure
+
+Running this at Bazyliszek, I'm basically planning to do a few rounds around the
+table.
+
+0. I tell the players that _roleplaying is a conversation with mechanics
+   sprinkled on_ and that I won't kick them under the table if they interrupt
+   me.
+1. Players create and introduce the characters. I ask questions to learn about
+   them and the dragon.
+2. I write down its Legendary Armor, Permanent Armor and Lore on post-it notes
+   and put them in the middle of the table.
+3. We play as usual, solving the dragon, narrating the actions. I run the core
+   game loop and ask "what do you do" a hundred times.
+4. We run the [**Aftermath**](#aftermath), the Hunters make their choices, and
+   we narrate what comes next. Did the Knight marry the Princess? Is the Wizard
+   who gave up on his quest for forbidden Knowledge now teaching kids at a
+   school?
+
+Thanks to my dear friend
+[Zack Thomson](https://bsky.app/profile/zackthomson.bsky.social) for talking it
+out with me on Discord and helping me come up with something semi-decent.
+
+---
+
+<footer>
+
+## Prior Art & Attributions
+
+This is a "DLC" to [1 HP Dragon] by Clayton Notestine; _Face Fury_ adapts Jeremy
+Strandberg's [Defy Danger, Restated], used under [CC BY-SA 4.0]; and I run the
+game with the DM moves from his [Stonetop] **or** [Monster of the Week] Keeper
+moves by Mike Sands. The ruleset in this post is shared under [CC BY-SA 4.0].
+
+[Stonetop]: https://www.lampblackandbrimstone.com/
+[Monster of the Week]: https://evilhat.com/product/monster-of-the-week/
+[CC BY-SA 4.0]: https://creativecommons.org/licenses/by-sa/4.0/
+
+</footer>
