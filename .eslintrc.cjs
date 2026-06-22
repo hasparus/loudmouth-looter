@@ -2,7 +2,7 @@ module.exports = {
   root: true,
   parser: "@typescript-eslint/parser",
   extends: ["@edgeandnode"],
-  plugins: ["better-tailwindcss"],
+  plugins: ["better-tailwindcss", "check-file"],
   settings: {
     react: { version: "999.999.999" },
     "better-tailwindcss": { entryPoint: "src/global-styles/base.css" },
@@ -21,6 +21,13 @@ module.exports = {
     ],
   },
   overrides: [
+    {
+      files: ["src/**/*.ts"],
+      excludedFiles: ["**/*.d.ts", "**/*.xml.ts", "**/*.txt.ts", "**/*.md.ts"],
+      rules: {
+        "check-file/filename-blocklist": ["error", { "**/*.ts": "*.tsx" }],
+      },
+    },
     {
       files: ["*.ts", "*.tsx"],
       parserOptions: {
