@@ -31,7 +31,8 @@ const date = new Date(frontmatter.date);
   }
   <PostTime
     date={date}
-    class="relative z-10 group-hover:text-red-700 dark:group-hover:text-red-400 [.group:has(:focus-visible)_&]:text-red-700 dark:[.group:has(:focus-visible)_&]:text-red-400"
+    class="relative z-10 cursor-pointer group-hover:text-red-700 dark:group-hover:text-red-400 [.group:has(:focus-visible)_&]:text-red-700 dark:[.group:has(:focus-visible)_&]:text-red-400"
+    onclick={`location.href='${frontmatter.path}'`}
   />
   <div class="pointer-events-none relative z-10 flex flex-col gap-3">
     <h2
