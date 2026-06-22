@@ -44,7 +44,7 @@ export function Commands({
     <CommandCenter inputId={INPUT_ID}>
       <CommandCenterTrigger
         classList={{
-          "zaduma-hover-before h-12 w-12 rounded-sm dark:text-neu-400 dark:hover:text-neu-300": true,
+          "zaduma-hover-before h-12 w-12 before:rounded-none! dark:text-neu-400 dark:hover:text-neu-300 hover:duration-0 trim-cap-alphabetic [&>span]:block [&>span]:translate-y-px": true,
           [className ?? ""]: true,
         }}
       />
@@ -178,8 +178,10 @@ export function CommandsPalette({
           placeholder="What do you seek?"
           autofocus
         />
-        <DialogCloseButton class="group cursor-pointer p-1 focus:outline-none">
-          <Kbd aria-hidden>esc</Kbd>
+        <DialogCloseButton class="group h-min cursor-pointer p-1 focus:outline-none">
+          <Kbd class="inline-block" aria-hidden>
+            esc
+          </Kbd>
           <span class="sr-only">Close</span>
         </DialogCloseButton>
       </div>
@@ -195,7 +197,11 @@ export function CommandsPalette({
         <Switch
           fallback={
             <>
-              <CommandItem shortcut="alt+t" onClick={handleShortcut}>
+              <CommandItem
+                tabIndex={0}
+                shortcut="alt+t"
+                onClick={handleShortcut}
+              >
                 Set Theme
               </CommandItem>
               <CommandGroup heading={<GroupHeading>Posts</GroupHeading>}>
@@ -271,7 +277,7 @@ function CommandItem(props: CommandItemProps) {
   return (
     <CommandCenterItem
       class={
-        "zaduma-hover-before selected:text-neu-900 dark:selected:text-neu-100 text-neu-700 dark:text-neu-300 relative flex w-full cursor-pointer justify-between rounded-sm p-2 transition-colors focus-visible:outline-black"
+        "zaduma-hover-before selected:text-neu-900 hover:text-neu-900 dark:selected:text-neu-100 dark:hover:text-neu-100 text-neu-700 dark:text-neu-300 relative flex w-full cursor-pointer items-center justify-between p-2 no-underline transition-colors before:rounded-none! hover:bg-none"
       }
       tabIndex={-1}
       onClick={() => {
@@ -288,7 +294,9 @@ function CommandItem(props: CommandItemProps) {
 function GroupHeading(props: { children: JSX.Element }) {
   return (
     <span class="all-small-caps text-neu-500 dark:text-neu-400 flex items-center gap-1.5 p-2 font-serif text-xs leading-none tracking-widest">
-      <span aria-hidden class="text-neu-400 dark:text-neu-500">❧</span>
+      <span aria-hidden class="text-neu-400 dark:text-neu-500">
+        ❧
+      </span>
       {props.children}
     </span>
   );

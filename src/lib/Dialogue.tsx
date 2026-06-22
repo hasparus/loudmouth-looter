@@ -1,9 +1,8 @@
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { Portal } from "solid-js/web";
 
+import styles from "./Dialogue.module.css";
 import type { Answer, Ex, Inline, Tree } from "./tree";
-
-import "./Dialogue.css";
 
 const renderEm = (md: string) => md.replace(/[_*]([^_*]+)[_*]/g, "<em>$1</em>");
 const TOKEN = /(!\[[^\]]*\]\([^)]+\)|\[[^\]]+\]\([^)]+\))/g;
@@ -93,9 +92,8 @@ export function Dialogue(props: { tree: Tree }) {
   return (
     <div ref={box}>
       <div
-        class="dlg-content"
+        class="transition-[opacity,filter,transform] duration-[220ms] ease-[cubic-bezier(0.23,1,0.32,1)] data-[shown=false]:-translate-y-1 data-[shown=false]:opacity-0 data-[shown=false]:blur-[3px] data-[shown=false]:duration-[110ms]"
         data-shown={shown() ? "true" : "false"}
-        data-animate={animate() ? "" : undefined}
       >
         <p class="text-neu-700 dark:text-neu-300 leading-relaxed">
           <Prose say={node().say} onNav={select} />{" "}
@@ -122,10 +120,14 @@ export function Dialogue(props: { tree: Tree }) {
             </div>
           </Show>
         </p>
-        <ol class="mt-5 flex list-none flex-col gap-1 pl-0">
+        <ol class="mt-5 flex list-none flex-col pl-0">
           <For each={node().answers}>
             {(a, i) => (
-              <li class="dlg-option m-0" style={{ "--i": i() }}>
+              <li
+                class="m-0"
+                classList={{ [styles.optionIn!]: animate() }}
+                style={{ "--i": i() }}
+              >
                 <Choice n={i() + 1} answer={a} onNav={select} />
               </li>
             )}

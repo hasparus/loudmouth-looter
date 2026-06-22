@@ -426,3 +426,7 @@
 @utility trim-end-alphabetic {
   text-box: trim-end cap alphabetic;
 }
+
+@utility trim-start-alphabetic {
+  text-box: trim-start cap alphabetic;
+}

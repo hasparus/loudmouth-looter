@@ -6,7 +6,7 @@
 
 @media (hover: hover) {
   .zaduma-hover-before {
-    @apply hover:before:bg-neu-100 dark:hover:before:bg-neu-800/60;
+    @apply hover:before:bg-neu-100 dark:hover:before:bg-neu-800/60 hover:before:duration-0;
   }
 }
 
@@ -15,6 +15,7 @@
  * IOS Safari zooms in on inputs on focus if their text size is smaller than 16px.
  */
 @supports (-webkit-overflow-scrolling: touch) {
+
   input,
   textarea,
   select {

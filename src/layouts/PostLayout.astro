@@ -45,7 +45,7 @@ const postSchema = blogPostingSchema({
   description={description}
 >
   <JsonLd data={postSchema} slot="head" />
-  <main class="zaduma-prose zaduma-prose-grid py-4">
+  <div class="zaduma-prose zaduma-prose-grid py-4">
     <header>
       <div
         class="flex items-center justify-between text-neu-600 dark:text-neu-400"
@@ -67,6 +67,6 @@ const postSchema = blogPostingSchema({
       )
     }
     <slot />
-  </main>
+  </div>
   <TableOfContents headings={headings} />
 </BaseLayout>

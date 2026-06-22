@@ -8,6 +8,8 @@
 @custom-variant selected (&[aria-selected="true"]);
 @custom-variant current (&[aria-current="true"]);
 
+@custom-variant group-link-hocus (&:is(:where(.group):has(>a:is(:hover, :focus)) *));
+
 @theme {
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -19,6 +21,8 @@
 
   --container-container: 43rem;
   --animate-scale-up: scale-up 150ms ease-in;
+
+  --leading-relaxed: 1.6;
 
   @keyframes scale-up {
     0% {
@@ -60,7 +64,7 @@ html {
 }
 
 * {
-  @apply outline-black selection:bg-link-700/15 selection:text-black dark:outline-white dark:selection:bg-link-400/30 dark:selection:text-white;
+  @apply selection:bg-link-700/15 dark:selection:bg-link-400/30 outline-black selection:text-black dark:outline-white dark:selection:text-white;
 }
 
 body {

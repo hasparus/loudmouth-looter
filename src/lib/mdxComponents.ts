@@ -5,7 +5,7 @@ import Track from "../editor/render/Track.astro";
 import { Blockquote } from "./prose/Blockquote";
 import { Code, Pre } from "./prose/code-and-pre";
 import { createHeading } from "./prose/Heading";
-import Hr from "./prose/Hr.astro";
+import Hr from "./prose/Hr";
 import Image from "./prose/Image.astro";
 import { Ol } from "./prose/Ol";
 import { Paragraph } from "./prose/Paragraph";

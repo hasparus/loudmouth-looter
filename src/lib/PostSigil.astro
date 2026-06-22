@@ -10,18 +10,18 @@ const { sigil } = Astro.props;
   aria-hidden="true"
   set:html={sigil}
   data-sigil
-  class="pointer-events-none absolute top-11 -left-10 z-10 hidden font-serif text-3xl leading-none text-accent-800 select-none md:block lg:-left-12 dark:text-accent-400 [&_svg]:h-[1.1em] [&_svg]:w-auto"
+  class="text-accent-800 dark:text-accent-400 pointer-events-none absolute top-11 -left-10 z-10 hidden font-serif text-3xl leading-none select-none md:block lg:-left-12 [&_svg]:h-[1.1em] [&_svg]:w-auto"
 />
 
 <script>
   /** px: width of the soft pull — like a gaussian blur radius */
-  const SIGMA = 50;
+  const SIGMA = 55;
   /** how far toward the cursor it leans at the center (0–1) */
   const PULL = 0.3;
   /** spring stiffness */
   const STIFF = 0.08;
   /** * velocity damping  */
-  const DAMP = 0.75;
+  const DAMP = 0.66;
 
   const sigils = [
     ...document.querySelectorAll<HTMLElement>("[data-sigil]"),
@@ -32,8 +32,9 @@ const { sigil } = Astro.props;
     my = -1e4;
   let running = false;
   const wake = () => running || ((running = true), requestAnimationFrame(tick));
-  addEventListener("pointermove", (e: PointerEvent) => {
-    if (document.querySelector("dialog[open]")) return; // dialog backdrop covers the sigil
+  // listen on <main>, not window: a modal dialog's backdrop sits in the top
+  // layer and swallows pointermove, so tracking pauses while a dialog is open
+  document.querySelector("main")?.addEventListener("pointermove", (e) => {
     mx = e.clientX;
     my = e.clientY;
     wake();

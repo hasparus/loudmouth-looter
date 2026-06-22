@@ -46,12 +46,12 @@ const { label, posts } = Astro.props;
     {label}
   </h1>
 
-  <main class="zaduma-prose py-10">
+  <div class="zaduma-prose py-10">
     <p>
       {posts.length}
       {posts.length === 1 ? "post" : "posts"} tagged <em>{label}</em>.
     </p>
-  </main>
+  </div>
 
   <ul>
     {

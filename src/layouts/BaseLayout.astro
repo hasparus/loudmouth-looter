@@ -131,14 +131,16 @@ const hasHeaderContent = Astro.slots.has("header-content");
         </Link>
       )
     }
-    <div class="max-w-container mx-auto px-4">
-      <header class="flex items-center" style={{ height: "37.5px" }}>
-        <slot name="header-content" />
-      </header>
-      <slot />
-    </div>
-    <ScrollbarStyles />
-    {cursors && <CursorParty />}
-    <Marginalia />
+    <main>
+      <div class="max-w-container mx-auto px-4">
+        <header class="flex items-center" style={{ height: "37.5px" }}>
+          <slot name="header-content" />
+        </header>
+        <slot />
+      </div>
+      <ScrollbarStyles />
+      {cursors && <CursorParty />}
+      <Marginalia />
+    </main>
   </body>
 </html>

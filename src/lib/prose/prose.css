@@ -41,13 +41,6 @@
   }
 }
 
-/* Post body grid (PostLayout adds .zaduma-prose-grid to the post <main> only —
-   the homepage keeps plain .zaduma-prose flow). The reading column keeps the
-   site's centered measure; on wide viewports a right margin column opens up and
-   <aside> elements flow into it, auto-aligned to the paragraph they follow.
-   CSS grid auto-placement does what the old asidesPlugin did by AST traversal:
-   a col-1 paragraph and the <aside> authored right after it land in the same
-   grid row. Images and other blocks stay in the reading column. */
 .zaduma-prose-grid {
   --aside-w: 15rem;
   --col-gap: 1rem;

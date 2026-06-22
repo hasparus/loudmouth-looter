@@ -18,7 +18,7 @@ export function Kbd(props: KbdProps) {
       ref={ref}
       {...props}
       class={
-        "border-neu-300 bg-neu-50 dark:border-neu-700 dark:bg-neu-800 all-small-caps font-text text-neu-500 dark:text-neu-400 border border-b-2 p-1 text-sm leading-none font-medium tracking-wide tabular-nums group-hover:border-b group-hover:shadow-[inset_0_1px_1px_0_rgba(0,0,0,0.025)] group-focus:outline-solid data-pressed:border-b" +
+        "border-neu-300 bg-neu-50 dark:border-neu-700 dark:bg-neu-800 all-small-caps font-text text-neu-500 dark:text-neu-400 trim-start-alphabetic border border-b-2 p-1 text-base leading-none font-medium tracking-wide tabular-nums group-hover:border-b group-hover:shadow-[inset_0_1px_1px_0_rgba(0,0,0,0.025)] group-focus:outline-solid data-pressed:border-b" +
         (props.class ? ` ${props.class}` : "")
       }
     />

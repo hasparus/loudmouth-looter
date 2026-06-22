@@ -18,7 +18,7 @@ const { href, class: className } = Astro.props;
   aria-hidden="true"
   tabindex="-1"
   class:list={[
-    "font-text text-neu-500 dark:text-neu-500 flex items-center whitespace-nowrap italic no-underline transition-colors group-hover:text-accent-700 group-hover:duration-0 dark:group-hover:text-accent-400 [.group:has(:focus-visible)_&]:text-accent-700",
+    "font-text text-neu-500 dark:text-neu-500 group-link-hocus:text-accent-700 group-link-hocus:duration-0 dark:group-link-hocus:text-accent-400 [.group:has(:focus-visible)_&]:text-accent-700 flex items-center whitespace-nowrap italic no-underline transition-colors",
     className,
   ]}
 >

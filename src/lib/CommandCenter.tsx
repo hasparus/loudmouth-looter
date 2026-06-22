@@ -58,7 +58,7 @@ export function CommandCenterTrigger(props: CommandCenterTriggerProps) {
         props.onClick?.(event);
       }}
     >
-      ⌘
+      <span>⌘</span>
     </button>
   );
 }
@@ -373,5 +373,5 @@ export function CommandList(
     }
   });
 
-  return <div id={listId} {...props} />;
+  return <div id={listId} tabIndex={-1} {...props} />;
 }
