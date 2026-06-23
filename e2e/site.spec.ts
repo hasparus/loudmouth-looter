@@ -72,6 +72,22 @@ test.describe("OG images", () => {
   });
 });
 
+test.describe("Move cards (published)", () => {
+  test("why-dragon renders move cards with a heading and a checkbox", async ({
+    page,
+  }) => {
+    await page.goto("/why-dragon/");
+    const move = page
+      .locator("article.group")
+      .filter({ has: page.getByRole("heading", { name: "Hear Me Roar" }) });
+    await expect(move).toBeVisible();
+
+    const checkbox = move.getByRole("checkbox").first();
+    await checkbox.check();
+    await expect(checkbox).toBeChecked();
+  });
+});
+
 test("homepage is readable on mobile", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile", "Mobile-specific test");
   await page.goto("/");
