@@ -21,12 +21,11 @@ export function MoveCard(props: MoveCardProps) {
     props,
   );
   const isSmall = () => merged.size === "sm";
-  const id = () =>
-    merged.id || merged.title.toLowerCase().replaceAll(" ", "-");
+  const id = () => merged.id || merged.title.toLowerCase().replaceAll(" ", "-");
 
   return (
     <article
-      class={`group break-inside-avoid ${merged.className} [.zaduma-prose_&]:before:inset-0 [.zaduma-prose_&]:before:border-l [.zaduma-prose_&]:before:border-l [.zaduma-prose_&]:before:w-0 [.zaduma-prose_&]:before:-left-6 [.zaduma-prose_&]:before:border-dashed [.zaduma-prose_&]:before:bg-neu-400 relative [.zaduma-prose_&]:before:absolute ${
+      class={`group break-inside-avoid ${merged.className} [.zaduma-prose_&]:before:bg-neu-400 relative [.zaduma-prose_&]:before:absolute [.zaduma-prose_&]:before:inset-0 [.zaduma-prose_&]:before:-left-6 [.zaduma-prose_&]:before:w-0 [.zaduma-prose_&]:before:border-l [.zaduma-prose_&]:before:border-dashed ${
         isSmall() ? "space-y-2" : "py-4"
       }`}
     >
@@ -67,7 +66,9 @@ export function MoveCard(props: MoveCardProps) {
                   {(_, i) => (
                     <input
                       class={
-                        isSmall() ? "size-3 rounded-full" : "size-4 rounded-full"
+                        isSmall()
+                          ? "size-3 rounded-full"
+                          : "size-4 rounded-full"
                       }
                       data-checkbox-marker="x"
                       name={`${id()}-r-${i}`}
@@ -101,7 +102,7 @@ export function MoveCard(props: MoveCardProps) {
         </Show>
         <div
           class={cn(
-            "text-neu-700 dark:text-neu-300 leading-relaxed flex flex-col gap-(--block-mb)",
+            "text-neu-700 dark:text-neu-300 flex flex-col gap-(--block-mb) leading-relaxed",
             isSmall() ? "mt-1 text-sm" : "mt-2",
           )}
         >

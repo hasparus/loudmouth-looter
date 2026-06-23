@@ -23,7 +23,7 @@ export function SlashMenu(props: SlashMenuProps) {
   return (
     <Show when={props.commands.length > 0}>
       <div
-        class="font-text fixed z-40 overflow-hidden rounded-lg bg-white shadow-xl ring ring-neu-400/30 dark:bg-neu-900 dark:ring-neu-600/30"
+        class="font-text ring-neu-400/30 dark:bg-neu-900 dark:ring-neu-600/30 fixed z-40 overflow-hidden rounded-lg bg-white shadow-xl ring"
         id={props.id}
         role="listbox"
         style={{
@@ -48,10 +48,10 @@ export function SlashMenu(props: SlashMenuProps) {
               }}
               role="option"
             >
-              <span class="w-28 shrink-0 font-mono text-xs text-neu-400 dark:text-neu-500">
+              <span class="text-neu-400 dark:text-neu-500 w-28 shrink-0 font-mono text-xs">
                 /{command.name}
               </span>
-              <span class="flex-1 text-sm text-neu-700 dark:text-neu-300">
+              <span class="text-neu-700 dark:text-neu-300 flex-1 text-sm">
                 {command.description}
               </span>
               <Show when={command.kind === "track" && command.shape}>

@@ -440,7 +440,7 @@ export function TextEditor() {
       </Show>
 
       <footer class="mt-auto flex items-center justify-between gap-2 px-4 pb-5 print:hidden">
-        <div class="flex min-w-0 items-center gap-1 font-mono text-xs text-neu-500 dark:text-neu-400">
+        <div class="text-neu-500 dark:text-neu-400 flex min-w-0 items-center gap-1 font-mono text-xs">
           <Show when={file.supported}>
             <Show
               when={file.name === null}
@@ -487,7 +487,9 @@ export function TextEditor() {
           </Show>
         </div>
         <button
-          aria-label={spellcheck() ? "Turn spellcheck off" : "Turn spellcheck on"}
+          aria-label={
+            spellcheck() ? "Turn spellcheck off" : "Turn spellcheck on"
+          }
           class={controlButton}
           onClick={() => setSpellcheck((value) => !value)}
           type="button"
