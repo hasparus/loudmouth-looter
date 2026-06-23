@@ -283,7 +283,6 @@ function CommandItem(props: CommandItemProps) {
       }
       tabIndex={-1}
       onClick={() => {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         if (own.shortcut) own.onClick!(own.shortcut);
       }}
       {...rest}

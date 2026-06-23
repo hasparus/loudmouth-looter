@@ -125,11 +125,16 @@ if (isRaw) {
     ? fetch(pathToImage).then(async (res) =>
         Buffer.from(await res.arrayBuffer()),
       )
-    : // Resolve the source image from the project root. `pathToImage` is
-      // relative to this component (`../../../src/images/...`); strip the
-      // leading `../` segments and join onto cwd so the lookup is independent
-      // of Astro's emitted chunk layout (which changed in Astro 6).
-      readFile(join(process.cwd(), pathToImage.replace(/^(?:\.\.\/)+/, ""))));
+    : src.startsWith(SRC_IMAGES_PREFIX)
+      ? readFile(
+          join(
+            process.cwd(),
+            "src",
+            "images",
+            decodeURIComponent(src.slice(SRC_IMAGES_PREFIX.length)),
+          ),
+        )
+      : readFile(new URL(pathToImage.replace("../", ""), import.meta.url)));
 
   const { metadata, css } = await getPlaiceholder(imageForPlaceholder, {
     size: 10,

@@ -23,18 +23,20 @@ test.describe("Visual regression", () => {
     await expect(page).toHaveScreenshot("index.png", {
       fullPage: true,
       maxDiffPixels: 500,
+      maxDiffPixelRatio: 0.005,
     });
   });
 
   test("blog posts match screenshots", async ({ page }) => {
     test.setTimeout(60_000);
     for (const post of postsInFS) {
-      await page.goto(`/${post}`);
+      await page.goto(`/${post}/`);
       await ensurePageStable(page);
 
       await expect(page).toHaveScreenshot(`${post.replace(/\//g, "-")}.png`, {
         fullPage: true,
         maxDiffPixels: 500,
+        maxDiffPixelRatio: 0.005,
       });
     }
   });

@@ -73,8 +73,7 @@ export function EditorHelpModal() {
         // The inner div covers the whole visible card; a click outside it landed
         // on the ::backdrop (or the dialog's own margin), so dismiss.
         onClick={(event) => {
-          if (innerRef && !innerRef.contains(event.target as Node))
-            setOpen(false);
+          if (innerRef && !innerRef.contains(event.target)) setOpen(false);
         }}
         onClose={() => setOpen(false)}
         ref={dialogRef}

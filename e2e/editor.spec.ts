@@ -19,7 +19,7 @@ async function clearEditor(page: import("@playwright/test").Page) {
 
 test.describe("editor", () => {
   test("loads and hydrates the writing surface", async ({ page }) => {
-    await page.goto("/editor");
+    await page.goto("/editor/");
     await expect(page.getByRole("textbox", EDITOR)).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Editor guide" }),
@@ -29,7 +29,7 @@ test.describe("editor", () => {
   test("slash menu opens as a listbox and matches commands", async ({
     page,
   }) => {
-    await page.goto("/editor");
+    await page.goto("/editor/");
     const editor = await clearEditor(page);
     await editor.pressSequentially("/sq");
 
@@ -39,7 +39,7 @@ test.describe("editor", () => {
   });
 
   test("inserts a squares track with the requested count", async ({ page }) => {
-    await page.goto("/editor");
+    await page.goto("/editor/");
     const editor = await clearEditor(page);
 
     await editor.pressSequentially("/squares 4");
@@ -53,7 +53,7 @@ test.describe("editor", () => {
   test("converts `- [ ] ` shorthand into a task with a toggle", async ({
     page,
   }) => {
-    await page.goto("/editor");
+    await page.goto("/editor/");
     const editor = await clearEditor(page);
 
     await editor.pressSequentially("- [ ] ", { delay: 40 });
