@@ -20,8 +20,7 @@
 .Blockquote {
   position: relative;
   quotes: "\201C" "\201D" "\2018" "\2019";
-  font: italic 444 22.5px var(--font-text);
-  line-height: 1.6;
+  font: italic 444 1em var(--font-text);
 
   &:after,
   &:before {
@@ -49,5 +48,10 @@
     bottom: 0;
     right: 0;
     transform: translate(calc(50% - 2px), calc(50% + 0.25rem + 8px));
+  }
+
+  &:global(.large) {
+    font: italic 444 22.5px var(--font-text);
+    line-height: 1.6;
   }
 }
