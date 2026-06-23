@@ -1,6 +1,5 @@
 import { unified } from "@astrojs/markdown-remark";
 import mdx from "@astrojs/mdx";
-import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import solidJs from "@astrojs/solid-js";
 import { transformerTwoslash } from "@shikijs/twoslash";
@@ -70,8 +69,7 @@ export default defineConfig({
       extendMarkdownConfig: true,
       recmaPlugins: [recmaMdxExcerpt],
     }),
-    react({ include: ["**/editor/**"] }),
-    solidJs({ exclude: ["**/editor/**"] }),
+    solidJs(),
     sitemap({
       filter: (page) =>
         !hiddenPaths.has(stripTrailingSlash(new URL(page).pathname)),

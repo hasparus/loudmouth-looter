@@ -1,6 +1,6 @@
 ---
 // Standalone editor page (own <html>, no site chrome) — mirrors dungeon-motion's
-// editor.astro. The editor is a React island (client:only); the slotted markup
+// editor.astro. The editor is a Solid island (client:only); the slotted markup
 // is the pre-hydration skeleton. Skin + Tailwind utilities come from
 // editor-skin.css, imported here so they load only on this route.
 // Avara (display face) is self-hosted from public/fonts under the SIL OFL 1.1
@@ -62,7 +62,7 @@ import "../editor/editor-skin.css";
     <InitColorScheme />
   </head>
   <body class="m-0">
-    <TextEditor client:only="react">
+    <TextEditor client:only="solid-js">
       <main class="min-h-screen">
         <div class="mx-auto max-w-3xl animate-pulse px-4 py-24 md:px-6">
           <div class="mb-4 h-8 w-2/3 rounded bg-neu-200 dark:bg-neu-800">

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { createStore } from "solid-js/store";
 
 import {
   isFileAccessSupported,
@@ -24,20 +24,28 @@ export interface LinkedFile {
 const WRITE_DEBOUNCE_MS = 600;
 
 export function useLinkedFile(): LinkedFile {
-  const [supported] = useState(isFileAccessSupported);
-  const [name, setName] = useState<string | null>(null);
-  const [status, setStatus] = useState<FileStatus>("saved");
-  const handle = useRef<FileSystemFileHandle | null>(null);
-  const pending = useRef<string | null>(null);
-  const draining = useRef<Promise<boolean> | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [state, setState] = createStore<{
+    name: string | null;
+    status: FileStatus;
+    supported: boolean;
+  }>({
+    name: null,
+    status: "saved",
+    supported: isFileAccessSupported(),
+  });
+  const handle: { current: FileSystemFileHandle | null } = { current: null };
+  const pending: { current: string | null } = { current: null };
+  const draining: { current: Promise<boolean> | null } = { current: null };
+  const timer: { current: ReturnType<typeof setTimeout> | null } = {
+    current: null,
+  };
 
   async function drain(): Promise<boolean> {
     if (draining.current) return await draining.current;
     if (!handle.current || pending.current === null) return true;
 
     let activeHtml: string | null = null;
-    const slow = setTimeout(() => setStatus("saving"), 150);
+    const slow = setTimeout(() => setState("status", "saving"), 150);
     draining.current = (async () => {
       try {
         while (handle.current && pending.current !== null) {
@@ -47,13 +55,13 @@ export function useLinkedFile(): LinkedFile {
           await writeDocument(handle.current, html);
           activeHtml = null;
         }
-        setStatus("saved");
+        setState("status", "saved");
         return true;
       } catch (error) {
         if (activeHtml !== null && pending.current === null)
           pending.current = activeHtml;
         console.warn("text-editor: file save failed", error);
-        setStatus("error");
+        setState("status", "error");
         return false;
       } finally {
         clearTimeout(slow);
@@ -95,12 +103,12 @@ export function useLinkedFile(): LinkedFile {
       const html = await readDocument(picked);
       handle.current = picked;
       pending.current = null;
-      setName(picked.name);
-      setStatus("saved");
+      setState("name", picked.name);
+      setState("status", "saved");
       return html;
     } catch (error) {
       console.warn("text-editor: could not open file", error);
-      setStatus("error");
+      setState("status", "error");
       return null;
     }
   }
@@ -110,7 +118,7 @@ export function useLinkedFile(): LinkedFile {
       const picked = await pickFileToCreate();
       if (!picked) return false;
       handle.current = picked;
-      setName(picked.name);
+      setState("name", picked.name);
     }
     return await flushWrite(html);
   }
@@ -121,10 +129,25 @@ export function useLinkedFile(): LinkedFile {
     clearTimer();
     handle.current = null;
     pending.current = null;
-    setName(null);
-    setStatus("saved");
+    setState("name", null);
+    setState("status", "saved");
     return true;
   }
 
-  return { close, flushWrite, name, open, queue, save, status, supported };
+  return {
+    close,
+    flushWrite,
+    open,
+    queue,
+    save,
+    get name() {
+      return state.name;
+    },
+    get status() {
+      return state.status;
+    },
+    get supported() {
+      return state.supported;
+    },
+  };
 }

@@ -1,12 +1,12 @@
 {
-  "//": "The editor was spun out of dungeon-motion, which typechecks at the `strict` level (not Astro's `strictest`) with the React JSX runtime and DOM.Iterable. We keep that config here so the cluster stays verbatim and proven, while the rest of the site stays at `strictest` (see ../../tsconfig.json).",
+  "//": "The editor was spun out of dungeon-motion and typechecks at the `strict` level (not Astro's `strictest`) with DOM.Iterable. It was migrated from React to Solid (see git history), so it uses the Solid JSX runtime here; the rest of the site stays at `strictest` (see ../../tsconfig.json).",
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "jsx": "react-jsx",
-    "jsxImportSource": "react",
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
     "skipLibCheck": true,
-    "types": ["react", "react-dom", "bun"]
+    "types": ["bun"]
   },
   "include": ["."]
 }

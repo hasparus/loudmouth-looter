@@ -1,14 +1,4 @@
-/** @jsxImportSource react */
-import {
-  type ClipboardEvent,
-  type FocusEvent,
-  type FormEvent,
-  type KeyboardEvent,
-  type MouseEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
 
 import { buildTrackElement, type SlashCommand } from "./editor-atoms";
 import {
@@ -47,7 +37,7 @@ import { useLinkedFile } from "./use-linked-file";
 import "./editor-atoms.css";
 
 // Keeps a track's roving tabindex on whichever toggle focus last reached.
-function handleFocus(event: FocusEvent<HTMLDivElement>) {
+function handleFocus(event: FocusEvent) {
   const toggle = (event.target as HTMLElement).closest(".te-toggle");
   if (!(toggle instanceof HTMLElement)) return;
   const track = toggle.closest(".te-track");
@@ -60,23 +50,22 @@ function handleFocus(event: FocusEvent<HTMLDivElement>) {
 // Mouse-down on a toggle would normally pull focus onto the button and wipe
 // the caret. Stop the default so a click toggles without uprooting the writer;
 // keyboard focus still works because it never goes via mousedown.
-function handleMouseDown(event: MouseEvent<HTMLDivElement>) {
+function handleMouseDown(event: MouseEvent) {
   const toggle = (event.target as HTMLElement).closest(".te-toggle");
   if (toggle) event.preventDefault();
 }
 
 export function TextEditor() {
-  const editorRef = useRef<HTMLDivElement>(null);
+  let editorEl: HTMLDivElement | undefined;
   // One-slot custom undo: the editor's transforms (slash commands, `- [ ] `,
   // headings, lists) bypass the browser's history, so Ctrl/Cmd+Z restores
   // this pre-transform snapshot. Cleared once the writer types past it.
-  const pendingUndo = useRef<UndoSnapshot | null>(null);
-  const [spellcheck, setSpellcheck] = useState(() => {
-    const saved = localStorage.getItem(SPELLCHECK_KEY);
-    return saved === null ? true : saved === "true";
-  });
-  const [slash, setSlash] = useState<SlashState | null>(null);
-  const [slashIndex, setSlashIndex] = useState(0);
+  let pendingUndo: UndoSnapshot | null = null;
+  const [spellcheck, setSpellcheck] = createSignal(
+    localStorage.getItem(SPELLCHECK_KEY) !== "false",
+  );
+  const [slash, setSlash] = createSignal<SlashState | null>(null);
+  const [slashIndex, setSlashIndex] = createSignal(0);
   const file = useLinkedFile();
 
   function persist(editor: HTMLElement) {
@@ -90,7 +79,7 @@ export function TextEditor() {
 
   // Recomputes the pending `/command` query after any caret-moving event.
   function refreshSlash() {
-    const editor = editorRef.current;
+    const editor = editorEl;
     if (!editor) return;
     const next = readSlashState(editor);
     setSlash(next && matchSlashCommands(next).length > 0 ? next : null);
@@ -98,19 +87,19 @@ export function TextEditor() {
   }
 
   function undoTransform(editor: HTMLElement) {
-    const snapshot = pendingUndo.current;
+    const snapshot = pendingUndo;
     if (!snapshot) return;
     editor.innerHTML = snapshot.html;
     normalizeTrackTabindexes(editor);
     restoreSelection(editor, snapshot.selection);
-    pendingUndo.current = null;
+    pendingUndo = null;
     setSlash(null);
     persistNow(editor);
   }
 
   // Replaces the typed `/command` query with its rendered atom.
   function commitSlash(command: SlashCommand, count: number | null) {
-    const editor = editorRef.current;
+    const editor = editorEl;
     if (!editor) return;
 
     const selection = globalThis.getSelection();
@@ -148,7 +137,7 @@ export function TextEditor() {
       );
       // Non-breaking space: a plain trailing space next to an inline atom gets
       // collapsed away by contentEditable whitespace normalisation.
-      const space = document.createTextNode(" ");
+      const space = document.createTextNode(" ");
       const fragment = document.createDocumentFragment();
       fragment.append(track, space);
       deleteRange.insertNode(fragment);
@@ -167,15 +156,15 @@ export function TextEditor() {
       }
     }
 
-    pendingUndo.current = snapshot;
+    pendingUndo = snapshot;
     setSlash(null);
     setSlashIndex(0);
     normalizeEmptyBlocks(editor);
     persistNow(editor);
   }
 
-  useEffect(() => {
-    const editor = editorRef.current;
+  onMount(() => {
+    const editor = editorEl;
     if (!editor) return;
 
     migrateStorage();
@@ -186,74 +175,80 @@ export function TextEditor() {
 
     const handleBeforeUnload = () => flushSave(editor);
     globalThis.addEventListener("beforeunload", handleBeforeUnload);
-    return () =>
-      globalThis.removeEventListener("beforeunload", handleBeforeUnload);
-  }, []);
+    onCleanup(() =>
+      globalThis.removeEventListener("beforeunload", handleBeforeUnload),
+    );
+  });
 
   // A caret move that fires no `input` event (arrow keys, clicks) still has to
   // refresh the slash menu, otherwise it lingers stale at the old anchor.
-  useEffect(() => {
+  onMount(() => {
     let scheduled = 0;
     const handler = () => {
       if (scheduled) return;
       scheduled = requestAnimationFrame(() => {
         scheduled = 0;
-        const editor = editorRef.current;
+        const editor = editorEl;
         const anchor = globalThis.getSelection()?.anchorNode ?? null;
         if (editor && anchor && editor.contains(anchor)) refreshSlash();
       });
     };
     document.addEventListener("selectionchange", handler);
-    return () => {
+    onCleanup(() => {
       document.removeEventListener("selectionchange", handler);
       if (scheduled) cancelAnimationFrame(scheduled);
-    };
-  }, []);
+    });
+  });
 
-  useEffect(() => {
-    localStorage.setItem(SPELLCHECK_KEY, String(spellcheck));
-  }, [spellcheck]);
+  createEffect(() => {
+    localStorage.setItem(SPELLCHECK_KEY, String(spellcheck()));
+  });
 
   async function handleOpenFile() {
-    const editor = editorRef.current;
+    const editor = editorEl;
     if (!editor) return;
     const html = await file.open();
     if (html === null) return;
     editor.innerHTML = sanitizeHtml(html);
     normalizeTrackTabindexes(editor);
     setSlash(null);
-    pendingUndo.current = null;
+    pendingUndo = null;
     flushSave(editor);
   }
 
   async function handleSaveFile() {
-    const editor = editorRef.current;
+    const editor = editorEl;
     if (editor) await file.save(serializeDocument(editor));
   }
 
   async function handleCloseFile() {
-    const editor = editorRef.current;
+    const editor = editorEl;
     await file.close(editor ? serializeDocument(editor) : undefined);
   }
 
-  const slashCommands = slash ? matchSlashCommands(slash) : [];
-  const slashActiveId =
-    slashCommands.length > 0
+  const slashCommands = () => {
+    const current = slash();
+    return current ? matchSlashCommands(current) : [];
+  };
+  const slashActiveId = () => {
+    const commands = slashCommands();
+    return commands.length > 0
       ? slashOptionId(
-          slashCommands[Math.min(slashIndex, slashCommands.length - 1)].name,
+          commands[Math.min(slashIndex(), commands.length - 1)].name,
         )
       : undefined;
+  };
 
   function handleBlur() {
-    const editor = editorRef.current;
+    const editor = editorEl;
     if (editor) persistNow(editor);
     setSlash(null);
   }
 
   // A click — or keyboard Space/Enter on a focused toggle — flips its state;
   // any click also refreshes the slash menu against the moved caret.
-  function handleClick(event: MouseEvent<HTMLDivElement>) {
-    const editor = editorRef.current;
+  function handleClick(event: MouseEvent) {
+    const editor = editorEl;
     if (!editor) return;
     const toggle = (event.target as HTMLElement).closest(".te-toggle");
     if (toggle instanceof HTMLElement && editor.contains(toggle)) {
@@ -264,33 +259,34 @@ export function TextEditor() {
     refreshSlash();
   }
 
-  function handleInput(event: FormEvent<HTMLDivElement>) {
-    const editor = editorRef.current;
+  function handleInput(event: InputEvent) {
+    const editor = editorEl;
     if (!editor) return;
-    if ((event.nativeEvent as InputEvent).isComposing) return;
+    if (event.isComposing) return;
     applyInlineTransform(editor);
     // A task transform stores its undo snapshot; plain typing (null) clears
     // any pending one — the writer has moved past it.
-    pendingUndo.current = applyTaskShorthand(editor);
+    pendingUndo = applyTaskShorthand(editor);
     normalizeEmptyBlocks(editor);
     refreshSlash();
     persist(editor);
   }
 
-  function handlePaste(event: ClipboardEvent<HTMLDivElement>) {
-    const editor = editorRef.current;
+  function handlePaste(event: ClipboardEvent) {
+    const editor = editorEl;
     if (!editor) return;
     event.preventDefault();
-    pendingUndo.current = null;
-    handleEditorPaste(editor, event.clipboardData);
+    pendingUndo = null;
+    if (event.clipboardData) handleEditorPaste(editor, event.clipboardData);
   }
 
   // Slash-menu keys while the menu is open. Returns true once handled.
-  function handleSlashKey(event: KeyboardEvent<HTMLDivElement>): boolean {
-    if (!slash) return false;
-    const matches = matchSlashCommands(slash);
+  function handleSlashKey(event: KeyboardEvent): boolean {
+    const current = slash();
+    if (!current) return false;
+    const matches = matchSlashCommands(current);
     if (matches.length === 0) return false;
-    const selected = matches[Math.min(slashIndex, matches.length - 1)];
+    const selected = matches[Math.min(slashIndex(), matches.length - 1)];
 
     if (event.key === "ArrowDown") {
       event.preventDefault();
@@ -314,17 +310,17 @@ export function TextEditor() {
     }
     // A track command needs its count before it can be committed; until then,
     // let Space through so the number can be typed.
-    const ready = selected.kind === "block" || slash.count !== null;
+    const ready = selected.kind === "block" || current.count !== null;
     if (event.key === "Enter" || (event.key === " " && ready)) {
       event.preventDefault();
-      commitSlash(selected, slash.count);
+      commitSlash(selected, current.count);
       return true;
     }
     return false;
   }
 
-  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    const editor = editorRef.current;
+  function handleKeyDown(event: KeyboardEvent) {
+    const editor = editorEl;
     if (!editor) return;
 
     if ((event.metaKey || event.ctrlKey) && file.supported) {
@@ -352,7 +348,7 @@ export function TextEditor() {
       (event.metaKey || event.ctrlKey) &&
       !event.shiftKey &&
       event.key.toLowerCase() === "z" &&
-      pendingUndo.current
+      pendingUndo
     ) {
       event.preventDefault();
       undoTransform(editor);
@@ -392,7 +388,7 @@ export function TextEditor() {
       if (handleEnter(editor)) {
         event.preventDefault();
         normalizeEmptyBlocks(editor);
-        pendingUndo.current = snapshot;
+        pendingUndo = snapshot;
         persistNow(editor);
       }
     }
@@ -402,17 +398,17 @@ export function TextEditor() {
     "flex font-mono text-xs items-center justify-center px-1 py-0.5 text-neu-500 transition hover:duration-0 hover:bg-neu-200/70 hover:text-neu-900 dark:text-neu-400 dark:hover:bg-neu-800 dark:hover:text-neu-50";
 
   return (
-    <main className="min-h-screen">
-      <div className="mx-auto max-w-3xl px-4 py-24 md:px-6 print:max-w-none print:px-0 print:py-0">
+    <main class="min-h-screen">
+      <div class="mx-auto max-w-3xl px-4 py-24 md:px-6 print:max-w-none print:px-0 print:py-0">
         <div
-          aria-activedescendant={slash ? slashActiveId : undefined}
-          aria-controls={slash ? SLASH_MENU_ID : undefined}
+          aria-activedescendant={slash() ? slashActiveId() : undefined}
+          aria-controls={slash() ? SLASH_MENU_ID : undefined}
           aria-label="Editor"
-          autoCapitalize={spellcheck ? "sentences" : "off"}
-          autoCorrect={spellcheck ? "on" : "off"}
-          className={`${styles.editor} min-h-[75vh] w-full border-0 bg-transparent text-[1.22rem] leading-normal outline-none print:min-h-0 print:text-black`}
-          contentEditable
-          tabIndex={0}
+          autocapitalize={spellcheck() ? "sentences" : "off"}
+          autocorrect={spellcheck() ? "on" : "off"}
+          class={`${styles.editor} min-h-[75vh] w-full border-0 bg-transparent text-[1.22rem] leading-normal outline-none print:min-h-0 print:text-black`}
+          contenteditable
+          tabindex={0}
           onBlur={handleBlur}
           onClick={handleClick}
           onFocus={handleFocus}
@@ -420,80 +416,83 @@ export function TextEditor() {
           onKeyDown={handleKeyDown}
           onMouseDown={handleMouseDown}
           onPaste={handlePaste}
-          ref={editorRef}
+          ref={editorEl}
           role="textbox"
-          spellCheck={spellcheck}
-          suppressContentEditableWarning
+          spellcheck={spellcheck()}
         />
       </div>
 
       <EditorHelpModal />
 
-      {slash && (
-        <SlashMenu
-          activeId={slashActiveId}
-          anchor={slash.anchor}
-          commands={slashCommands}
-          count={slash.count}
-          id={SLASH_MENU_ID}
-          index={slashIndex}
-          onPick={(command) => commitSlash(command, slash.count)}
-          optionId={slashOptionId}
-        />
-      )}
+      <Show when={slash()}>
+        {(current) => (
+          <SlashMenu
+            activeId={slashActiveId()}
+            anchor={current().anchor}
+            commands={slashCommands()}
+            count={current().count}
+            id={SLASH_MENU_ID}
+            index={slashIndex()}
+            onPick={(command) => commitSlash(command, current().count)}
+            optionId={slashOptionId}
+          />
+        )}
+      </Show>
 
-      <footer className="mt-auto flex items-center justify-between gap-2 px-4 pb-5 print:hidden">
-        <div className="flex min-w-0 items-center gap-1 font-mono text-xs text-neu-500 dark:text-neu-400">
-          {file.supported &&
-            (file.name === null ? (
-              <>
-                <button
-                  className={controlButton}
-                  onClick={() => void handleOpenFile()}
-                  type="button"
-                >
-                  [open]
-                </button>
-                <button
-                  className={controlButton}
-                  onClick={() => void handleSaveFile()}
-                  type="button"
-                >
-                  [save]
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  className={controlButton}
-                  onClick={() => void handleSaveFile()}
-                  type="button"
-                >
-                  [save]
-                </button>
-                <button
-                  className={controlButton}
-                  onClick={() => void handleCloseFile()}
-                  type="button"
-                >
-                  [close]
-                </button>
-                <span className="truncate px-1" title={file.name}>
-                  {file.name}
-                  {file.status === "saved" && " · saved"}
-                  {file.status === "saving" && " · saving…"}
-                  {file.status === "error" && " · save failed"}
-                </span>
-              </>
-            ))}
+      <footer class="mt-auto flex items-center justify-between gap-2 px-4 pb-5 print:hidden">
+        <div class="flex min-w-0 items-center gap-1 font-mono text-xs text-neu-500 dark:text-neu-400">
+          <Show when={file.supported}>
+            <Show
+              when={file.name === null}
+              fallback={
+                <>
+                  <button
+                    class={controlButton}
+                    onClick={() => void handleSaveFile()}
+                    type="button"
+                  >
+                    [save]
+                  </button>
+                  <button
+                    class={controlButton}
+                    onClick={() => void handleCloseFile()}
+                    type="button"
+                  >
+                    [close]
+                  </button>
+                  <span class="truncate px-1" title={file.name ?? undefined}>
+                    {file.name}
+                    {file.status === "saved" && " · saved"}
+                    {file.status === "saving" && " · saving…"}
+                    {file.status === "error" && " · save failed"}
+                  </span>
+                </>
+              }
+            >
+              <button
+                class={controlButton}
+                onClick={() => void handleOpenFile()}
+                type="button"
+              >
+                [open]
+              </button>
+              <button
+                class={controlButton}
+                onClick={() => void handleSaveFile()}
+                type="button"
+              >
+                [save]
+              </button>
+            </Show>
+          </Show>
         </div>
         <button
-          aria-label={spellcheck ? "Turn spellcheck off" : "Turn spellcheck on"}
-          className={controlButton}
+          aria-label={spellcheck() ? "Turn spellcheck off" : "Turn spellcheck on"}
+          class={controlButton}
           onClick={() => setSpellcheck((value) => !value)}
           type="button"
         >
-          [spellcheck {spellcheck ? "on" : "off"}]
+          [spellcheck {spellcheck() ? "on" : "off"}]
         </button>
       </footer>
     </main>

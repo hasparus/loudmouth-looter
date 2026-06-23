@@ -1,11 +1,10 @@
-/** @jsxImportSource react */
-import React from "react";
+import { Index, type JSX, mergeProps, Show } from "solid-js";
 
 import { cn } from "./cn";
 
 export interface MoveCardProps {
   checkboxes?: number;
-  children: React.ReactNode;
+  children: JSX.Element;
   className?: string;
   id?: string;
   isBaseMove?: boolean;
@@ -16,103 +15,99 @@ export interface MoveCardProps {
   title: string;
 }
 
-export const MoveCard = ({
-  id,
-  checkboxes,
-  children,
-  className = "",
-  isBaseMove = false,
-  requirement,
-  resourceName = "",
-  resources,
-  size,
-  title,
-}: MoveCardProps) => {
-  const isSmall = size === "sm";
-  id ||= title.toLowerCase().replaceAll(" ", "-");
+export function MoveCard(props: MoveCardProps) {
+  const merged = mergeProps(
+    { className: "", isBaseMove: false, resourceName: "" },
+    props,
+  );
+  const isSmall = () => merged.size === "sm";
+  const id = () =>
+    merged.id || merged.title.toLowerCase().replaceAll(" ", "-");
 
   return (
     <article
-      className={`group break-inside-avoid ${className} ${
-        isSmall ? "space-y-2" : "py-4"
+      class={`group break-inside-avoid ${merged.className} [.zaduma-prose_&]:before:inset-0 [.zaduma-prose_&]:before:border-l [.zaduma-prose_&]:before:border-l [.zaduma-prose_&]:before:w-0 [.zaduma-prose_&]:before:-left-6 [.zaduma-prose_&]:before:border-dashed [.zaduma-prose_&]:before:bg-neu-400 relative [.zaduma-prose_&]:before:absolute ${
+        isSmall() ? "space-y-2" : "py-4"
       }`}
     >
-      <div className="flex-1">
-        <div className={cn("flex items-center", isSmall ? "gap-2" : "gap-2.5")}>
-          {!isBaseMove && (
+      <div class="flex-1">
+        <div class={cn("flex items-center", isSmall() ? "gap-2" : "gap-2.5")}>
+          <Show when={!merged.isBaseMove}>
             <input
-              aria-describedby={`${id}-title`}
-              className={cn(
+              aria-describedby={`${id()}-title`}
+              class={cn(
                 "aspect-square shrink-0",
-                isSmall ? "mt-[-3.5px] size-4" : "-mt-0.75 size-4.5",
+                isSmall() ? "mt-[-3.5px] size-4" : "-mt-0.75 size-4.5",
               )}
-              id={id}
-              name={id}
+              id={id()}
+              name={id()}
               type="checkbox"
             />
-          )}
+          </Show>
           <h3
-            className={`font-serif font-bold tracking-wide text-neu-800 dark:text-neu-100 ${
-              isSmall ? "" : "text-xl [text-box-trim:trim-end]"
+            class={`text-neu-800 dark:text-neu-100 font-serif font-bold tracking-wide ${
+              isSmall() ? "" : "text-xl [text-box-trim:trim-end]"
             }`}
-            id={id ? `${id}-title` : undefined}
+            id={id() ? `${id()}-title` : undefined}
           >
-            {title}
+            {merged.title}
           </h3>
-          {!!resources && (
-            <div className="ml-auto flex items-center gap-1 text-sm text-neu-500 dark:text-neu-400">
+          <Show when={!!merged.resources}>
+            <div class="text-neu-500 dark:text-neu-400 ml-auto flex items-center gap-1 text-sm">
               <span
-                className={cn(
+                class={cn(
                   "translate-y-px tracking-wider [text-box-trim:trim-end]",
-                  isSmall ? "text-xs" : "",
+                  isSmall() ? "text-xs" : "",
                 )}
               >
-                {resourceName}
+                {merged.resourceName}
               </span>
-              <div className="ml-1 flex gap-0.5">
-                {Array.from({ length: resources }).map((_, i) => (
-                  <input
-                    className={
-                      isSmall ? "size-3 rounded-full" : "size-4 rounded-full"
-                    }
-                    data-checkbox-marker="x"
-                    key={i}
-                    name={`${id}-r-${i}`}
-                    type="checkbox"
-                  />
-                ))}
+              <div class="ml-1 flex gap-0.5">
+                <Index each={Array.from({ length: merged.resources ?? 0 })}>
+                  {(_, i) => (
+                    <input
+                      class={
+                        isSmall() ? "size-3 rounded-full" : "size-4 rounded-full"
+                      }
+                      data-checkbox-marker="x"
+                      name={`${id()}-r-${i}`}
+                      type="checkbox"
+                    />
+                  )}
+                </Index>
               </div>
             </div>
-          )}
-          {!!checkboxes && (
-            <div className="ml-auto flex items-center gap-1 text-sm text-neu-500 dark:text-neu-400">
-              <div className="ml-1 flex gap-0.75">
-                {Array.from({ length: checkboxes }).map((_, i) => (
-                  <input
-                    className="aspect-square size-3.5 shrink-0"
-                    key={i}
-                    name={`${id}-c-${i}`}
-                    type="checkbox"
-                  />
-                ))}
+          </Show>
+          <Show when={!!merged.checkboxes}>
+            <div class="text-neu-500 dark:text-neu-400 ml-auto flex items-center gap-1 text-sm">
+              <div class="ml-1 flex gap-0.75">
+                <Index each={Array.from({ length: merged.checkboxes ?? 0 })}>
+                  {(_, i) => (
+                    <input
+                      class="aspect-square size-3.5 shrink-0"
+                      name={`${id()}-c-${i}`}
+                      type="checkbox"
+                    />
+                  )}
+                </Index>
               </div>
             </div>
-          )}
+          </Show>
         </div>
-        {requirement && (
-          <p className="mt-0.75 text-sm text-neu-500 dark:text-neu-400">
-            (Requires {requirement})
+        <Show when={merged.requirement}>
+          <p class="text-neu-500 dark:text-neu-400 mt-0.75 text-sm">
+            (Requires {merged.requirement})
           </p>
-        )}
+        </Show>
         <div
-          className={cn(
-            "leading-relaxed text-neu-700 dark:text-neu-300",
-            isSmall ? "mt-1 text-sm" : "mt-2",
+          class={cn(
+            "text-neu-700 dark:text-neu-300 leading-relaxed flex flex-col gap-(--block-mb)",
+            isSmall() ? "mt-1 text-sm" : "mt-2",
           )}
         >
-          {children}
+          {merged.children}
         </div>
       </div>
     </article>
   );
-};
+}
