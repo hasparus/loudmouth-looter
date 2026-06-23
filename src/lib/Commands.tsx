@@ -1,6 +1,7 @@
 import {
   createEffect,
   createSignal,
+  For,
   type JSX,
   Match,
   onCleanup,
@@ -30,10 +31,7 @@ import { Shortcut } from "./Shortcut";
 
 const INPUT_ID = "command-input";
 
-export function Commands({
-  posts,
-  class: className,
-}: {
+export function Commands(props: {
   posts: { title: string; href: string }[];
   class?: string;
 }) {
@@ -45,19 +43,17 @@ export function Commands({
       <CommandCenterTrigger
         classList={{
           "zaduma-hover-before h-12 w-12 before:rounded-none! dark:text-neu-400 dark:hover:text-neu-300 hover:duration-0 trim-cap-alphabetic [&>span]:block [&>span]:translate-y-px": true,
-          [className ?? ""]: true,
+          [props.class ?? ""]: true,
         }}
       />
       <Show when={clientside()} keyed>
-        <CommandsPalette posts={posts} />
+        <CommandsPalette posts={props.posts} />
       </Show>
     </CommandCenter>
   );
 }
 
-export function CommandsPalette({
-  posts,
-}: {
+export function CommandsPalette(props: {
   posts: { title: string; href: string }[];
 }) {
   type CommandsPage = "posts" | "theme" | undefined;
@@ -246,9 +242,9 @@ export function CommandsPalette({
           </Match>
           <Match when={page() === "posts"}>
             <CommandGroup heading={<GroupHeading>Posts</GroupHeading>}>
-              {posts.map((p) => (
-                <CommandItem href={p.href}>{p.title}</CommandItem>
-              ))}
+              <For each={props.posts}>
+                {(p) => <CommandItem href={p.href}>{p.title}</CommandItem>}
+              </For>
             </CommandGroup>
           </Match>
         </Switch>
