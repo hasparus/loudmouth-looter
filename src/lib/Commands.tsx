@@ -120,9 +120,11 @@ export function CommandsPalette(props: {
         document.documentElement.classList.toggle("high-contrast");
       },
     ],
+    /* eslint-disable solid/reactivity */
     ["1", () => setColorScheme("light")],
     ["2", () => setColorScheme("dark")],
     ["3", () => setColorScheme(null)],
+    /* eslint-enable solid/reactivity */
     [
       "alt+slash",
       () => {

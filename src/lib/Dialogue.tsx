@@ -41,10 +41,10 @@ const reduceMotion = () =>
 const TRIGGER =
   "cursor-pointer border-0 bg-transparent p-0 text-inherit underline decoration-dotted decoration-accent-400/70 decoration-[1.5px] underline-offset-[0.2em] transition-colors duration-150 ease-out hover:text-accent-700 hover:decoration-accent-500 active:opacity-70 dark:decoration-accent-400/60 dark:hover:text-accent-400 dark:hover:decoration-accent-400";
 
-const OPEN =
-  "cursor-text select-text border-0 bg-transparent p-0 text-inherit";
+const OPEN = "cursor-text select-text border-0 bg-transparent p-0 text-inherit";
 
 export function Dialogue(props: { tree: Tree }) {
+  // eslint-disable-next-line solid/reactivity -- seeds the signal once; the tree root is static
   const [stack, setStack] = createSignal<string[]>([props.tree.root]);
   const id = () => stack()[stack().length - 1]!;
   const node = () => props.tree.nodes[id()]!;
@@ -84,6 +84,7 @@ export function Dialogue(props: { tree: Tree }) {
     }, 110);
   };
 
+  /* eslint-disable solid/reactivity */
   const select = (to: string) => {
     if (isUrl(to)) {
       window.location.href = to;
@@ -93,6 +94,7 @@ export function Dialogue(props: { tree: Tree }) {
   };
   const back = () => navigate(() => setStack(stack().slice(0, -1)));
   const restart = () => navigate(() => setStack([props.tree.root]));
+  /* eslint-enable solid/reactivity */
 
   onMount(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -184,6 +186,7 @@ function Choice(props: {
     </>
   );
 
+  // eslint-disable-next-line solid/reactivity, solid/components-return-once -- static answer
   return isUrl(props.answer.to) ? (
     <a href={props.answer.to} class={cls}>
       {inner}
@@ -215,7 +218,9 @@ function Prose(props: { say: Inline[]; onNav: (node: string) => void }) {
 
 /** Render one inline mark: text, _em_, a [link], or an ![image] meme. */
 function MarkView(props: { mark: Mark }) {
+  // eslint-disable-next-line solid/reactivity -- a mark is immutable once rendered
   const m = props.mark;
+  // eslint-disable-next-line solid/components-return-once -- narrowing requires the ternary
   return typeof m === "string" ? (
     <>{m}</>
   ) : "em" in m ? (
@@ -274,9 +279,11 @@ function MemeLink(props: { alt: string; src: string }) {
 }
 
 function Expand(props: { ex: Ex; onNav: (node: string) => void }) {
+  // eslint-disable-next-line solid/reactivity -- an expand's target is fixed once rendered
   const into = props.ex.into;
 
   if (isNodeRef(into)) {
+    // eslint-disable-next-line solid/components-return-once -- static expand; shape is decided once
     return (
       <button
         type="button"

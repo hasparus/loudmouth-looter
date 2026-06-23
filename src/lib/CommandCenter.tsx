@@ -75,9 +75,11 @@ export function CommandCenter(props: CommandCenterProps) {
   let inputId = createUniqueId();
   const listId = createUniqueId();
 
+  /* eslint-disable solid/reactivity */
   if (props.inputId) {
     inputId = props.inputId;
   }
+  /* eslint-enable solid/reactivity */
 
   const [inputValue, onInput] = createSignal("");
   const [selectedCommand, selectCommand] = createSignal<string>("");
@@ -229,6 +231,7 @@ export function CommandItem(props: CommandItemProps) {
   const { isSelected, matchesFilter, onSelectedUnmount } =
     useCommandCenterCtx();
 
+  /* eslint-disable solid/reactivity */
   const res = (
     own.href ? (
       <a
@@ -250,6 +253,7 @@ export function CommandItem(props: CommandItemProps) {
       </button>
     )
   ) as HTMLElement;
+  /* eslint-enable solid/reactivity */
 
   createEffect(() => {
     const text = getCommandText(res);
