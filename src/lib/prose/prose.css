@@ -63,12 +63,23 @@
     /* Last column: the single column when stacked (< xl), the margin column at
        xl. -2 / -1 resolves correctly in both track counts. */
     grid-column: -2 / -1;
-    @apply h-min text-sm;
+    height: min-content;
     font-family: var(--font-hand);
     padding-left: var(--col-gap);
 
+    &,
+    &>p {
+      font-size: 1.25rem;
+      line-height: 1.15;
+    }
+
+    & strong,
     & code {
-      @apply italic;
+      font-style: italic;
+    }
+
+    & strong {
+      font-size: 1.015cap;
     }
 
     border-left: 1px solid var(--color-neu-200);
