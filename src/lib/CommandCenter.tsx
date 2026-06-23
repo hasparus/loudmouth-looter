@@ -72,14 +72,9 @@ export function CommandCenter(props: CommandCenterProps) {
   const dialogRef = {
     current: undefined as HTMLDialogElement | undefined,
   };
-  let inputId = createUniqueId();
+  // eslint-disable-next-line solid/reactivity -- stable id, read once
+  const inputId = props.inputId ?? createUniqueId();
   const listId = createUniqueId();
-
-  /* eslint-disable solid/reactivity */
-  if (props.inputId) {
-    inputId = props.inputId;
-  }
-  /* eslint-enable solid/reactivity */
 
   const [inputValue, onInput] = createSignal("");
   const [selectedCommand, selectCommand] = createSignal<string>("");
@@ -231,8 +226,8 @@ export function CommandItem(props: CommandItemProps) {
   const { isSelected, matchesFilter, onSelectedUnmount } =
     useCommandCenterCtx();
 
-  /* eslint-disable solid/reactivity */
   const res = (
+    // eslint-disable-next-line solid/reactivity -- static href, element built once
     own.href ? (
       <a
         href={own.href}
@@ -253,17 +248,14 @@ export function CommandItem(props: CommandItemProps) {
       </button>
     )
   ) as HTMLElement;
-  /* eslint-enable solid/reactivity */
 
   createEffect(() => {
     const text = getCommandText(res);
 
     const selected = isSelected(text);
     res.ariaSelected = String(selected);
-    res.style.display = matchesFilter(text) ? "" : "none";
 
     const isVisible = matchesFilter(text);
-
     res.style.display = isVisible ? "" : "none";
     res.role = isVisible ? "option" : "none";
 

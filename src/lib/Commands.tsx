@@ -73,12 +73,6 @@ export function CommandsPalette(props: {
 
   const keybindings = new Map<string, () => void>([
     [
-      "backspace",
-      () => {
-        setPage(undefined);
-      },
-    ],
-    [
       "escape",
       () => {
         setPage(undefined);
@@ -120,11 +114,12 @@ export function CommandsPalette(props: {
         document.documentElement.classList.toggle("high-contrast");
       },
     ],
-    /* eslint-disable solid/reactivity */
+    // eslint-disable-next-line solid/reactivity -- stable setter, runs on keypress
     ["1", () => setColorScheme("light")],
+    // eslint-disable-next-line solid/reactivity -- stable setter, runs on keypress
     ["2", () => setColorScheme("dark")],
+    // eslint-disable-next-line solid/reactivity -- stable setter, runs on keypress
     ["3", () => setColorScheme(null)],
-    /* eslint-enable solid/reactivity */
     [
       "alt+slash",
       () => {

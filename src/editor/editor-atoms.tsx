@@ -2,8 +2,6 @@ import { Index } from "solid-js";
 
 // Primitive atoms shared by the text editor, its slash menu, and the help
 // modal. DOM builders produce the live, interactive elements embedded in the
-// contentEditable surface; TrackPreview renders the same look as inert React
-// for menus and documentation. Styling lives in editor-atoms.css.
 
 export type Shape = "circle" | "rhomb" | "square";
 

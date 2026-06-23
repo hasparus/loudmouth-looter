@@ -84,17 +84,18 @@ export function Dialogue(props: { tree: Tree }) {
     }, 110);
   };
 
-  /* eslint-disable solid/reactivity */
   const select = (to: string) => {
     if (isUrl(to)) {
       window.location.href = to;
       return;
     }
+    // eslint-disable-next-line solid/reactivity -- runs from a handler, not a tracked scope
     navigate(() => setStack([...stack(), to]));
   };
+  // eslint-disable-next-line solid/reactivity -- runs from a handler, not a tracked scope
   const back = () => navigate(() => setStack(stack().slice(0, -1)));
+  // eslint-disable-next-line solid/reactivity -- runs from a handler, not a tracked scope
   const restart = () => navigate(() => setStack([props.tree.root]));
-  /* eslint-enable solid/reactivity */
 
   onMount(() => {
     const onKey = (event: KeyboardEvent) => {
