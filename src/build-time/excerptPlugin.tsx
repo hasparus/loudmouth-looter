@@ -183,10 +183,10 @@ function blockName(call: CallExpression): string | null {
 
 /** The value of the `children` prop in a jsx call's props object. */
 function findChildren(
-  props: Expression | SpreadElement | undefined,
+  obj: Expression | SpreadElement | undefined,
 ): Expression | null {
-  if (props?.type !== "ObjectExpression") return null;
-  for (const prop of props.properties) {
+  if (obj?.type !== "ObjectExpression") return null;
+  for (const prop of obj.properties) {
     if (
       prop.type === "Property" &&
       !prop.computed &&

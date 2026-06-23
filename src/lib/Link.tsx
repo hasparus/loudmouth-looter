@@ -7,7 +7,7 @@ export interface LinkProps extends JSX.AnchorHTMLAttributes<HTMLAnchorElement> {
 export function Link(props: LinkProps) {
   const [own, rest] = splitProps(props, ["classList", "noUnderline"]);
 
-  const childIsImg = isChildAnImage(rest.children);
+  const childIsImg = () => isChildAnImage(rest.children);
 
   return (
     // eslint-disable-next-line jsx-a11y/anchor-has-content
@@ -18,7 +18,7 @@ export function Link(props: LinkProps) {
           !own.noUnderline,
         "no-underline": !!own.noUnderline,
         "p-2 -mx-2 rounded-sm transition-colors relative": true,
-        "zaduma-image-box": childIsImg,
+        "zaduma-image-box": childIsImg(),
       }}
       {...rest}
     />
