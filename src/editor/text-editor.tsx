@@ -1,4 +1,11 @@
-import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  onCleanup,
+  onMount,
+  Show,
+} from "solid-js";
 
 import { buildTrackElement, type SlashCommand } from "./editor-atoms";
 import {
@@ -226,18 +233,18 @@ export function TextEditor() {
     await file.close(editor ? serializeDocument(editor) : undefined);
   }
 
-  const slashCommands = () => {
+  const slashCommands = createMemo(() => {
     const current = slash();
     return current ? matchSlashCommands(current) : [];
-  };
-  const slashActiveId = () => {
+  });
+  const slashActiveId = createMemo(() => {
     const commands = slashCommands();
     return commands.length > 0
       ? slashOptionId(
           commands[Math.min(slashIndex(), commands.length - 1)].name,
         )
       : undefined;
-  };
+  });
 
   function handleBlur() {
     const editor = editorEl;
