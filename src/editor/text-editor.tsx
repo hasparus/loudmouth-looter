@@ -38,6 +38,7 @@ import {
 } from "./editor-dom";
 import { EditorHelpModal } from "./editor-help-modal";
 import { sanitizeHtml } from "./editor-sanitize";
+import { buildMoveElement } from "./move-dom";
 import { SlashMenu } from "./slash-menu";
 import styles from "./text-editor.module.css";
 import { useLinkedFile } from "./use-linked-file";
@@ -142,6 +143,23 @@ export function TextEditor() {
       const caret = document.createRange();
       caret.setStartAfter(space);
       caret.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(caret);
+    } else if (command.name === "move") {
+      const body = document.createElement("p");
+      body.innerHTML = "<br>";
+      const move = buildMoveElement("New Move", undefined, [body]);
+      const block = getCurrentBlock(editor);
+      if (block) block.replaceWith(move);
+      else deleteRange.insertNode(move);
+
+      const title = move.querySelector("h3");
+      const caret = document.createRange();
+      if (title) caret.selectNodeContents(title);
+      else {
+        caret.selectNodeContents(body);
+        caret.collapse(true);
+      }
       selection.removeAllRanges();
       selection.addRange(caret);
     } else if (command.blockClass) {

@@ -50,6 +50,12 @@ export const SLASH_COMMANDS: SlashCommand[] = [
     kind: "block",
     name: "chevron",
   },
+  {
+    defaultCount: 0,
+    description: "Move card",
+    kind: "block",
+    name: "move",
+  },
 ];
 
 const MAX_COUNT = 12;
