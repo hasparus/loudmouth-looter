@@ -1,4 +1,7 @@
 @import "tailwindcss";
+
+@source "../../posts/**/*.mdx";
+
 @import "./skin.css";
 
 @custom-variant dark (&:where(.dark, .dark *));

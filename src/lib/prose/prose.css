@@ -156,6 +156,39 @@
   width: 100%;
 }
 
+.zaduma-prose .te-move {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: -2rem;
+    border-left: 1.5px solid var(--color-neu-400);
+  }
+
+  &::after {
+    content: "⚜";
+    position: absolute;
+    top: 50%;
+    left: -2rem;
+    transform: translate(-46%, -50%);
+    color: var(--color-neu-400);
+    background: var(--grain-bg);
+    padding-block: 0.25rem;
+    font-size: 1.125rem;
+    line-height: 1;
+  }
+
+  :where(html.dark) &::before {
+    border-left-color: var(--color-neu-600);
+  }
+
+  :where(html.dark) &::after {
+    color: var(--color-neu-500);
+  }
+}
+
 details {
   @apply -mx-4 rounded-lg border;
   border-color: var(--color-neu-300);
