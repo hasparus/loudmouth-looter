@@ -55,7 +55,7 @@ jobs:
           OG_IMAGE_SECRET: placeholder
 
       - name: Run linter
-        run: bun run lint --quiet
+        run: bun run lint
 
       - name: Typecheck
         run: bun run typecheck

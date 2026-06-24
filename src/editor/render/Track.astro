@@ -3,10 +3,11 @@
 // - value (controlled): inert aria-hidden spans, same as editor TrackPreview.
 // - defaultValue (uncontrolled): real buttons with click delegation via a
 //   module script so the published track is interactive.
+import { Show } from "solid-js";
+
 import { resolveTrackProps } from "../track-props";
 
 import "../editor-atoms.css";
-import { Show } from "solid-js";
 
 interface Props {
   shape?: string;
