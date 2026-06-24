@@ -213,14 +213,14 @@
      never depends on a CSS-module hash landing on the same element. */
   .zaduma-prose ul:not(.contains-task-list)>li::before {
     content: "◈";
-    color: var(--color-neu-400);
+    @apply text-neu-500/80;
     margin-right: 0.5rem;
     position: relative;
-    top: -0.03em;
+    top: 0.06em;
   }
 
   html.dark .zaduma-prose ul:not(.contains-task-list)>li::before {
-    color: var(--color-neu-500);
+    @apply text-neu-400;
   }
 
   /* One checkbox for the whole site — GFM task lists, Move cards, editor atoms.

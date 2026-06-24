@@ -48,7 +48,7 @@ function MoveWithTitle(props: MoveProps & { title: string }) {
             />
           </Show>
           <h3
-            class={`text-neu-800 dark:text-neu-100 font-serif font-bold tracking-wide ${
+            class={`text-neu-800 dark:text-neu-200 font-serif font-bold tracking-wide ${
               isSmall() ? "" : "text-xl [text-box-trim:trim-end]"
             }`}
             id={`${id()}-title`}
@@ -56,7 +56,7 @@ function MoveWithTitle(props: MoveProps & { title: string }) {
             {merged.title}
           </h3>
           <Show when={!!merged.resources}>
-            <div class="text-neu-500 dark:text-neu-400 ml-auto flex items-center gap-1 text-sm">
+            <div class="text-neu-500 dark:text-neu-100 ml-auto flex items-center gap-1 text-sm">
               <span
                 class={cn(
                   "translate-y-px tracking-wider [text-box-trim:trim-end]",
@@ -84,7 +84,7 @@ function MoveWithTitle(props: MoveProps & { title: string }) {
             </div>
           </Show>
           <Show when={!!merged.checkboxes}>
-            <div class="text-neu-500 dark:text-neu-400 ml-auto flex items-center gap-1 text-sm">
+            <div class="text-neu-500 dark:text-neu-200 ml-auto flex items-center gap-1 text-sm">
               <div class="ml-1 flex gap-0.75">
                 <Index each={Array.from({ length: merged.checkboxes ?? 0 })}>
                   {(_, i) => (
@@ -100,13 +100,13 @@ function MoveWithTitle(props: MoveProps & { title: string }) {
           </Show>
         </div>
         <Show when={merged.requirement}>
-          <p class="text-neu-500 dark:text-neu-400 mt-0.75 text-sm">
+          <p class="text-neu-500 dark:text-neu-200 mt-0.75 text-sm">
             (Requires {merged.requirement})
           </p>
         </Show>
         <div
           class={cn(
-            "text-neu-900 dark:text-neu-300 flex flex-col gap-(--block-mb) leading-relaxed",
+            "text-neu-900 dark:text-neu-200 flex flex-col gap-(--block-mb) leading-relaxed",
             isSmall() ? "mt-1 text-sm" : "mt-2",
           )}
           data-move-body=""
