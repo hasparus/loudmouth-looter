@@ -55,4 +55,8 @@
     font: italic 444 22.5px var(--font-text);
     line-height: 1.6;
   }
+
+  &:has(span[data-no-italic]) {
+    font-style: normal;
+  }
 }
