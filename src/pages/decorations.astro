@@ -1,0 +1,270 @@
+---
+// Temporary chooser: 10 medieval left-edge decorations for Move cards.
+// Not linked from anywhere — reach it at /decorations. Pick one and I'll port
+// it onto `.zaduma-prose .te-move` in src/lib/prose/prose.css.
+// ponytail: self-contained specimens with a scoped <style>, no shared abstraction
+// and no edits to the live prose rule until a winner is chosen.
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// roman · id · name · traditional motif it apes
+const options = [
+  ["I", "rule", "Solid bar border", "the plain Gothic gutter bar"],
+  ["II", "double", "Double rule", "a reserved white line between two bars"],
+  ["III", "segmented", "Party-coloured bar", "alternating red/blue Lombard segments"],
+  ["IV", "fleur", "Fleur-de-lis finial", "a heraldic bar capped mid-span"],
+  ["V", "fleuron", "Fleuron runner", "a vine of stacked aldus leaves (❦)"],
+  ["VI", "bracket", "Bracket border", "the L-shaped corner bracket of a bar border"],
+  ["VII", "diaper", "Diaper lattice", "a tooled gold-and-blue diamond ground"],
+  ["VIII", "flourish", "Pen-flourish", "filigree sweeping off an initial"],
+  ["IX", "beaded", "Beaded line-filler", "a beaded gilt band turned vertical"],
+  ["X", "manicule", "Manicule", "the margin's little pointing hand"],
+] as const;
+---
+
+<BaseLayout
+  title="decorations"
+  description="medieval left-edge decorations for Move cards — chooser"
+  cursors={false}
+>
+  <div class="sheet flex flex-col gap-3 py-10">
+    <header class="mb-4">
+      <h1 class="font-serif font-bold tracking-tighter">Marginalia</h1>
+      <p class="text-neu-500">
+        Ten left-edge treatments for a Move card, in the manner of a medieval
+        scribe. Pick a numeral and I'll set it on the real cards.
+      </p>
+    </header>
+
+    {
+      options.map(([roman, id, name, motif]) => (
+        <section class="specimen">
+          <div class="label">
+            <span class="num font-serif">{roman}</span>
+            <div>
+              <h2 class="font-serif">{name}</h2>
+              <p class="text-neu-500 text-sm">{motif}</p>
+            </div>
+          </div>
+          <div class={`opt opt-${id}`}>
+            <article class="deco-card">
+              <h3 class="font-serif font-bold tracking-wide">
+                Strike from the Shadows
+              </h3>
+              <p class="req text-neu-500 text-sm">(Requires a free hand)</p>
+              <p class="body">
+                When you slip a blade between the ribs of the unwary, roll
+                +cunning. On a 10+ choose two; on a 7–9 choose one and the watch
+                takes notice.
+              </p>
+            </article>
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  /* Specimen scaffold ------------------------------------------------------ */
+  .sheet {
+    max-width: 44rem;
+  }
+
+  .specimen {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding-block: 1.25rem;
+    border-bottom: 1px solid
+      light-dark(var(--color-neu-200), var(--color-neu-800));
+  }
+  .specimen:last-child {
+    border-bottom: none;
+  }
+
+  .label {
+    display: flex;
+    align-items: baseline;
+    gap: 0.85rem;
+  }
+  .num {
+    color: light-dark(var(--color-neu-400), var(--color-neu-600));
+    font-size: 1.4rem;
+    line-height: 1;
+    min-width: 1.6rem;
+    letter-spacing: 0.05em;
+  }
+  .label h2 {
+    font-size: 1.05rem;
+  }
+
+  .deco-card {
+    position: relative;
+    /* generous left padding = the manuscript gutter the ornament lives in */
+    padding: 0.9rem 1rem 1rem 2.75rem;
+    background: light-dark(var(--color-neu-50), var(--color-neu-800));
+    border: 1px solid light-dark(var(--color-neu-200), var(--color-neu-700));
+    border-radius: 2px;
+  }
+  .deco-card h3 {
+    color: light-dark(var(--color-neu-800), var(--color-neu-200));
+    font-size: 1.15rem;
+  }
+  .deco-card .body {
+    margin-top: 0.35rem;
+    color: light-dark(var(--color-neu-900), var(--color-neu-200));
+    line-height: 1.55;
+  }
+
+  /* The ornament colour, one knob for all neutral specimens. */
+  .opt {
+    --ink: light-dark(var(--color-neu-400), var(--color-neu-600));
+    --ink-strong: light-dark(var(--color-neu-500), var(--color-neu-500));
+  }
+
+  /* I · Solid bar ---------------------------------------------------------- */
+  .opt-rule .deco-card::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.4rem;
+    left: 1rem;
+    border-left: 2px solid var(--ink);
+  }
+
+  /* II · Double rule ------------------------------------------------------- */
+  .opt-double .deco-card::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.4rem;
+    left: 1rem;
+    border-left: 3px double var(--ink);
+  }
+
+  /* III · Party-coloured / segmented bar ----------------------------------- */
+  .opt-segmented .deco-card::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.4rem;
+    left: 1rem;
+    width: 4px;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--ink-strong) 0 11px,
+      transparent 11px 13px,
+      var(--ink) 13px 24px,
+      transparent 24px 26px
+    );
+  }
+
+  /* IV · Fleur-de-lis finial (current live treatment) ---------------------- */
+  .opt-fleur .deco-card::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.4rem;
+    left: 1rem;
+    border-left: 1.5px solid var(--ink);
+  }
+  .opt-fleur .deco-card::after {
+    content: "⚜";
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translate(-46%, -50%);
+    color: var(--ink-strong);
+    background: light-dark(var(--color-neu-50), var(--color-neu-800));
+    padding-block: 0.25rem;
+    font-size: 1.125rem;
+    line-height: 1;
+  }
+
+  /* V · Fleuron runner — a vine of leaves down the gutter ------------------ */
+  .opt-fleuron .deco-card::before {
+    content: "❦\A❧\A❦\A❧\A❦";
+    white-space: pre;
+    position: absolute;
+    top: 0.5rem;
+    left: 0.7rem;
+    color: var(--ink);
+    font-size: 0.8rem;
+    line-height: 1.9;
+    text-align: center;
+  }
+
+  /* VI · Bracket border — an L hugging the left edge ----------------------- */
+  .opt-bracket .deco-card::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.4rem;
+    left: 0.85rem;
+    width: 11px;
+    border: 1.5px solid var(--ink);
+    border-right: none;
+  }
+
+  /* VII · Diaper lattice — cross-hatched diamond ground -------------------- */
+  .opt-diaper .deco-card::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.4rem;
+    left: 0.85rem;
+    width: 12px;
+    background:
+      repeating-linear-gradient(
+        45deg,
+        var(--ink) 0 1px,
+        transparent 1px 7px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        var(--ink) 0 1px,
+        transparent 1px 7px
+      );
+  }
+
+  /* VIII · Pen-flourish — filigree off the top corner ---------------------- */
+  .opt-flourish .deco-card::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.4rem;
+    left: 1rem;
+    border-left: 1px solid var(--ink);
+  }
+  .opt-flourish .deco-card::after {
+    content: "❧";
+    position: absolute;
+    top: -0.35rem;
+    left: 1rem;
+    transform: translateX(-42%) rotate(-8deg);
+    color: var(--ink-strong);
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  /* IX · Beaded line-filler — a string of pearls --------------------------- */
+  .opt-beaded .deco-card::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.4rem;
+    left: 1rem;
+    border-left: 3px dotted var(--ink);
+  }
+
+  /* X · Manicule — the pointing hand --------------------------------------- */
+  .opt-manicule .deco-card::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.4rem;
+    left: 1rem;
+    border-left: 1.5px solid var(--ink);
+  }
+  .opt-manicule .deco-card::after {
+    content: "☞";
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translate(-12%, -50%);
+    color: var(--ink-strong);
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+</style>
