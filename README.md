@@ -25,8 +25,7 @@ bun run dev                  # → http://localhost:4321
   `<Move>` blocks in MDX.
 - **GFM tasks**: type `- [ ] ` to start an interactive task list.
 - **Track props**: `value` (static fill), `defaultValue` (interactive,
-  ephemeral), `max` (1–12). `value` beats `defaultValue`; `filled`/`total` are
-  legacy parse-only aliases.
+  ephemeral), `max` (1–12). `value` beats `defaultValue`.
 - Atoms render identically in the editor and on published pages via the shared
   stylesheet `src/editor/editor-atoms.css`.
 
@@ -73,7 +72,3 @@ Secrets required in GitHub Actions:
 | `VERCEL_TOKEN`      | Deploy gate (`HAS_VERCEL` condition) |
 | `VERCEL_ORG_ID`     | Vercel org                           |
 | `VERCEL_PROJECT_ID` | Vercel project                       |
-
-See [docs/tradeoffs-and-limitations.md] for architectural notes.
-
-[docs/tradeoffs-and-limitations.md]: ./docs/tradeoffs-and-limitations.md

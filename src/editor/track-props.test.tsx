@@ -33,21 +33,6 @@ describe("resolveTrackProps", () => {
     expect(r).toEqual({ shape: "circle", fill: 0, max: 5, interactive: false });
   });
 
-  test("legacy filled+total aliases", () => {
-    const r = resolveTrackProps({ shape: "rhomb", filled: "1", total: "3" });
-    expect(r).toEqual({ shape: "rhomb", fill: 1, max: 3, interactive: false });
-  });
-
-  test("value takes priority over filled", () => {
-    const r = resolveTrackProps({
-      shape: "circle",
-      value: "4",
-      filled: "1",
-      max: "6",
-    });
-    expect(r.fill).toBe(4);
-  });
-
   test("fill clamped to 0 when negative", () => {
     const r = resolveTrackProps({ value: "-5", max: "5" });
     expect(r.fill).toBe(0);

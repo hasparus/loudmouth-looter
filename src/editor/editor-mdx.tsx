@@ -355,15 +355,14 @@ function trackToDom(node: MdxJsxFlowElement | MdxJsxTextElement): HTMLElement {
     value: attributeOf(node, "value"),
     defaultValue: attributeOf(node, "defaultValue"),
     max: attributeOf(node, "max"),
-    total: attributeOf(node, "total"),
-    filled: attributeOf(node, "filled"),
   });
 
   const track = buildTrackElement(shape, max);
   if (interactive) track.dataset.interactive = "1";
   const toggles = track.querySelectorAll(".te-toggle");
-  for (let i = 0; i < fill; i++)
-    toggles[i].setAttribute("aria-checked", "true");
+  for (let i = 0; i < fill; i++) {
+    toggles[i]?.setAttribute("aria-checked", "true");
+  }
   return track;
 }
 

@@ -45,15 +45,6 @@ describe("mdxToHtml", () => {
     expect(html).toContain('data-shape="square"');
   });
 
-  test("legacy Track (filled/total) → DOM with correct counts", () => {
-    const html = mdxToHtml('<Track shape="rhomb" filled="1" total="3" />\n');
-    expect(html).toContain('data-shape="rhomb"');
-    const checked = (html.match(/aria-checked="true"/g) ?? []).length;
-    expect(checked).toBe(1);
-    const unchecked = (html.match(/aria-checked="false"/g) ?? []).length;
-    expect(unchecked).toBe(2);
-  });
-
   test("Move with heading and paragraph", () => {
     const html = mdxToHtml("<Move>\n## Title\n\nBody text.\n</Move>\n");
     expect(html).toBe(
@@ -124,11 +115,6 @@ describe("htmlToMdx", () => {
     expect(htmlToMdx(html)).toBe(
       '<Track shape="square" defaultValue="1" max="4" />\n',
     );
-  });
-
-  test("legacy Track DOM → re-emits as value/max", () => {
-    const html = mdxToHtml('<Track shape="rhomb" filled="1" total="3" />\n');
-    expect(htmlToMdx(html)).toBe('<Track shape="rhomb" value="1" max="3" />\n');
   });
 
   test("Move card survives round-trip", () => {

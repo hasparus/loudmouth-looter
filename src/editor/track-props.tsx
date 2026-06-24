@@ -22,8 +22,6 @@ export function resolveTrackProps(raw: {
   value?: unknown;
   defaultValue?: unknown;
   max?: unknown;
-  total?: unknown;
-  filled?: unknown;
   name?: unknown;
 }): ResolvedTrack {
   const shape: Shape = TRACK_SHAPES.has(raw.shape as string)
@@ -32,10 +30,10 @@ export function resolveTrackProps(raw: {
 
   const interactive = raw.defaultValue != null && raw.value == null;
 
-  const fillSource = raw.value ?? raw.defaultValue ?? raw.filled;
+  const fillSource = raw.value ?? raw.defaultValue;
 
   const maxVal = Math.min(
-    Math.max(Math.trunc(Number(raw.max ?? raw.total) || 1), 1),
+    Math.max(Math.trunc(Number(raw.max) || 1), 1),
     TRACK_MAX,
   );
 
