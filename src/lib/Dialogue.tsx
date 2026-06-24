@@ -8,6 +8,7 @@ import {
   Show,
 } from "solid-js";
 import { Portal } from "solid-js/web";
+import { Transition } from "solid-transition-group";
 
 import { SLOT_TEXT_OPTIONS } from "./animations";
 import styles from "./Dialogue.module.css";
@@ -267,17 +268,31 @@ function MemeLink(props: { alt: string; src: string }) {
       >
         {props.alt}
       </a>
-      <Show when={pos()}>
-        {(p) => (
-          <Portal>
-            <img
-              src={props.src}
-              alt={props.alt}
-              class="border-neu-300 dark:border-neu-700 pointer-events-none fixed z-50 max-w-2xl rounded-sm border shadow-2xl animate-bounce-in"
-              style={{ left: `${p().x}px`, top: `${p().y + 20}px` }}
-            />
-          </Portal>
-        )}
+      <Show when={hoverable()}>
+        <Portal>
+          <Transition
+            {...(reduceMotion()
+              ? {
+                  onEnter: (_: Element, done: () => void) => done(),
+                  onExit: (_: Element, done: () => void) => done(),
+                }
+              : {
+                  enterActiveClass: "animate-bounce-in",
+                  exitActiveClass: "animate-bounce-out",
+                })}
+          >
+            <Show when={pos()}>
+              {(p) => (
+                <img
+                  src={props.src}
+                  alt={props.alt}
+                  class="border-neu-300 dark:border-neu-700 pointer-events-none fixed z-50 max-w-2xl origin-top-left rounded-sm border shadow-2xl"
+                  style={{ left: `${p().x}px`, top: `${p().y + 20}px` }}
+                />
+              )}
+            </Show>
+          </Transition>
+        </Portal>
       </Show>
     </>
   );
