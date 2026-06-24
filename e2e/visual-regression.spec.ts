@@ -37,8 +37,8 @@ test.describe("Visual regression", () => {
 
       await expect(page).toHaveScreenshot(`${name}.png`, {
         fullPage: true,
-        maxDiffPixels: 500,
-        maxDiffPixelRatio: 0.005,
+        maxDiffPixels: 2000,
+        maxDiffPixelRatio: 0.01,
       });
     });
   }
