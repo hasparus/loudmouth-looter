@@ -150,8 +150,8 @@ jobs:
         with:
           urls: |
             https://${{ needs.build-and-deploy.outputs.deployment }}/
-            https://${{ needs.build-and-deploy.outputs.deployment }}/features/asides/
-            https://${{ needs.build-and-deploy.outputs.deployment }}/features/shiki-twoslash/
+            https://${{ needs.build-and-deploy.outputs.deployment }}/why-dragon/
+            https://${{ needs.build-and-deploy.outputs.deployment }}/tags/pbta/
           budgetPath: ".github/lighthouse-budget.json"
           uploadArtifacts: true
           temporaryPublicStorage: true

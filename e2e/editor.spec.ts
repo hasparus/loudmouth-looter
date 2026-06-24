@@ -71,7 +71,7 @@ test.describe("editor", () => {
   test("slash menu navigates with arrows, commits a block on Enter", async ({
     page,
   }) => {
-    await page.goto("/editor");
+    await page.goto("/editor/");
     const editor = await clearEditor(page);
 
     await editor.pressSequentially("/");
@@ -99,7 +99,7 @@ test.describe("editor", () => {
   test("help modal opens, then closes via Escape and the close button", async ({
     page,
   }) => {
-    await page.goto("/editor");
+    await page.goto("/editor/");
     const guide = page.getByRole("button", { name: "Editor guide" });
 
     await guide.click();
@@ -119,7 +119,7 @@ test.describe("editor", () => {
   });
 
   test("spellcheck toggle flips its label", async ({ page }) => {
-    await page.goto("/editor");
+    await page.goto("/editor/");
     const turnOff = page.getByRole("button", { name: "Turn spellcheck off" });
     await expect(turnOff).toBeVisible();
 

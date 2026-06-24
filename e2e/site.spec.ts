@@ -4,38 +4,22 @@ test.describe("Homepage", () => {
   test("renders with article list", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("h1")).toHaveText("loudmouth looter");
-    // Check that article links are present
-    const articles = page.locator("ul li a");
-    await expect(articles).toHaveCount(8);
-    // Verify some known titles
-    await expect(page.getByText("Editor Atoms")).toBeVisible();
-    await expect(page.getByText("OG Images")).toBeVisible();
-    await expect(page.getByText("Asides")).toBeVisible();
-    await expect(page.getByText("Shiki Twoslash")).toBeVisible();
-    await expect(page.getByText("Markdown Cheat Sheet")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Why Would You Fight a Dragon?" }).first(),
+    ).toBeVisible();
   });
 });
 
 test.describe("Article pages", () => {
-  test("asides page renders correctly", async ({ page }) => {
-    await page.goto("/features/asides/");
-    await expect(page.locator("h1")).toHaveText("Asides");
-    await expect(page.getByText("<aside>")).toBeVisible();
+  test("why-dragon page renders correctly", async ({ page }) => {
+    await page.goto("/why-dragon/");
+    await expect(page.locator("h1")).toHaveText(
+      "Why Would You Fight a Dragon?",
+    );
+    await expect(
+      page.locator("aside", { hasText: "DM = Dragon Minder" }),
+    ).toHaveCount(1);
     await expect(page.locator("time")).toBeVisible();
-  });
-
-  test("shiki-twoslash page renders correctly", async ({ page }) => {
-    await page.goto("/features/shiki-twoslash/");
-    await expect(page.locator("h1")).toHaveText("Shiki Twoslash");
-    // Should have code blocks with syntax highlighting
-    const shikiBlocks = await page.locator("pre.astro-code").count();
-    expect(shikiBlocks).toBeGreaterThanOrEqual(2);
-  });
-
-  test("frontmatter page renders correctly", async ({ page }) => {
-    await page.goto("/features/post-with-frontmatter/");
-    await expect(page.locator("h1")).toHaveText("Frontmatter");
-    await expect(page.locator("time")).toHaveText("2022-10-04");
   });
 });
 
@@ -43,30 +27,54 @@ test.describe("Asides render as side notes on wide viewports", () => {
   test("aside positioned to the right on desktop", async ({
     page,
   }, testInfo) => {
-    await page.goto("/features/asides/");
+    await page.goto("/why-dragon/");
     const aside = page.locator("aside").first();
-    await expect(aside).toBeVisible();
+    await expect(aside).toHaveCount(1);
 
     if (testInfo.project.name !== "mobile") {
       const box = await aside.boundingBox();
       expect(box?.x).toBeGreaterThan(300);
     }
   });
-});
 
-test.describe("Code blocks render with syntax highlighting", () => {
-  test("code blocks have syntax colors", async ({ page }) => {
-    await page.goto("/features/shiki-twoslash/");
-    // Shiki generates spans with color styles
-    const coloredSpans = page.locator("pre.astro-code span[style*='color']");
-    const count = await coloredSpans.count();
-    expect(count).toBeGreaterThan(5);
+  test("desktop aside content overflows without sizing the grid row", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name === "mobile", "Desktop-only layout");
+
+    await page.goto("/why-dragon/");
+    const geometry = await page
+      .locator(".zaduma-prose-grid")
+      .evaluate((grid) => {
+        const aside = grid.querySelector("aside");
+        if (!aside) return null;
+
+        const asideBox = aside.getBoundingClientRect();
+        const previousBox =
+          aside.previousElementSibling?.getBoundingClientRect() ?? null;
+        const marker = getComputedStyle(aside, "::before");
+
+        return {
+          asideHeight: asideBox.height,
+          markerHeight: parseFloat(marker.height),
+          topDelta: previousBox
+            ? Math.abs(asideBox.top - previousBox.top)
+            : null,
+          borderLeftWidth: marker.borderLeftWidth,
+        };
+      });
+
+    expect(geometry).not.toBeNull();
+    expect(geometry!.asideHeight).toBe(0);
+    expect(geometry!.markerHeight).toBeGreaterThan(0);
+    expect(geometry!.topDelta).toBeLessThan(1);
+    expect(geometry!.borderLeftWidth).toBe("1px");
   });
 });
 
 test.describe("OG images", () => {
   test("og meta tags are present on article pages", async ({ page }) => {
-    await page.goto("/features/og-images/");
+    await page.goto("/why-dragon/");
     const ogImage = page.locator('meta[property="og:image"]');
     await expect(ogImage).toHaveAttribute("content", /.+/);
   });
@@ -92,8 +100,9 @@ test("homepage is readable on mobile", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile", "Mobile-specific test");
   await page.goto("/");
   await expect(page.locator("h1")).toBeVisible();
-  const articles = page.locator("ul li a");
-  await expect(articles).toHaveCount(8);
+  await expect(
+    page.getByRole("link", { name: "Why Would You Fight a Dragon?" }).first(),
+  ).toBeVisible();
   // Content should not overflow
   const body = page.locator("body");
   const box = await body.boundingBox();
