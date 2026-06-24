@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const pages = [
   { path: "/", name: "index" },
-  { path: "/design/", name: "design" },
+  { path: "/_fixtures/e2e-fixture/", name: "e2e-fixture" },
   { path: "/why-dragon/", name: "why-dragon" },
 ] as const;
 
@@ -24,8 +24,11 @@ test.describe("Visual regression", () => {
   for (const { path, name } of pages) {
     test(`${name} page matches screenshot`, async ({ page }, testInfo) => {
       const snapshot = `${name}-${testInfo.project.name}-${process.platform}.png`;
+      const updating =
+        testInfo.config.updateSnapshots === "all" ||
+        testInfo.config.updateSnapshots === "missing";
       test.skip(
-        !committedSnapshots.has(snapshot),
+        !committedSnapshots.has(snapshot) && !updating,
         `Snapshot ${snapshot} not committed`,
       );
 

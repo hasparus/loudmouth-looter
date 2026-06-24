@@ -1,8 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-test.describe("design page fixture", () => {
+const FIXTURE = "/_fixtures/e2e-fixture/";
+
+test.describe("e2e fixture post", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/design/");
+    await page.goto(FIXTURE);
   });
 
   test("renders fixture section headings", async ({ page }) => {
@@ -104,24 +106,22 @@ test.describe("design page fixture", () => {
   });
 
   test("renders markdown kitchen-sink elements", async ({ page }) => {
-    const fixture = page.locator("section", {
-      has: page.getByRole("heading", { name: "E2E fixture" }),
-    });
+    const prose = page.locator(".zaduma-prose-grid");
 
-    await expect(fixture.getByRole("table")).toBeVisible();
-    await expect(fixture.getByRole("blockquote")).toBeVisible();
-    await expect(fixture.getByRole("link", { name: "design link" })).toBeVisible();
-    await expect(fixture.getByRole("img", { name: "Fixture image" })).toBeVisible();
-    await expect(fixture.locator("aside")).toContainText(
+    await expect(prose.getByRole("table")).toBeVisible();
+    await expect(prose.getByRole("blockquote")).toBeVisible();
+    await expect(
+      prose.getByRole("link", { name: "fixture link" }),
+    ).toBeVisible();
+    await expect(prose.getByRole("img", { name: "Fixture image" })).toBeVisible();
+    await expect(prose.locator("aside")).toContainText(
       "Fixture side note for prose-grid layout",
     );
-    await expect(fixture.locator("sub")).toHaveText("2");
-    await expect(
-      fixture.locator("p", { hasText: "X" }).locator("sup"),
-    ).toHaveText("2");
-    await expect(
-      fixture.getByRole("link", { name: "1", exact: true }),
-    ).toBeVisible();
+    await expect(prose.locator("sub")).toHaveText("2");
+    await expect(prose.locator("p", { hasText: "X" }).locator("sup")).toHaveText(
+      "2",
+    );
+    await expect(prose.getByRole("link", { name: "1", exact: true })).toBeVisible();
   });
 
   test("aside positioned to the right on desktop", async ({ page }, testInfo) => {
@@ -167,5 +167,13 @@ test.describe("design page fixture", () => {
     expect(geometry!.markerHeight).toBeGreaterThan(0);
     expect(geometry!.topDelta).toBeLessThan(1);
     expect(geometry!.borderLeftWidth).toBe("1px");
+  });
+
+  test("is excluded from the index and llms.txt", async ({ request }) => {
+    const index = await request.get("/");
+    expect(await index.text()).not.toContain("/_fixtures/e2e-fixture/");
+
+    const llms = await request.get("/llms.txt");
+    expect(await llms.text()).not.toContain("E2E fixture");
   });
 });

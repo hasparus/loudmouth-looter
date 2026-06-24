@@ -150,7 +150,7 @@ jobs:
         with:
           urls: |
             https://${{ needs.build-and-deploy.outputs.deployment }}/
-            https://${{ needs.build-and-deploy.outputs.deployment }}/design/
+            https://${{ needs.build-and-deploy.outputs.deployment }}/_fixtures/e2e-fixture/
             https://${{ needs.build-and-deploy.outputs.deployment }}/why-dragon/
           budgetPath: ".github/lighthouse-budget.json"
           uploadArtifacts: true

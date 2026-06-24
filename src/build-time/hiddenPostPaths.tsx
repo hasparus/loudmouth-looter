@@ -2,7 +2,7 @@ import matter from "gray-matter";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { isPostVisible } from "../lib/isPostVisible";
+import { isPostRoutable } from "../lib/isPostVisible";
 
 import { postPath } from "./postPath";
 
@@ -27,8 +27,9 @@ export function getHiddenPostPaths(
     const frontmatter = {
       hidden: data.hidden === true,
       draft: data.draft === true,
+      fixture: data.fixture === true,
     };
-    if (!isPostVisible(frontmatter, { isProd })) {
+    if (!isPostRoutable(frontmatter, { isProd }) || frontmatter.fixture) {
       hidden.add(postPath(postsDir, abs));
     }
   }

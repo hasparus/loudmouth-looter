@@ -2,7 +2,7 @@
 import type { MarkdownInstance } from "astro";
 
 import PostLayout from "../layouts/PostLayout.astro";
-import { isPostVisible } from "../lib/isPostVisible";
+import { isPostRoutable } from "../lib/isPostVisible";
 import { mdxComponents } from "../lib/mdxComponents";
 import type { PostFrontmatter } from "../types";
 
@@ -13,7 +13,7 @@ export const getStaticPaths = async () => {
     getHeadings: any;
   }>("../../posts/**/*.mdx", { eager: true });
   const posts = Object.values(postModules).filter((post) =>
-    isPostVisible(post.frontmatter, { isProd: import.meta.env.PROD }),
+    isPostRoutable(post.frontmatter, { isProd: import.meta.env.PROD }),
   );
 
   return posts.map((post) => {
