@@ -11,12 +11,13 @@ import { Portal } from "solid-js/web";
 
 import { SLOT_TEXT_OPTIONS } from "./animations";
 import styles from "./Dialogue.module.css";
+import { FlowText } from "./FlowText";
 import { Link } from "./Link";
 import type { Answer, Ex, Inline, Mark, Tree } from "./tree";
 
 import "slot-text/style.css";
 
-const inlineToText = (part: Inline): string =>
+export const inlineToText = (part: Inline): string =>
   typeof part === "string"
     ? part
     : "em" in part
@@ -29,19 +30,23 @@ const inlineToText = (part: Inline): string =>
             ? part.img
             : part.base;
 
-const isUrl = (s: string) => /^https?:\/\//.test(s);
+export const isUrl = (s: string) => /^https?:\/\//.test(s);
 const isNodeRef = (into: Ex["into"]): into is { node: string } =>
   !Array.isArray(into);
+/** True when prose carries an inline `[[ ]]` expansion (vs a node jump). */
+const hasInlineExpand = (say: Inline[]) =>
+  say.some((p) => typeof p !== "string" && "base" in p && Array.isArray(p.into));
 
 const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
 const reduceMotion = () =>
   typeof matchMedia !== "undefined" &&
   matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const TRIGGER =
+export const TRIGGER =
   "cursor-pointer border-0 bg-transparent p-0 text-inherit underline decoration-dotted decoration-accent-400/70 decoration-[1.5px] underline-offset-[0.2em] transition-colors duration-150 ease-out hover:text-accent-700 hover:decoration-accent-500 active:opacity-70 dark:decoration-accent-400/60 dark:hover:text-accent-400 dark:hover:decoration-accent-400";
 
-const OPEN = "cursor-text select-text border-0 bg-transparent p-0 text-inherit";
+export const OPEN =
+  "cursor-text select-text border-0 bg-transparent p-0 text-inherit";
 
 export function Dialogue(props: { tree: Tree }) {
   // eslint-disable-next-line solid/reactivity -- seeds the signal once; the tree root is static
@@ -97,6 +102,32 @@ export function Dialogue(props: { tree: Tree }) {
   // eslint-disable-next-line solid/reactivity -- runs from a handler, not a tracked scope
   const restart = () => navigate(() => setStack([props.tree.root]));
 
+  /** Back/restart affordance trailing the prose; shared by both render paths. */
+  const nav = () => (
+    <Show when={stack().length > 1}>
+      <span class="text-neu-500 dark:text-neu-400 ml-3 inline-flex">
+        <button
+          type="button"
+          class="hover:text-accent-700 dark:hover:text-accent-400 relative inline-flex cursor-pointer items-center border-0 bg-transparent px-1 transition-colors before:absolute before:-inset-1"
+          onClick={back}
+        >
+          <span aria-hidden>⇜</span>
+          <span class="sr-only">back</span>
+        </button>
+        <Show when={stack().length > 2}>
+          <button
+            type="button"
+            class="hover:text-accent-700 dark:hover:text-accent-400 relative inline-flex cursor-pointer items-center border-0 bg-transparent px-1 transition-colors before:absolute before:-inset-1"
+            onClick={restart}
+          >
+            <span aria-hidden>↺</span>
+            <span class="sr-only">back to start</span>
+          </button>
+        </Show>
+      </span>
+    </Show>
+  );
+
   onMount(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
@@ -124,31 +155,13 @@ export function Dialogue(props: { tree: Tree }) {
         class="transition-[opacity,filter,transform] duration-220 ease-[cubic-bezier(0.23,1,0.32,1)] data-[shown=false]:-translate-y-1 data-[shown=false]:opacity-0 data-[shown=false]:blur-[3px] data-[shown=false]:duration-110"
         data-shown={shown() ? "true" : "false"}
       >
-        <p class="text-neu-800 dark:text-neu-300 leading-relaxed">
-          <Prose say={node().say} onNav={select} />{" "}
-          <Show when={stack().length > 1}>
-            <span class="text-neu-500 dark:text-neu-400 ml-3 inline-flex">
-              <button
-                type="button"
-                class="hover:text-accent-700 dark:hover:text-accent-400 relative inline-flex cursor-pointer items-center border-0 bg-transparent px-1 transition-colors before:absolute before:-inset-1"
-                onClick={back}
-              >
-                <span aria-hidden>⇜</span>
-                <span class="sr-only">back</span>
-              </button>
-              <Show when={stack().length > 2}>
-                <button
-                  type="button"
-                  class="hover:text-accent-700 dark:hover:text-accent-400 relative inline-flex cursor-pointer items-center border-0 bg-transparent px-1 transition-colors before:absolute before:-inset-1"
-                  onClick={restart}
-                >
-                  <span aria-hidden>↺</span>
-                  <span class="sr-only">back to start</span>
-                </button>
-              </Show>
-            </span>
-          </Show>
-        </p>
+        {hasInlineExpand(node().say) ? (
+          <FlowText say={node().say} onNav={select} trailing={nav()} />
+        ) : (
+          <p class="text-neu-800 dark:text-neu-300 leading-relaxed">
+            <Prose say={node().say} onNav={select} /> {nav()}
+          </p>
+        )}
         <ol class="mt-5 flex list-none flex-col pl-0">
           <For each={node().answers}>
             {(a, i) => (
@@ -252,7 +265,7 @@ function MemeLink(props: { alt: string; src: string }) {
     typeof matchMedia !== "undefined" && matchMedia("(hover: hover)").matches;
   const track = (event: MouseEvent) => {
     if (!hoverable()) return;
-    if (img?.classList.contains("animate-bounce-out")) {
+    if (img.classList.contains("animate-bounce-out")) {
       img.getAnimations().forEach((a) => a.cancel());
       img.classList.remove("animate-bounce-out");
       if (onExitEnd) {

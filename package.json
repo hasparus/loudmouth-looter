@@ -26,6 +26,7 @@
     "@astrojs/mdx": "6.0.3",
     "@astrojs/sitemap": "^3.7.3",
     "@astrojs/solid-js": "^6",
+    "@chenglou/pretext": "0.0.8",
     "@fontsource/caveat": "5.2.8",
     "@fontsource/crimson-text": "5.2.7",
     "@mdx-js/mdx": "3.1.1",
