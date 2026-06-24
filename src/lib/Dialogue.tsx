@@ -8,7 +8,6 @@ import {
   Show,
 } from "solid-js";
 import { Portal } from "solid-js/web";
-import { Transition } from "solid-transition-group";
 
 import { SLOT_TEXT_OPTIONS } from "./animations";
 import styles from "./Dialogue.module.css";
@@ -247,10 +246,29 @@ function MarkView(props: { mark: Mark }) {
  */
 function MemeLink(props: { alt: string; src: string }) {
   const [pos, setPos] = createSignal<{ x: number; y: number } | null>(null);
+  let img!: HTMLImageElement;
   const hoverable = () =>
     typeof matchMedia !== "undefined" && matchMedia("(hover: hover)").matches;
   const track = (event: MouseEvent) => {
-    if (hoverable()) setPos({ x: event.clientX, y: event.clientY });
+    if (!hoverable()) return;
+    img?.getAnimations().forEach((a) => a.cancel());
+    img?.classList.remove("animate-bounce-out");
+    setPos({ x: event.clientX, y: event.clientY });
+  };
+  const leave = () => {
+    if (!pos() || reduceMotion()) {
+      setPos(null);
+      return;
+    }
+    img.classList.remove("animate-bounce-in");
+    img.classList.add("animate-bounce-out");
+    const onEnd = (event: AnimationEvent) => {
+      if (event.target !== img) return;
+      img.removeEventListener("animationend", onEnd);
+      setPos(null);
+      img.classList.remove("animate-bounce-out");
+    };
+    img.addEventListener("animationend", onEnd);
   };
 
   return (
@@ -263,36 +281,23 @@ function MemeLink(props: { alt: string; src: string }) {
         style={{ cursor: "image-set(var(--cur-help)) 16 16, help" }}
         onMouseEnter={track}
         onMouseMove={track}
-        onMouseLeave={() => setPos(null)}
+        onMouseLeave={leave}
         onClick={(event) => hoverable() && event.preventDefault()}
       >
         {props.alt}
       </a>
-      <Show when={hoverable()}>
-        <Portal>
-          <Transition
-            {...(reduceMotion()
-              ? {
-                  onEnter: (_: Element, done: () => void) => done(),
-                  onExit: (_: Element, done: () => void) => done(),
-                }
-              : {
-                  enterActiveClass: "animate-bounce-in",
-                  exitActiveClass: "animate-bounce-out",
-                })}
-          >
-            <Show when={pos()}>
-              {(p) => (
-                <img
-                  src={props.src}
-                  alt={props.alt}
-                  class="border-neu-300 dark:border-neu-700 pointer-events-none fixed z-50 max-w-2xl origin-top-left rounded-sm border shadow-2xl"
-                  style={{ left: `${p().x}px`, top: `${p().y + 20}px` }}
-                />
-              )}
-            </Show>
-          </Transition>
-        </Portal>
+      <Show when={hoverable() && pos()}>
+        {(p) => (
+          <Portal>
+            <img
+              ref={img}
+              src={props.src}
+              alt={props.alt}
+              class="border-neu-300 dark:border-neu-700 animate-bounce-in pointer-events-none fixed z-50 max-w-2xl origin-top-left rounded-sm border shadow-2xl"
+              style={{ left: `${p().x}px`, top: `${p().y + 20}px` }}
+            />
+          </Portal>
+        )}
       </Show>
     </>
   );
