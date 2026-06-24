@@ -102,7 +102,7 @@ export function MoveCard(props: MoveCardProps) {
         </Show>
         <div
           class={cn(
-            "text-neu-800 dark:text-neu-300 flex flex-col gap-(--block-mb) leading-relaxed",
+            "text-neu-900 dark:text-neu-300 flex flex-col gap-(--block-mb) leading-relaxed",
             isSmall() ? "mt-1 text-sm" : "mt-2",
           )}
         >

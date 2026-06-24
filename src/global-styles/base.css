@@ -55,7 +55,7 @@ html {
   font-size: 15px;
   line-height: 1.6;
   min-height: 100%;
-  color: var(--color-neu-700);
+  color: var(--color-neu-800);
 
   &.dark {
     /* color-scheme set by skin.css; repeat color here for specificity */
