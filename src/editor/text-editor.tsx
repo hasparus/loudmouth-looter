@@ -7,6 +7,7 @@ import {
   Show,
 } from "solid-js";
 
+import { ControlButton } from "./ControlButton";
 import { buildTrackElement, type SlashCommand } from "./editor-atoms";
 import {
   applyInlineTransform,
@@ -394,9 +395,6 @@ export function TextEditor() {
     }
   }
 
-  const controlButton =
-    "flex font-mono text-xs items-center justify-center px-1 py-0.5 text-neu-500 transition hover:duration-0 hover:bg-neu-200/70 hover:text-neu-900 dark:text-neu-400 dark:hover:bg-neu-800 dark:hover:text-neu-50";
-
   return (
     <main class="min-h-screen">
       <div class="mx-auto max-w-3xl px-4 py-24 md:px-6 print:max-w-none print:px-0 print:py-0">
@@ -446,20 +444,12 @@ export function TextEditor() {
               when={file.name === null}
               fallback={
                 <>
-                  <button
-                    class={controlButton}
-                    onClick={() => void handleSaveFile()}
-                    type="button"
-                  >
+                  <ControlButton onClick={() => void handleSaveFile()}>
                     [save]
-                  </button>
-                  <button
-                    class={controlButton}
-                    onClick={() => void handleCloseFile()}
-                    type="button"
-                  >
+                  </ControlButton>
+                  <ControlButton onClick={() => void handleCloseFile()}>
                     [close]
-                  </button>
+                  </ControlButton>
                   <span class="truncate px-1" title={file.name ?? undefined}>
                     {file.name}
                     {file.status === "saved" && " · saved"}
@@ -469,33 +459,23 @@ export function TextEditor() {
                 </>
               }
             >
-              <button
-                class={controlButton}
-                onClick={() => void handleOpenFile()}
-                type="button"
-              >
+              <ControlButton onClick={() => void handleOpenFile()}>
                 [open]
-              </button>
-              <button
-                class={controlButton}
-                onClick={() => void handleSaveFile()}
-                type="button"
-              >
+              </ControlButton>
+              <ControlButton onClick={() => void handleSaveFile()}>
                 [save]
-              </button>
+              </ControlButton>
             </Show>
           </Show>
         </div>
-        <button
+        <ControlButton
           aria-label={
             spellcheck() ? "Turn spellcheck off" : "Turn spellcheck on"
           }
-          class={controlButton}
           onClick={() => setSpellcheck((value) => !value)}
-          type="button"
         >
           [spellcheck {spellcheck() ? "on" : "off"}]
-        </button>
+        </ControlButton>
       </footer>
     </main>
   );
