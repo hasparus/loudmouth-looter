@@ -141,6 +141,10 @@
     }
   }
 
+  & figcaption p {
+    font-size: var(--text-base);
+  }
+
   @media (min-width: 1280px) {
     grid-template-columns:
       [bleed-start] var(--aside-w) [main-start] minmax(0, 1fr) [main-end aside-start] var(--aside-w) [bleed-end];
