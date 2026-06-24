@@ -38,11 +38,15 @@ export function sanitizeImageSrc(src: string): string {
 
 const ALLOWED_TAGS = new Set([
   "A",
+  "ARTICLE",
   "BR",
+  "DIV",
   "H1",
   "H2",
+  "H3",
   "I",
   "IMG",
+  "INPUT",
   "LI",
   "OL",
   "P",
@@ -63,7 +67,7 @@ const TAG_RENAME: Record<string, string> = { B: "STRONG", EM: "I" };
 const ATOM_TAGS: Record<string, string> = {
   "te-arrow": "P",
   "te-chevron": "P",
-  "te-move": "DIV",
+  "te-move": "ARTICLE",
   "te-task": "LI",
   "te-toggle": "BUTTON",
   "te-track": "SPAN",
@@ -131,6 +135,23 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
       el.setAttribute("src", src);
       const alt = child.getAttribute("alt");
       if (alt) el.setAttribute("alt", alt);
+      target.append(el);
+      continue;
+    }
+
+    if (tag === "INPUT") {
+      if (child.getAttribute("type") !== "checkbox") {
+        sanitizeInto(child, target);
+        continue;
+      }
+      const el = document.createElement("input");
+      el.setAttribute("type", "checkbox");
+      for (const name of ["id", "name", "class", "aria-describedby"]) {
+        const value = child.getAttribute(name);
+        if (value) el.setAttribute(name, value);
+      }
+      if (child.getAttribute("contenteditable") === "false")
+        el.setAttribute("contenteditable", "false");
       target.append(el);
       continue;
     }
