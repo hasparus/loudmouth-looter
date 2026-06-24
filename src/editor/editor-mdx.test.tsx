@@ -47,9 +47,11 @@ describe("mdxToHtml", () => {
 
   test("Move with heading and paragraph", () => {
     const html = mdxToHtml("<Move>\n## Title\n\nBody text.\n</Move>\n");
-    expect(html).toBe(
-      '<div class="te-move"><h2>Title</h2><p>Body text.</p></div>',
-    );
+    expect(html).toContain('class="te-move');
+    expect(html).toContain("<h3");
+    expect(html).toContain("Title");
+    expect(html).toContain("<p>Body text.</p>");
+    expect(html).toContain('type="checkbox"');
   });
 });
 

@@ -20,6 +20,8 @@ import remarkStringify from "remark-stringify";
 import { unified } from "unified";
 
 import { buildToggleElement, buildTrackElement } from "./editor-atoms";
+import { buildMoveElement } from "./move-dom";
+import { resolveMoveFromMdx } from "./move-props";
 import { resolveTrackProps, type Shape, TRACK_SHAPES } from "./track-props";
 
 const processor = unified()
@@ -58,6 +60,8 @@ function blockFrom(node: ChildNode): RootContent | null {
       return heading(2, node);
     case "OL":
       return listFrom(node, true);
+    case "ARTICLE":
+      return node.classList.contains("te-move") ? moveElement(node) : null;
     case "DIV":
       return node.classList.contains("te-move") ? moveElement(node) : null;
     case "P":
@@ -74,6 +78,27 @@ function blockFrom(node: ChildNode): RootContent | null {
 }
 
 function moveElement(el: HTMLElement): MdxJsxFlowElement {
+  const bodyRoot = el.querySelector("[data-move-body]");
+  if (bodyRoot instanceof HTMLElement) {
+    const titleEl = el.querySelector("h3");
+    const title = titleEl ? normalizeText(titleEl.textContent) : "";
+    const children: BlockContent[] = [];
+    if (title) {
+      children.push({
+        type: "heading",
+        depth: 2,
+        children: [text(title)],
+      });
+    }
+    children.push(...(blocksFrom(bodyRoot) as BlockContent[]));
+    return {
+      type: "mdxJsxFlowElement",
+      attributes: [],
+      children,
+      name: "Move",
+    };
+  }
+
   return {
     type: "mdxJsxFlowElement",
     attributes: [],
@@ -271,13 +296,13 @@ function flowElementToDom(node: MdxJsxFlowElement): HTMLElement | null {
 }
 
 function moveToDom(node: MdxJsxFlowElement): HTMLElement {
-  const el = document.createElement("div");
-  el.className = "te-move";
-  for (const child of node.children) {
+  const { title, id, body } = resolveMoveFromMdx(node);
+  const bodyEls: HTMLElement[] = [];
+  for (const child of body) {
     const childEl = blockToDom(child);
-    if (childEl) el.append(childEl);
+    if (childEl) bodyEls.push(childEl);
   }
-  return el;
+  return buildMoveElement(title, id, bodyEls);
 }
 
 function appendBlocksInline(
