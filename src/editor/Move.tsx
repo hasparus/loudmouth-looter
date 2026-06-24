@@ -9,6 +9,7 @@ export interface MoveProps {
   children: JSX.Element;
   className?: string;
   id?: string;
+  illuminated?: boolean;
   isBaseMove?: boolean;
   requirement?: string;
   resourceName?: string;
@@ -29,6 +30,7 @@ function MoveWithTitle(props: MoveProps & { title: string }) {
     <article
       class={cn(
         MOVE_ARTICLE_CLASS,
+        merged.illuminated ? "te-move-illuminated" : undefined,
         merged.className,
         isSmall() ? "space-y-2" : undefined,
       )}
@@ -127,7 +129,16 @@ export function Move(props: MoveProps) {
   return (
     <Show
       when={merged.title}
-      fallback={<article class="te-move">{merged.children}</article>}
+      fallback={
+        <article
+          class={cn(
+            "te-move",
+            merged.illuminated ? "te-move-illuminated" : undefined,
+          )}
+        >
+          {merged.children}
+        </article>
+      }
     >
       {(title) => <MoveWithTitle {...merged} title={title()} />}
     </Show>

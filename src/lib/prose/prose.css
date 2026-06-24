@@ -200,6 +200,29 @@
   }
 }
 
+.zaduma-prose .te-move-illuminated::before {
+  left: -46px;
+  width: 32px;
+  background: light-dark(var(--color-neu-500), var(--color-neu-400));
+  mask-image: var(--vine),
+    linear-gradient(to bottom,
+      transparent,
+      black 32px,
+      black calc(100% - 32px),
+      transparent);
+  mask-repeat: repeat-y, no-repeat;
+  mask-size: 32px auto, 100% 100%;
+  mask-composite: intersect;
+}
+
+.zaduma-prose .te-move-illuminated:nth-of-type(odd)::before {
+  --vine: url("/pattern.webp");
+}
+
+.zaduma-prose .te-move-illuminated:nth-of-type(even)::before {
+  --vine: url("/pattern-3.webp");
+}
+
 details {
   @apply -mx-4 rounded-lg border;
   border-color: var(--color-neu-300);
