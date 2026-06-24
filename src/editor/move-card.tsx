@@ -25,7 +25,7 @@ export function MoveCard(props: MoveCardProps) {
 
   return (
     <article
-      class={`group break-inside-avoid ${merged.className} [.zaduma-prose_&]:before:bg-neu-400 relative [.zaduma-prose_&]:before:absolute [.zaduma-prose_&]:before:inset-0 [.zaduma-prose_&]:before:-left-6 [.zaduma-prose_&]:before:w-0 [.zaduma-prose_&]:before:border-l [.zaduma-prose_&]:before:border-dashed ${
+      class={`group break-inside-avoid ${merged.className} ${
         isSmall() ? "space-y-2" : "py-4"
       }`}
     >
@@ -102,7 +102,7 @@ export function MoveCard(props: MoveCardProps) {
         </Show>
         <div
           class={cn(
-            "text-neu-700 dark:text-neu-300 flex flex-col gap-(--block-mb) leading-relaxed",
+            "text-neu-800 dark:text-neu-300 flex flex-col gap-(--block-mb) leading-relaxed",
             isSmall() ? "mt-1 text-sm" : "mt-2",
           )}
         >
