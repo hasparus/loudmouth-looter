@@ -130,7 +130,7 @@ export function Dialogue(props: { tree: Tree }) {
             <span class="text-neu-500 dark:text-neu-400 ml-3 inline-flex">
               <button
                 type="button"
-                class="hover:text-accent-700 dark:hover:text-accent-400 inline-flex cursor-pointer items-center border-0 bg-transparent p-1 transition-colors"
+                class="hover:text-accent-700 dark:hover:text-accent-400 relative inline-flex cursor-pointer items-center border-0 bg-transparent transition-colors before:absolute before:-inset-1"
                 onClick={back}
               >
                 <span aria-hidden>⇜</span>
@@ -139,7 +139,7 @@ export function Dialogue(props: { tree: Tree }) {
               <Show when={stack().length > 2}>
                 <button
                   type="button"
-                  class="hover:text-accent-700 dark:hover:text-accent-400 inline-flex cursor-pointer items-center border-0 bg-transparent p-1 transition-colors"
+                  class="hover:text-accent-700 dark:hover:text-accent-400 relative inline-flex cursor-pointer items-center border-0 bg-transparent transition-colors before:absolute before:-inset-1"
                   onClick={restart}
                 >
                   <span aria-hidden>↺</span>
