@@ -31,6 +31,10 @@
     @apply px-6;
     color: var(--color-neu-600);
     font: italic 400 1em var(--serif);
+
+    & p {
+      max-width: 100%;
+    }
   }
 
   :where(html.dark) & figcaption {
@@ -127,6 +131,10 @@
 
     &>aside {
       contain: size;
+
+      & figcaption {
+        padding-inline: 0;
+      }
     }
   }
 }

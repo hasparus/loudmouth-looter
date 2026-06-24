@@ -21,14 +21,18 @@ test.describe("Article pages", () => {
     ).toHaveCount(1);
     await expect(page.locator("time")).toBeVisible();
 
-    const neptune = page.locator('img[src*="neptune"]').first();
-    await neptune.scrollIntoViewIfNeeded();
-    await expect(neptune).toBeVisible();
-    expect(
-      await neptune.evaluate(
-        (img: HTMLImageElement) => img.complete && img.naturalWidth > 0,
-      ),
-    ).toBe(true);
+    for (const name of ["horseback", "neptune"]) {
+      const image = page.locator(`img[src*="${name}"]`).first();
+      await image.scrollIntoViewIfNeeded();
+      await expect(image).toBeVisible();
+      await expect
+        .poll(() =>
+          image.evaluate(
+            (img: HTMLImageElement) => img.complete && img.naturalWidth > 0,
+          ),
+        )
+        .toBe(true);
+    }
   });
 });
 

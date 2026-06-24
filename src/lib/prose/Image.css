@@ -5,7 +5,7 @@
   - we use it twice here to bump the specificity over `.zaduma-prose p a`
 */
 .zaduma-image-box.zaduma-image-box {
-  @apply inline-block rounded-sm;
+  @apply inline-block;
   max-width: 100%;
 
   & img {
