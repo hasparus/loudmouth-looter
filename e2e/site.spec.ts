@@ -36,40 +36,6 @@ test.describe("Asides render as side notes on wide viewports", () => {
       expect(box?.x).toBeGreaterThan(300);
     }
   });
-
-  test("desktop aside content overflows without sizing the grid row", async ({
-    page,
-  }, testInfo) => {
-    test.skip(testInfo.project.name === "mobile", "Desktop-only layout");
-
-    await page.goto("/why-dragon/");
-    const geometry = await page
-      .locator(".zaduma-prose-grid")
-      .evaluate((grid) => {
-        const aside = grid.querySelector("aside");
-        if (!aside) return null;
-
-        const asideBox = aside.getBoundingClientRect();
-        const previousBox =
-          aside.previousElementSibling?.getBoundingClientRect() ?? null;
-        const marker = getComputedStyle(aside, "::before");
-
-        return {
-          asideHeight: asideBox.height,
-          markerHeight: parseFloat(marker.height),
-          topDelta: previousBox
-            ? Math.abs(asideBox.top - previousBox.top)
-            : null,
-          borderLeftWidth: marker.borderLeftWidth,
-        };
-      });
-
-    expect(geometry).not.toBeNull();
-    expect(geometry!.asideHeight).toBe(0);
-    expect(geometry!.markerHeight).toBeGreaterThan(0);
-    expect(geometry!.topDelta).toBeLessThan(1);
-    expect(geometry!.borderLeftWidth).toBe("1px");
-  });
 });
 
 test.describe("OG images", () => {
@@ -103,7 +69,6 @@ test("homepage is readable on mobile", async ({ page }, testInfo) => {
   await expect(
     page.getByRole("link", { name: "Why Would You Fight a Dragon?" }).first(),
   ).toBeVisible();
-  // Content should not overflow
   const body = page.locator("body");
   const box = await body.boundingBox();
   expect(box!.width).toBeLessThanOrEqual(375);

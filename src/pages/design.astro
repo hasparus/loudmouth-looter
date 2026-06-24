@@ -4,9 +4,13 @@
 // ponytail: plain data arrays + raw markup under the global prose/skin styles,
 // no per-primitive abstraction.
 import BaseLayout from "../layouts/BaseLayout.astro";
+import E2eFixture from "../lib/design/e2e-fixture.mdx";
 import { Kbd } from "../lib/Kbd";
 import { Link } from "../lib/Link";
+import { mdxComponents } from "../lib/mdxComponents";
 import { Shortcut } from "../lib/Shortcut";
+
+import "../global-styles/shiki.css";
 
 const palettes = ["neu", "accent", "link"] as const;
 const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
@@ -144,6 +148,17 @@ const fonts = [
           <li>Another item</li>
         </ul>
         <hr />
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-serif">E2E fixture</h2>
+      <p class="text-neu-500 text-sm">
+        Published MDX atoms and markdown kitchen-sink for Playwright — not linked
+        from the site.
+      </p>
+      <div class="zaduma-prose-grid zaduma-prose">
+        <E2eFixture components={mdxComponents} />
       </div>
     </section>
 

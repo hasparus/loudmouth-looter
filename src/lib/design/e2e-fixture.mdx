@@ -1,0 +1,72 @@
+import itHappens from "../it-happens.webp";
+
+## Tracks
+
+Squares: <Track shape="square" value={2} max={4} />
+
+Circles: <Track shape="circle" value={3} max={5} />
+
+Rhombs: <Track shape="rhomb" value={1} max={3} />
+
+Interactive: <Track shape="square" defaultValue={1} max={4} />
+
+## Marker lines
+
+<Line kind="arrow">Goblins pour out of the broken gate, blades drawn.</Line>
+
+<Line kind="chevron">What do you do?</Line>
+
+## Tasks
+
+- [x] Spin the editor out of dungeon-motion
+- [x] Scaffold from the newest zaduma
+- [ ] Adopt the editor skin across the whole site
+
+## Moves
+
+<Move>
+
+## Learn and Grow
+
+When you go through something that could change who you are, discuss with the
+table what move or compendium fits. The GM will tell you it's unlocked, or give
+you steps to unlock it.
+
+</Move>
+
+## Code
+
+```ts twoslash
+// @filename: maths.ts
+export function absolute(num: number) {
+  if (num < 0) return num * -1;
+  return num;
+}
+
+// @filename: index.ts
+import { absolute } from "./maths.js";
+const value = absolute(-1);
+```
+
+```json
+{ "fixture": true }
+```
+
+## Markdown
+
+> A blockquote — the marginal voice of the manuscript.
+
+| Syntax    | Description |
+| --------- | ----------- |
+| Header    | Title       |
+| Paragraph | Text        |
+
+A sentence with a [design link](/design/) and H<sub>2</sub>O plus X<sup>2</sup>.
+
+Here's a footnote.[^1]
+
+[^1]: Footnote body for the fixture.
+
+<img src={itHappens.src} alt="Fixture image" width="320" />
+
+<aside>Fixture side note for prose-grid layout.</aside>
