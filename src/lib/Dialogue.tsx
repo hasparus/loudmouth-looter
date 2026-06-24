@@ -11,7 +11,6 @@ import { Portal } from "solid-js/web";
 
 import { SLOT_TEXT_OPTIONS } from "./animations";
 import styles from "./Dialogue.module.css";
-import { FlowText } from "./FlowText";
 import { Link } from "./Link";
 import type { Answer, Ex, Inline, Mark, Tree } from "./tree";
 
@@ -33,9 +32,6 @@ export const inlineToText = (part: Inline): string =>
 export const isUrl = (s: string) => /^https?:\/\//.test(s);
 const isNodeRef = (into: Ex["into"]): into is { node: string } =>
   !Array.isArray(into);
-/** True when prose carries an inline `[[ ]]` expansion (vs a node jump). */
-const hasInlineExpand = (say: Inline[]) =>
-  say.some((p) => typeof p !== "string" && "base" in p && Array.isArray(p.into));
 
 const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
 const reduceMotion = () =>
@@ -154,13 +150,9 @@ export function Dialogue(props: { tree: Tree }) {
         class={styles.content}
         data-shown={shown() ? "true" : "false"}
       >
-        {hasInlineExpand(node().say) ? (
-          <FlowText say={node().say} onNav={select} trailing={nav()} />
-        ) : (
-          <p class="text-neu-800 dark:text-neu-300 leading-relaxed">
-            <Prose say={node().say} onNav={select} /> {nav()}
-          </p>
-        )}
+        <p class="text-neu-800 dark:text-neu-300 leading-relaxed">
+          <Prose say={node().say} onNav={select} /> {nav()}
+        </p>
         <ol class="mt-5 flex list-none flex-col pl-0">
           <For each={node().answers}>
             {(a, i) => (

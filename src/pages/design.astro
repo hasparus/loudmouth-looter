@@ -7,6 +7,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { Kbd } from "../lib/Kbd";
 import { Link } from "../lib/Link";
 import { Shortcut } from "../lib/Shortcut";
+import { WrapText } from "../lib/WrapText";
 
 const palettes = ["neu", "accent", "link"] as const;
 const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
@@ -185,6 +186,15 @@ const fonts = [
           class="border-neu-300 bg-neu-50 rounded border px-2 py-1"
         />
       </div>
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-serif">Text wrapping illustrations</h2>
+      <p class="text-neu-500 text-sm">
+        Lines laid out off-DOM with pretext, narrowed where they meet the
+        figure. Loaded as its own island — pretext ships only on this page.
+      </p>
+      <WrapText client:visible />
     </section>
   </div>
 </BaseLayout>
