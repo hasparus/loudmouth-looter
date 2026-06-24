@@ -228,11 +228,8 @@ export function TextEditor() {
   });
   const slashActiveId = createMemo(() => {
     const commands = slashCommands();
-    return commands.length > 0
-      ? slashOptionId(
-          commands[Math.min(slashIndex(), commands.length - 1)].name,
-        )
-      : undefined;
+    const command = commands[Math.min(slashIndex(), commands.length - 1)];
+    return command ? slashOptionId(command.name) : undefined;
   });
 
   function handleBlur() {
@@ -280,6 +277,7 @@ export function TextEditor() {
     const matches = matchSlashCommands(current);
     if (matches.length === 0) return false;
     const selected = matches[Math.min(slashIndex(), matches.length - 1)];
+    if (!selected) return false;
 
     if (event.key === "ArrowDown") {
       event.preventDefault();

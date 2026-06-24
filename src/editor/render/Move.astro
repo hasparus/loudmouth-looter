@@ -18,7 +18,7 @@ const { title, id } = Astro.props;
 
 {
   title ? (
-    <MoveCard title={title} id={id}>
+    <MoveCard title={title} {...id === undefined ? {} : { id }}>
       <slot />
     </MoveCard>
   ) : (

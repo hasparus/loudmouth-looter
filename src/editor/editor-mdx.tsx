@@ -370,7 +370,6 @@ function attribute(name: string, value: string): MdxJsxAttribute {
   return { type: "mdxJsxAttribute", name, value };
 }
 
-// Only reads string-valued MDX attributes; expression/boolean attrs resolve undefined — fine because the editor always writes strings.
 function attributeOf(
   node: MdxJsxFlowElement | MdxJsxTextElement,
   name: string,

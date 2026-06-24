@@ -41,5 +41,11 @@ export function resolveTrackProps(raw: {
 
   const name = typeof raw.name === "string" ? raw.name : undefined;
 
-  return { shape, fill, max: maxVal, interactive, name };
+  return {
+    shape,
+    fill,
+    max: maxVal,
+    interactive,
+    ...(name === undefined ? {} : { name }),
+  };
 }
