@@ -152,7 +152,7 @@ export function Dialogue(props: { tree: Tree }) {
   return (
     <div ref={box}>
       <div
-        class="transition-[opacity,filter,transform] duration-220 ease-[cubic-bezier(0.23,1,0.32,1)] data-[shown=false]:-translate-y-1 data-[shown=false]:opacity-0 data-[shown=false]:blur-[3px] data-[shown=false]:duration-110"
+        class={styles.content}
         data-shown={shown() ? "true" : "false"}
       >
         {hasInlineExpand(node().say) ? (
