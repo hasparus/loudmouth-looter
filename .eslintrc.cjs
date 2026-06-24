@@ -32,10 +32,7 @@ module.exports = {
       files: ["*.ts", "*.tsx"],
       extends: ["plugin:solid/typescript"],
       parserOptions: {
-        project: [
-          require.resolve("./tsconfig.json"),
-          require.resolve("./src/editor/tsconfig.json"),
-        ],
+        project: [require.resolve("./tsconfig.json")],
       },
       rules: {
         "react/jsx-key": "off",
