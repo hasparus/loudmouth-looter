@@ -27,7 +27,10 @@ function isPointInPolygon(points: Point[], x: number, y: number): boolean {
   for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
     const a = points[i]!;
     const b = points[j]!;
-    if (a.y > y !== b.y > y && x < ((b.x - a.x) * (y - a.y)) / (b.y - a.y) + a.x)
+    if (
+      (a.y > y) !== (b.y > y) &&
+      x < ((b.x - a.x) * (y - a.y)) / (b.y - a.y) + a.x
+    )
       inside = !inside;
   }
   return inside;
