@@ -19,7 +19,8 @@
     "format": "prettier --write src api e2e .github/scripts playwright.config.ts astro.config.ts",
     "ci": "bun run lint && prettier --check src api e2e .github/scripts playwright.config.ts astro.config.ts",
     "test": "playwright test",
-    "test:unit": "bun test src"
+    "test:unit": "bun test src",
+    "test:update-snapshots:linux": ".github/scripts/update-linux-snapshots.sh"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7",
