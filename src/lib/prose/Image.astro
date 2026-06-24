@@ -243,10 +243,13 @@ async function readImageForPlaceholder(source: ImageSource) {
 
 <span
   zaduma-image
+  style={`--zaduma-img-src: url("${attrs.src}")`}
   class:list={[
     "zaduma-image-box relative block overflow-hidden",
     !placeholder &&
-      "!inline-flex w-full justify-center bg-current/10 [&>img]:h-full [&>img]:object-contain",
+      // ponytail: no bg tint — it only ever showed through transparent pixels
+      // (gray box behind line-art) or as a load flash; opaque imgs cover it.
+      "!inline-flex w-full justify-center [&>img]:h-full [&>img]:object-contain",
   ]}
 >
   <img

@@ -351,6 +351,15 @@
         color-mix(in srgb, var(--color-link-500) 18%, transparent 100%) 100%);
   }
 
+  html.dark figure.zaduma-line-art [zaduma-image] {
+    background-color: var(--color-accent-500);
+    -webkit-mask: var(--zaduma-img-src) center / contain no-repeat;
+    mask: var(--zaduma-img-src) center / contain no-repeat;
+  }
+  html.dark figure.zaduma-line-art [zaduma-image] > img {
+    visibility: hidden;
+  }
+
   button {
     cursor: pointer;
   }
