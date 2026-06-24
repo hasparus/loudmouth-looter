@@ -20,6 +20,15 @@ test.describe("Article pages", () => {
       page.locator("aside", { hasText: "DM = Dragon Minder" }),
     ).toHaveCount(1);
     await expect(page.locator("time")).toBeVisible();
+
+    const neptune = page.locator('img[src*="neptune"]').first();
+    await neptune.scrollIntoViewIfNeeded();
+    await expect(neptune).toBeVisible();
+    expect(
+      await neptune.evaluate(
+        (img: HTMLImageElement) => img.complete && img.naturalWidth > 0,
+      ),
+    ).toBe(true);
   });
 });
 

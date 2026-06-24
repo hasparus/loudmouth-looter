@@ -28,6 +28,9 @@ import "./Image.css";
 // All* images with `src`s starting from / are imported from `src/images/` folder.
 const SRC_IMAGES_PREFIX = "/";
 
+// Astro rewrites relative markdown image imports to built asset URLs.
+const ASTRO_ASSET_PREFIX = "/_astro/";
+
 // Images with `src` starting with /content/ live in public dir.
 const PUBLIC_IMAGES_PREFIX = "/content/";
 
@@ -52,17 +55,15 @@ let height = props.height;
 
 let src = await props.src;
 if (typeof src === "object") {
-  if ("default" in src) src = src.default;
-  if ("src" in src) {
-    src = src.src;
+  const image = "default" in src ? src.default : src;
+  if (typeof image === "object" && image && "src" in image) {
+    width ??= "width" in image ? image.width : width;
+    height ??= "height" in image ? image.height : height;
+    src = image.src;
   }
 }
 
-const pathToImage = decodeURIComponent(
-  src.startsWith(SRC_IMAGES_PREFIX)
-    ? `../../../src/images${src.slice(SRC_IMAGES_PREFIX.length - 1)}`
-    : src,
-);
+const isAstroAsset = src.startsWith(ASTRO_ASSET_PREFIX);
 let importedImage = null;
 
 let placeholder: null | {
@@ -72,9 +73,19 @@ let placeholder: null | {
   backgroundRepeat: string;
 } = null;
 
-const isRaw = src.startsWith("raw!") || src.startsWith(PUBLIC_IMAGES_PREFIX);
+const isRaw = src.startsWith("raw!");
 if (isRaw) {
   src = src.slice(4);
+}
+
+const isPublicImage = src.startsWith(PUBLIC_IMAGES_PREFIX);
+const isSitePath = src.startsWith(SRC_IMAGES_PREFIX) && !src.startsWith("//");
+const shouldTrySrcImages = isSitePath && !isAstroAsset && !isPublicImage;
+const pathToImage = decodeURIComponent(
+  shouldTrySrcImages ? `../../../src/images${src}` : src,
+);
+
+if (isRaw || isPublicImage) {
 
   if (src.startsWith(PUBLIC_IMAGES_PREFIX)) {
     const globbed = import.meta.glob<false, string, { default: ImageMetadata }>(
@@ -99,53 +110,53 @@ if (isRaw) {
       height != null ? height * (imported.width / imported.height) : undefined;
   }
 } else {
-  if (src.startsWith(SRC_IMAGES_PREFIX)) {
-    src = src.slice(SRC_IMAGES_PREFIX.length - 1);
+  if (shouldTrySrcImages) {
     const allImages = import.meta.glob<
       false,
       string,
       { default: ImageMetadata }
     >("../../../src/images/**/*");
+    const loadImage = allImages[pathToImage];
 
-    try {
-      importedImage = (await allImages[pathToImage.replace("../src/", "")]!())
-        .default;
-    } catch (err) {
-      console.error({ allImages, pathToImage });
-      throw err;
-    }
-    props.width ??= importedImage.width;
-    props.height ??= importedImage.height;
-    if (importedImage.format === "jpg") {
-      importedImage.format = "webp";
+    if (loadImage) {
+      importedImage = (await loadImage()).default;
+      props.width ??= importedImage.width;
+      props.height ??= importedImage.height;
+      if (importedImage.format === "jpg") {
+        importedImage.format = "webp";
+      }
     }
   }
 
-  const imageForPlaceholder = await (pathToImage.startsWith("http")
-    ? fetch(pathToImage).then(async (res) =>
-        Buffer.from(await res.arrayBuffer()),
-      )
-    : src.startsWith(SRC_IMAGES_PREFIX)
-      ? readFile(
-          join(
-            process.cwd(),
-            "src",
-            "images",
-            decodeURIComponent(src.slice(SRC_IMAGES_PREFIX.length)),
-          ),
-        )
-      : readFile(new URL(pathToImage.replace("../", ""), import.meta.url)));
+  const imageForPlaceholder = isAstroAsset || (isSitePath && !importedImage)
+    ? null
+    : await (pathToImage.startsWith("http")
+        ? fetch(pathToImage).then(async (res) =>
+            Buffer.from(await res.arrayBuffer()),
+          )
+        : src.startsWith(SRC_IMAGES_PREFIX)
+          ? readFile(
+              join(
+                process.cwd(),
+                "src",
+                "images",
+                decodeURIComponent(src.slice(SRC_IMAGES_PREFIX.length)),
+              ),
+            )
+          : readFile(new URL(pathToImage.replace("../", ""), import.meta.url)));
 
-  const { metadata, css } = await getPlaiceholder(imageForPlaceholder, {
-    size: 10,
-  });
-  placeholder = css;
+  if (imageForPlaceholder) {
+    const { metadata, css } = await getPlaiceholder(imageForPlaceholder, {
+      size: 10,
+    });
+    placeholder = css;
 
-  if (!width && !height && !props.aspectRatio) {
-    width ??= metadata.width;
-    props.aspectRatio ??= metadata.width / metadata.height;
-    width = Math.min(width, WIDE_CONTAINER_WIDTH);
-    height = Math.round(width / parseFloat(props.aspectRatio as string));
+    if (!width && !height && !props.aspectRatio) {
+      width ??= metadata.width;
+      props.aspectRatio ??= metadata.width / metadata.height;
+      width = Math.min(width, WIDE_CONTAINER_WIDTH);
+      height = Math.round(width / parseFloat(props.aspectRatio as string));
+    }
   }
 }
 
@@ -157,7 +168,7 @@ height ??=
 props.alt ||= "";
 let attrs = { src, class: "", width, height, aspectRatio: props.aspectRatio };
 
-if (!isRaw) {
+if (!isRaw && !isPublicImage && !isAstroAsset && (!isSitePath || importedImage)) {
   let attributes;
   props.src = src;
   ({ src, attributes } = await getImage({
