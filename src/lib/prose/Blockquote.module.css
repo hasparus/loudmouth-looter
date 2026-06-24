@@ -26,7 +26,7 @@
   &:before {
     @apply text-4xl leading-none;
     font-family: var(--font-serif);
-    color: var(--color-neu-300);
+    color: var(--color-neu-400);
     position: absolute;
     font-style: normal;
     font-weight: 900;
