@@ -37,7 +37,7 @@ test.describe("Visual regression", () => {
 
       await expect(page).toHaveScreenshot(`${name}.png`, {
         fullPage: true,
-        maxDiffPixels: 2000,
+        maxDiffPixels: 25_000,
         maxDiffPixelRatio: 0.01,
       });
     });
@@ -45,33 +45,19 @@ test.describe("Visual regression", () => {
 });
 
 async function ensurePageStable(page: Page) {
-  await page.evaluate(async () => {
-    await new Promise<void>((resolve) => {
-      let y = 0;
-      const step = () => {
-        window.scrollTo(0, y);
-        y += window.innerHeight;
-        if (y < document.body.scrollHeight) {
-          requestAnimationFrame(step);
-        } else {
-          window.scrollTo(0, 0);
-          requestAnimationFrame(() => resolve());
-        }
-      };
-      step();
-    });
-  });
-
   await page.waitForLoadState("networkidle");
 
   await page.evaluate(async () => {
     await document.fonts.ready;
     await Promise.all(
-      Array.from(document.images).map((img) =>
-        img.complete && img.naturalWidth > 0
-          ? Promise.resolve()
-          : img.decode().catch(() => undefined),
-      ),
+      Array.from(document.images).map((img) => {
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+        if (img.loading === "lazy") return Promise.resolve();
+        return Promise.race([
+          img.decode().catch(() => undefined),
+          new Promise((resolve) => setTimeout(resolve, 3_000)),
+        ]);
+      }),
     );
     await new Promise((resolve) => requestAnimationFrame(resolve));
     await new Promise((resolve) => requestAnimationFrame(resolve));

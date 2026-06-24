@@ -63,14 +63,15 @@ const { loading = "lazy", decoding = "async", ...props } = Astro.props as Props;
 let width = props.width;
 let height = props.height;
 
-let src = await props.src;
-if (typeof src === "object") {
-  const image = "default" in src ? src.default : src;
-  if (typeof image === "object" && image && "src" in image) {
-    width ??= "width" in image ? image.width : width;
-    height ??= "height" in image ? image.height : height;
-    src = image.src;
-  }
+const srcInput = await props.src;
+let src: string;
+if (typeof srcInput === "object") {
+  const image = "default" in srcInput ? srcInput.default : srcInput;
+  width ??= image.width;
+  height ??= image.height;
+  src = image.src;
+} else {
+  src = srcInput;
 }
 
 let placeholder: null | {
