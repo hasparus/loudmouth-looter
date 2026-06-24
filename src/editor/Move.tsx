@@ -1,8 +1,10 @@
 import { Index, type JSX, mergeProps, Show } from "solid-js";
 
 import { cn } from "./cn";
+import { MOVE_ARTICLE_CLASS } from "./move-dom";
+import { slugFromTitle } from "./move-props";
 
-export interface MoveCardProps {
+export interface MoveProps {
   checkboxes?: number;
   children: JSX.Element;
   className?: string;
@@ -12,22 +14,24 @@ export interface MoveCardProps {
   resourceName?: string;
   resources?: number;
   size?: "sm";
-  title: string;
+  title?: string;
 }
 
-export function MoveCard(props: MoveCardProps) {
+function MoveWithTitle(props: MoveProps & { title: string }) {
   const merged = mergeProps(
     { className: "", isBaseMove: false, resourceName: "" },
     props,
   );
   const isSmall = () => merged.size === "sm";
-  const id = () => merged.id || merged.title.toLowerCase().replaceAll(" ", "-");
+  const id = () => merged.id ?? slugFromTitle(merged.title);
 
   return (
     <article
-      class={`group break-inside-avoid ${merged.className} ${
-        isSmall() ? "space-y-2" : "py-4"
-      }`}
+      class={cn(
+        MOVE_ARTICLE_CLASS,
+        merged.className,
+        isSmall() ? "space-y-2" : undefined,
+      )}
     >
       <div class="flex-1">
         <div class={cn("flex items-center", isSmall() ? "gap-2" : "gap-2.5")}>
@@ -47,7 +51,7 @@ export function MoveCard(props: MoveCardProps) {
             class={`text-neu-800 dark:text-neu-100 font-serif font-bold tracking-wide ${
               isSmall() ? "" : "text-xl [text-box-trim:trim-end]"
             }`}
-            id={id() ? `${id()}-title` : undefined}
+            id={`${id()}-title`}
           >
             {merged.title}
           </h3>
@@ -105,10 +109,27 @@ export function MoveCard(props: MoveCardProps) {
             "text-neu-900 dark:text-neu-300 flex flex-col gap-(--block-mb) leading-relaxed",
             isSmall() ? "mt-1 text-sm" : "mt-2",
           )}
+          data-move-body=""
         >
           {merged.children}
         </div>
       </div>
     </article>
+  );
+}
+
+export function Move(props: MoveProps) {
+  const merged = mergeProps(
+    { className: "", isBaseMove: false, resourceName: "" },
+    props,
+  );
+
+  return (
+    <Show
+      when={merged.title}
+      fallback={<article class="te-move">{merged.children}</article>}
+    >
+      {(title) => <MoveWithTitle {...merged} title={title()} />}
+    </Show>
   );
 }

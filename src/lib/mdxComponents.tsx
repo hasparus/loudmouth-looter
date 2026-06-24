@@ -1,5 +1,5 @@
+import { Move } from "../editor/Move";
 import Line from "../editor/render/Line.astro";
-import Move from "../editor/render/Move.astro";
 import Track from "../editor/render/Track.astro";
 
 import { Blockquote } from "./prose/Blockquote";
@@ -41,7 +41,6 @@ export const mdxComponents = {
   pre: Pre,
   Pre,
   p: Paragraph,
-  // Editor atoms authored in the /editor tool and saved into .mdx posts.
   Track,
   Line,
   Move,
