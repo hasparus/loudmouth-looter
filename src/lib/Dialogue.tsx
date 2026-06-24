@@ -247,12 +247,19 @@ function MarkView(props: { mark: Mark }) {
 function MemeLink(props: { alt: string; src: string }) {
   const [pos, setPos] = createSignal<{ x: number; y: number } | null>(null);
   let img!: HTMLImageElement;
+  let onExitEnd: ((event: AnimationEvent) => void) | undefined;
   const hoverable = () =>
     typeof matchMedia !== "undefined" && matchMedia("(hover: hover)").matches;
   const track = (event: MouseEvent) => {
     if (!hoverable()) return;
-    img?.getAnimations().forEach((a) => a.cancel());
-    img?.classList.remove("animate-bounce-out");
+    if (img?.classList.contains("animate-bounce-out")) {
+      img.getAnimations().forEach((a) => a.cancel());
+      img.classList.remove("animate-bounce-out");
+      if (onExitEnd) {
+        img.removeEventListener("animationend", onExitEnd);
+        onExitEnd = undefined;
+      }
+    }
     setPos({ x: event.clientX, y: event.clientY });
   };
   const leave = () => {
@@ -262,13 +269,14 @@ function MemeLink(props: { alt: string; src: string }) {
     }
     img.classList.remove("animate-bounce-in");
     img.classList.add("animate-bounce-out");
-    const onEnd = (event: AnimationEvent) => {
+    onExitEnd = (event: AnimationEvent) => {
       if (event.target !== img) return;
-      img.removeEventListener("animationend", onEnd);
+      img.removeEventListener("animationend", onExitEnd!);
+      onExitEnd = undefined;
       setPos(null);
       img.classList.remove("animate-bounce-out");
     };
-    img.addEventListener("animationend", onEnd);
+    img.addEventListener("animationend", onExitEnd);
   };
 
   return (
