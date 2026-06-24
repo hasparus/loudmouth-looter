@@ -130,7 +130,7 @@ export function Dialogue(props: { tree: Tree }) {
             <span class="text-neu-500 dark:text-neu-400 ml-3 inline-flex">
               <button
                 type="button"
-                class="hover:text-accent-700 dark:hover:text-accent-400 relative inline-flex cursor-pointer items-center border-0 bg-transparent transition-colors before:absolute before:-inset-1"
+                class="hover:text-accent-700 dark:hover:text-accent-400 relative inline-flex cursor-pointer items-center border-0 bg-transparent px-1 transition-colors before:absolute before:-inset-1"
                 onClick={back}
               >
                 <span aria-hidden>⇜</span>
@@ -139,7 +139,7 @@ export function Dialogue(props: { tree: Tree }) {
               <Show when={stack().length > 2}>
                 <button
                   type="button"
-                  class="hover:text-accent-700 dark:hover:text-accent-400 relative inline-flex cursor-pointer items-center border-0 bg-transparent transition-colors before:absolute before:-inset-1"
+                  class="hover:text-accent-700 dark:hover:text-accent-400 relative inline-flex cursor-pointer items-center border-0 bg-transparent px-1 transition-colors before:absolute before:-inset-1"
                   onClick={restart}
                 >
                   <span aria-hidden>↺</span>
@@ -174,7 +174,7 @@ function Choice(props: {
   onNav: (node: string) => void;
 }) {
   const cls =
-    "group flex w-full items-center gap-3 py-0.5 text-left text-neu-800 no-underline transition-colors hover:text-accent-700 hover:duration-0 dark:text-neu-300 dark:hover:text-accent-400";
+    "group flex w-full items-center gap-3 py-0.5 text-left text-neu-800 no-underline transition-colors hover:text-accent-700 hover:duration-0 dark:text-neu-300 dark:hover:text-accent-400 px-3 -mx-3";
 
   const inner = (
     <>
@@ -273,7 +273,7 @@ function MemeLink(props: { alt: string; src: string }) {
             <img
               src={props.src}
               alt={props.alt}
-              class="border-neu-300 dark:border-neu-700 pointer-events-none fixed z-50 max-h-80 max-w-xs rounded-sm border shadow-2xl"
+              class="border-neu-300 dark:border-neu-700 pointer-events-none fixed z-50 max-w-2xl rounded-sm border shadow-2xl animate-bounce-in"
               style={{ left: `${p().x}px`, top: `${p().y + 20}px` }}
             />
           </Portal>
