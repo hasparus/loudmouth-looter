@@ -35,7 +35,7 @@ export function buildMoveElement(
   const h3 = document.createElement("h3");
   h3.id = `${moveId}-title`;
   h3.className =
-    "text-neu-800 dark:text-neu-100 font-serif font-bold tracking-wide text-xl [text-box-trim:trim-end]";
+    "text-neu-800 dark:text-neu-200 font-serif font-bold tracking-wide text-xl [text-box-trim:trim-end]";
   h3.textContent = title;
 
   headerRow.append(checkbox, h3);

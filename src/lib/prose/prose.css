@@ -84,7 +84,7 @@
     }
 
     & strong {
-      font-size: 1.015cap;
+      font-size: 1.1cap;
       color: light-dark(black, white);
     }
 
@@ -166,37 +166,27 @@
     left: -2rem;
     width: 12px;
     background:
-      repeating-linear-gradient(
-        45deg,
+      repeating-linear-gradient(45deg,
         var(--color-neu-400) 0 1px,
-        transparent 1px 7px
-      ),
-      repeating-linear-gradient(
-        -45deg,
+        transparent 1px 7px),
+      repeating-linear-gradient(-45deg,
         var(--color-neu-400) 0 1px,
-        transparent 1px 7px
-      );
-    mask: linear-gradient(
-      to bottom,
-      transparent,
-      black 16px,
-      black calc(100% - 16px),
-      transparent
-    );
+        transparent 1px 7px);
+    mask: linear-gradient(to bottom,
+        transparent,
+        black 16px,
+        black calc(100% - 16px),
+        transparent);
   }
 
   :where(html.dark) &::before {
     background:
-      repeating-linear-gradient(
-        45deg,
+      repeating-linear-gradient(45deg,
         var(--color-neu-600) 0 1px,
-        transparent 1px 7px
-      ),
-      repeating-linear-gradient(
-        -45deg,
+        transparent 1px 7px),
+      repeating-linear-gradient(-45deg,
         var(--color-neu-600) 0 1px,
-        transparent 1px 7px
-      );
+        transparent 1px 7px);
   }
 }
 
