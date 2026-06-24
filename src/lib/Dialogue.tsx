@@ -124,13 +124,13 @@ export function Dialogue(props: { tree: Tree }) {
         class="transition-[opacity,filter,transform] duration-220 ease-[cubic-bezier(0.23,1,0.32,1)] data-[shown=false]:-translate-y-1 data-[shown=false]:opacity-0 data-[shown=false]:blur-[3px] data-[shown=false]:duration-110"
         data-shown={shown() ? "true" : "false"}
       >
-        <p class="text-neu-700 dark:text-neu-300 leading-relaxed">
+        <p class="text-neu-800 dark:text-neu-300 leading-relaxed">
           <Prose say={node().say} onNav={select} />{" "}
           <Show when={stack().length > 1}>
-            <div class="text-neu-500 dark:text-neu-400 ml-3 inline-flex">
+            <span class="text-neu-500 dark:text-neu-400 ml-3 inline-flex">
               <button
                 type="button"
-                class="hover:text-accent-700 dark:hover:text-accent-400 flex cursor-pointer items-center p-1 transition-colors"
+                class="hover:text-accent-700 dark:hover:text-accent-400 inline-flex cursor-pointer items-center border-0 bg-transparent p-1 transition-colors"
                 onClick={back}
               >
                 <span aria-hidden>⇜</span>
@@ -139,14 +139,14 @@ export function Dialogue(props: { tree: Tree }) {
               <Show when={stack().length > 2}>
                 <button
                   type="button"
-                  class="hover:text-accent-700 dark:hover:text-accent-400 flex cursor-pointer items-center p-1 transition-colors"
+                  class="hover:text-accent-700 dark:hover:text-accent-400 inline-flex cursor-pointer items-center border-0 bg-transparent p-1 transition-colors"
                   onClick={restart}
                 >
                   <span aria-hidden>↺</span>
                   <span class="sr-only">back to start</span>
                 </button>
               </Show>
-            </div>
+            </span>
           </Show>
         </p>
         <ol class="mt-5 flex list-none flex-col pl-0">
@@ -174,7 +174,7 @@ function Choice(props: {
   onNav: (node: string) => void;
 }) {
   const cls =
-    "group flex w-full items-center gap-3 py-0.5 text-left text-neu-700 no-underline transition-colors hover:text-accent-700 hover:duration-0 dark:text-neu-300 dark:hover:text-accent-400";
+    "group flex w-full items-center gap-3 py-0.5 text-left text-neu-800 no-underline transition-colors hover:text-accent-700 hover:duration-0 dark:text-neu-300 dark:hover:text-accent-400";
 
   const inner = (
     <>
@@ -187,19 +187,23 @@ function Choice(props: {
     </>
   );
 
-  // eslint-disable-next-line solid/reactivity, solid/components-return-once -- static answer
-  return isUrl(props.answer.to) ? (
-    <a href={props.answer.to} class={cls}>
-      {inner}
-    </a>
-  ) : (
-    <button
-      type="button"
-      class={cls}
-      onClick={() => props.onNav(props.answer.to)}
+  return (
+    <Show
+      when={isUrl(props.answer.to)}
+      fallback={
+        <button
+          type="button"
+          class={cls}
+          onClick={() => props.onNav(props.answer.to)}
+        >
+          {inner}
+        </button>
+      }
     >
-      {inner}
-    </button>
+      <a href={props.answer.to} class={cls}>
+        {inner}
+      </a>
+    </Show>
   );
 }
 
