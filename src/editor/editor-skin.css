@@ -21,9 +21,7 @@ html {
 }
 
 html.dark {
-  /* color-scheme is set by skin.css @layer base; repeat color here for
-     specificity inside the editor bundle. */
-  color: var(--color-neu-300);
+  color: var(--color-neu-200);
 }
 
 h5 {

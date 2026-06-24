@@ -92,7 +92,7 @@ html {
   color: var(--color-neu-800);
 
   &.dark {
-    color: var(--color-neu-300);
+    color: var(--color-neu-200);
   }
 }
 
