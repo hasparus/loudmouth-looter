@@ -35,3 +35,11 @@
     transform: none;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .optionIn {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

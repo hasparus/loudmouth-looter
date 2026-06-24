@@ -61,32 +61,31 @@ export function Dialogue(props: { tree: Tree }) {
 
   const navigate = (mutate: () => void) => {
     if (busy) return;
-    if (reduceMotion()) {
-      mutate();
-      return;
-    }
     busy = true;
+    const rm = reduceMotion();
     const from = box.offsetHeight;
     setShown(false);
     window.setTimeout(() => {
       setAnimate(true);
       mutate();
       requestAnimationFrame(() => {
-        const to = box.offsetHeight;
-        if (from !== to) {
-          box.style.overflow = "hidden";
-          const anim = box.animate(
-            [{ height: `${from}px` }, { height: `${to}px` }],
-            { duration: 240, easing: EASE_OUT },
-          );
-          anim.onfinish = () => (box.style.overflow = "");
+        if (!rm) {
+          const to = box.offsetHeight;
+          if (from !== to) {
+            box.style.overflow = "hidden";
+            const anim = box.animate(
+              [{ height: `${from}px` }, { height: `${to}px` }],
+              { duration: 240, easing: EASE_OUT },
+            );
+            anim.onfinish = () => (box.style.overflow = "");
+          }
         }
         requestAnimationFrame(() => {
           setShown(true);
           busy = false;
         });
       });
-    }, 110);
+    }, rm ? 120 : 110);
   };
 
   const select = (to: string) => {
