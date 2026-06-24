@@ -32,6 +32,7 @@ import {
   type SlashState,
   SPELLCHECK_KEY,
   STORAGE_KEY,
+  syncDocumentTitle,
   trackBeforeCaret,
   type UndoSnapshot,
 } from "./editor-dom";
@@ -43,7 +44,6 @@ import { useLinkedFile } from "./use-linked-file";
 
 import "./editor-atoms.css";
 
-// Keeps a track's roving tabindex on whichever toggle focus last reached.
 function handleFocus(event: FocusEvent) {
   const toggle = (event.target as HTMLElement).closest(".te-toggle");
   if (!(toggle instanceof HTMLElement)) return;
@@ -54,9 +54,6 @@ function handleFocus(event: FocusEvent) {
   }
 }
 
-// Mouse-down on a toggle would normally pull focus onto the button and wipe
-// the caret. Stop the default so a click toggles without uprooting the writer;
-// keyboard focus still works because it never goes via mousedown.
 function handleMouseDown(event: MouseEvent) {
   const toggle = (event.target as HTMLElement).closest(".te-toggle");
   if (toggle) event.preventDefault();
@@ -64,9 +61,6 @@ function handleMouseDown(event: MouseEvent) {
 
 export function TextEditor() {
   let editorEl: HTMLDivElement | undefined;
-  // One-slot custom undo: the editor's transforms (slash commands, `- [ ] `,
-  // headings, lists) bypass the browser's history, so Ctrl/Cmd+Z restores
-  // this pre-transform snapshot. Cleared once the writer types past it.
   let pendingUndo: UndoSnapshot | null = null;
   const [spellcheck, setSpellcheck] = createSignal(
     localStorage.getItem(SPELLCHECK_KEY) !== "false",
@@ -77,14 +71,15 @@ export function TextEditor() {
 
   function persist(editor: HTMLElement) {
     save(editor);
+    syncDocumentTitle(editor);
     file.queue(serializeDocument(editor));
   }
   function persistNow(editor: HTMLElement) {
     flushSave(editor);
+    syncDocumentTitle(editor);
     void file.flushWrite(serializeDocument(editor));
   }
 
-  // Recomputes the pending `/command` query after any caret-moving event.
   function refreshSlash() {
     const editor = editorEl;
     if (!editor) return;
@@ -104,7 +99,6 @@ export function TextEditor() {
     persistNow(editor);
   }
 
-  // Replaces the typed `/command` query with its rendered atom.
   function commitSlash(command: SlashCommand, count: number | null) {
     const editor = editorEl;
     if (!editor) return;
@@ -136,14 +130,10 @@ export function TextEditor() {
     deleteRange.deleteContents();
 
     if (command.kind === "track" && command.shape) {
-      // deleteRange is collapsed at the deletion point; insert the atom and a
-      // trailing space there as one fragment, then drop the caret past both.
       const track = buildTrackElement(
         command.shape,
         count ?? command.defaultCount,
       );
-      // Non-breaking space: a plain trailing space next to an inline atom gets
-      // collapsed away by contentEditable whitespace normalisation.
       const space = document.createTextNode(" ");
       const fragment = document.createDocumentFragment();
       fragment.append(track, space);
@@ -157,7 +147,6 @@ export function TextEditor() {
     } else if (command.blockClass) {
       const block = getCurrentBlock(editor);
       if (block && block.tagName === "P") {
-        // Replace the line kind rather than stacking marker classes.
         block.classList.remove("te-arrow", "te-chevron");
         block.classList.add(command.blockClass);
       }
@@ -179,6 +168,7 @@ export function TextEditor() {
       localStorage.getItem(STORAGE_KEY) || DEFAULT_HTML,
     );
     normalizeTrackTabindexes(editor);
+    syncDocumentTitle(editor);
 
     const handleBeforeUnload = () => flushSave(editor);
     globalThis.addEventListener("beforeunload", handleBeforeUnload);
@@ -187,8 +177,6 @@ export function TextEditor() {
     );
   });
 
-  // A caret move that fires no `input` event (arrow keys, clicks) still has to
-  // refresh the slash menu, otherwise it lingers stale at the old anchor.
   onMount(() => {
     let scheduled = 0;
     const handler = () => {
@@ -218,6 +206,7 @@ export function TextEditor() {
     if (html === null) return;
     editor.innerHTML = sanitizeHtml(html);
     normalizeTrackTabindexes(editor);
+    syncDocumentTitle(editor);
     setSlash(null);
     pendingUndo = null;
     flushSave(editor);
@@ -252,8 +241,6 @@ export function TextEditor() {
     setSlash(null);
   }
 
-  // A click — or keyboard Space/Enter on a focused toggle — flips its state;
-  // any click also refreshes the slash menu against the moved caret.
   function handleClick(event: MouseEvent) {
     const editor = editorEl;
     if (!editor) return;
@@ -271,8 +258,6 @@ export function TextEditor() {
     if (!editor) return;
     if (event.isComposing) return;
     applyInlineTransform(editor);
-    // A task transform stores its undo snapshot; plain typing (null) clears
-    // any pending one — the writer has moved past it.
     pendingUndo = applyTaskShorthand(editor);
     normalizeEmptyBlocks(editor);
     refreshSlash();
@@ -285,9 +270,10 @@ export function TextEditor() {
     event.preventDefault();
     pendingUndo = null;
     if (event.clipboardData) handleEditorPaste(editor, event.clipboardData);
+    syncDocumentTitle(editor);
+    persist(editor);
   }
 
-  // Slash-menu keys while the menu is open. Returns true once handled.
   function handleSlashKey(event: KeyboardEvent): boolean {
     const current = slash();
     if (!current) return false;
@@ -310,13 +296,10 @@ export function TextEditor() {
       setSlash(null);
       return true;
     }
-    // Tab dismisses the menu and is left to move focus normally.
     if (event.key === "Tab") {
       setSlash(null);
       return true;
     }
-    // A track command needs its count before it can be committed; until then,
-    // let Space through so the number can be typed.
     const ready = selected.kind === "block" || current.count !== null;
     if (event.key === "Enter" || (event.key === " " && ready)) {
       event.preventDefault();
@@ -350,7 +333,6 @@ export function TextEditor() {
       }
     }
 
-    // Ctrl/Cmd+Z reverts the most recent editor transform.
     if (
       (event.metaKey || event.ctrlKey) &&
       !event.shiftKey &&
@@ -362,8 +344,6 @@ export function TextEditor() {
       return;
     }
 
-    // Keys on a focused toggle: arrows rove within the track, the rest
-    // (Space, Enter, Tab) are left to the native button.
     const onToggle = (event.target as HTMLElement).closest(".te-toggle");
     if (onToggle) {
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
@@ -375,9 +355,6 @@ export function TextEditor() {
 
     if (handleSlashKey(event)) return;
 
-    // Backspace just before a track peels off its last toggle rather than
-    // deleting the whole atom. The final toggle falls through to the default
-    // (which removes the now-empty track).
     if (event.key === "Backspace") {
       const track = trackBeforeCaret(editor);
       const toggles = track ? [...track.querySelectorAll(".te-toggle")] : [];

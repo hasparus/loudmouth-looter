@@ -20,6 +20,9 @@ async function clearEditor(page: import("@playwright/test").Page) {
 test.describe("editor", () => {
   test("loads and hydrates the writing surface", async ({ page }) => {
     await page.goto("/editor/");
+    await expect(page).toHaveTitle(
+      "The Plan of the Parliament of Erl — loudmouth looter",
+    );
     await expect(page.getByRole("textbox", EDITOR)).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Editor guide" }),
@@ -116,6 +119,16 @@ test.describe("editor", () => {
     await expect(dialog).toBeVisible();
     await dialog.getByRole("button", { name: "Close" }).click();
     await expect(dialog).not.toBeVisible();
+  });
+
+  test("updates document title from the first h1", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+
+    await editor.pressSequentially("# My Custom Title");
+    await page.keyboard.press("Enter");
+
+    await expect(page).toHaveTitle("My Custom Title — loudmouth looter");
   });
 
   test("spellcheck toggle flips its label", async ({ page }) => {
