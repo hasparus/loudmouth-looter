@@ -59,8 +59,6 @@ export interface PostFrontmatter {
   };
   /** Hidden in PROD, visible in dev. */
   draft?: boolean;
-  /** Routable for e2e, excluded from index, feeds, sitemap, and agent endpoints. */
-  fixture?: boolean;
-  /** Never rendered, including in dev. */
+  /** Omitted from index, feeds, sitemap, and agent endpoints; still routable. */
   hidden?: boolean;
 }

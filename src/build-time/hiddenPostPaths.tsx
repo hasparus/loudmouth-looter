@@ -27,9 +27,8 @@ export function getHiddenPostPaths(
     const frontmatter = {
       hidden: data.hidden === true,
       draft: data.draft === true,
-      fixture: data.fixture === true,
     };
-    if (!isPostRoutable(frontmatter, { isProd }) || frontmatter.fixture) {
+    if (!isPostRoutable(frontmatter, { isProd }) || frontmatter.hidden) {
       hidden.add(postPath(postsDir, abs));
     }
   }
