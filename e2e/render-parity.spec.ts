@@ -11,7 +11,7 @@ test.describe("published post render parity", () => {
     }
   });
 
-  test("renders a move card (dungeon-motion MoveCard) with its heading lifted to title/id", async ({
+  test("renders a move card with its heading lifted to title/id", async ({
     page,
   }) => {
     const card = page.locator("article.group", { hasText: "Hear Me Roar" });
