@@ -3,11 +3,13 @@
 // controls. Not linked from anywhere — reach it at /design.
 // ponytail: plain data arrays + raw markup under the global prose/skin styles,
 // no per-primitive abstraction.
+import { ControlButton } from "../editor/ControlButton";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { Dragon } from "../lib/Dragon";
 import { Kbd } from "../lib/Kbd";
 import { Link } from "../lib/Link";
 import { Shortcut } from "../lib/Shortcut";
-import { WrapText } from "../lib/WrapText";
+import { Spread } from "../lib/Spread";
 
 const palettes = ["neu", "accent", "link"] as const;
 const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
@@ -95,7 +97,7 @@ const fonts = [
         {
           cursors.map(([label, cls, png, native]) => (
             <li
-              class={`${cls} border-neu-300 bg-neu-50 dark:bg-neu-800 flex flex-col items-center gap-2 rounded border p-4`}
+              class={`${cls} border-neu-300 dark:border-neu-700 bg-neu-50 dark:bg-neu-800 flex flex-col items-center gap-2 rounded border p-4`}
               style={
                 cls ? undefined : `cursor: url("/cursors/${png}"), ${native}`
               }
@@ -161,40 +163,51 @@ const fonts = [
     <section class="flex flex-col gap-4">
       <h2 class="font-serif">Controls</h2>
       <div class="flex flex-wrap items-center gap-4">
-        <button class="border-neu-400 bg-neu-100 rounded border px-3 py-1">
-          Button
-        </button>
-        <button
-          disabled
-          class="border-neu-300 bg-neu-100 text-neu-400 rounded border px-3 py-1"
-        >
-          Disabled
-        </button>
         <label class="flex items-center gap-2">
           <input type="checkbox" checked /> Checkbox
         </label>
         <label class="flex items-center gap-2">
           <input type="checkbox" data-checkbox-marker="x" checked /> Cross marker
         </label>
-        <select class="border-neu-300 bg-neu-50 rounded border px-2 py-1">
-          <option>Select…</option>
-          <option>Another</option>
-        </select>
-        <input
-          type="text"
-          placeholder="Text input"
-          class="border-neu-300 bg-neu-50 rounded border px-2 py-1"
-        />
+      </div>
+      <p class="text-neu-500 text-sm">The two real button styles in the app:</p>
+      <div class="flex flex-wrap items-center gap-4">
+        {
+          /* .zaduma-hover-before — command palette / menu, src/lib/Commands.tsx */
+        }
+        <button class="zaduma-hover-before rounded px-3 py-1"
+          >zaduma-hover-before</button
+        >
+        {/* the editor's toolbar button, src/editor/ControlButton.tsx */}
+        <ControlButton>ControlButton (editor toolbar)</ControlButton>
       </div>
     </section>
 
     <section class="flex flex-col gap-4">
-      <h2 class="font-serif">Text wrapping illustrations</h2>
+      <h2 class="font-serif">Two-column flow around shapes</h2>
       <p class="text-neu-500 text-sm">
-        Lines laid out off-DOM with pretext, narrowed where they meet the
-        figure. Loaded as its own island — pretext ships only on this page.
+        One text stream fills the left column, then continues in the right,
+        wrapping around two shapes. Pretext computes the layout off-DOM. Click a
+        shape to spin it and the text re-wraps live. After
+        <Link href="https://chenglou.me/pretext/dynamic-layout/">
+          pretext's dynamic-layout
+        </Link>.
       </p>
-      <WrapText client:visible />
+      <Spread client:visible />
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-serif">Here be dragons</h2>
+      <p class="text-neu-500 text-sm">
+        Pretext lays the text out as individual characters. A serpent of glyphs
+        follows your cursor and shoves the words aside as it passes; they settle
+        back once it's gone. It runs on canvas and never triggers a DOM reflow.
+        After
+        <Link href="https://pretext-playground.builderz.dev/">
+          pretext-playground
+        </Link>.
+      </p>
+      <Dragon client:visible />
     </section>
   </div>
 </BaseLayout>
