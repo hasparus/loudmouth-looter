@@ -16,7 +16,7 @@ export function Link(props: LinkProps) {
         "underline underline-offset-4 decoration-neu-300 dark:decoration-neu-600 hover:decoration-link-600 dark:hover:decoration-link-500 focus:decoration-link-600 dark:focus:decoration-link-500":
           !own.noUnderline,
         "no-underline": !!own.noUnderline,
-        "p-2 -mx-2 rounded-sm transition-colors relative": true,
+        "p-2 -mx-2 transition-colors relative": true,
         "zaduma-image-box": childIsImg(),
       }}
       {...rest}
