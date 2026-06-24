@@ -23,16 +23,18 @@ const {
   shape,
   fill,
   max: maxVal,
-  interactive: isInteractive,
+  interactive,
   name,
 } = resolveTrackProps(Astro.props);
 ---
 
 {
-  isInteractive ? (
+  interactive ? (
     <span class="te-track">
       <Show when={name}>
-        <span>{name}</span>
+        <span class="text-neu-600 dark:text-neu-300 trim-end-alphabetic font-serif text-sm font-black">
+          {name}
+        </span>
       </Show>
       {Array.from({ length: maxVal }, (_, i) => (
         <button
@@ -48,7 +50,9 @@ const {
   ) : (
     <span aria-hidden="true" class="te-track" data-preview="1">
       <Show when={name}>
-        <span>{name}</span>
+        <span class="text-neu-600 dark:text-neu-300 trim-end-alphabetic font-serif text-sm font-black">
+          {name}
+        </span>
       </Show>
       {Array.from({ length: maxVal }, (_, i) => (
         <span
