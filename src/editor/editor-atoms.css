@@ -1,26 +1,18 @@
-/* RPG primitive atoms for the story editor (see editor-atoms.tsx and
-   text-editor.tsx). Deliberately global and un-hashed: these class names
-   appear verbatim in saved editor HTML and in help-modal previews, so they
-   must survive the localStorage round-trip and must not be CSS-module-scoped. */
 
 .te-track {
   display: inline-flex;
   align-items: center;
-  /* Match the main page's progress-dot rhythm (move-card.tsx uses gap-0.75,
-     ~25% of the toggle width). */
   gap: 0.22em;
   vertical-align: -0.1em;
   white-space: nowrap;
   user-select: none;
 }
 
-/* Help-modal / slash-menu previews are illustration only. */
 .te-track[data-preview] .te-toggle {
   cursor: default;
   pointer-events: none;
 }
 
-/* Monster-move and GM-question lines: hanging-indent paragraphs with a marker. */
 .te-arrow,
 .te-chevron {
   margin-left: 1.7em;
@@ -47,53 +39,10 @@
   opacity: 0.55;
 }
 
-/* Class-based dark mode (zaduma toggles html.dark), rewritten from the
-   editor's original prefers-color-scheme rule. */
 .dark .te-chevron {
   color: var(--color-neu-400, #a8a29e);
 }
 
-/* Move card: a move's heading + rules. Mirrors dungeon-motion's MoveCard
-   (the render side, render/Move.astro, uses that React component verbatim) so
-   the live editor surface matches the published card: borderless, a bold
-   tracking-wide title preceded by a square checkbox marker. The first heading
-   reads as the card's title; here it's styled in place to stay source-faithful. */
-.te-move {
-  padding: 1rem 0;
-  margin: 0;
-  break-inside: avoid;
-}
-
-.te-move> :first-child {
-  margin-top: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  font-size: 1.25em;
-  font-weight: 700;
-  letter-spacing: 0.025em;
-  color: var(--color-neu-800, #292524);
-}
-
-/* Decorative square checkbox in front of the title — the editor's heading is
-   contentEditable text, so the box is a marker rather than a live input. */
-.te-move> :first-child::before {
-  content: "";
-  flex-shrink: 0;
-  width: 0.7em;
-  height: 0.7em;
-  border: 0.13em solid currentColor;
-}
-
-.te-move> :last-child {
-  margin-bottom: 0;
-}
-
-.dark .te-move> :first-child {
-  color: var(--color-neu-100, #f5f5f4);
-}
-
-/* Task-list item: one clickable box followed by editable text. */
 .te-task {
   list-style: none;
 }
