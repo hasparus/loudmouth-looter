@@ -82,11 +82,7 @@
       font-size: 1.015cap;
     }
 
-    border-left: 1px solid var(--color-neu-200);
-
-    :global(.dark) & {
-      border-left-color: var(--color-neu-700);
-    }
+    border-left: 1px solid light-dark(var(--color-neu-300), var(--color-neu-600));
   }
 
   @media (min-width: 1280px) {
