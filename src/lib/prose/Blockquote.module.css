@@ -21,7 +21,7 @@
   position: relative;
   quotes: "\201C" "\201D" "\2018" "\2019";
   font: italic 444 1em var(--font-text);
-  border: 0.5px solid rgb(0 0 0 / 0.075);
+  border: 0.5px solid light-dark(var(--color-neu-200), var(--color-neu-800));
 
   &:after,
   &:before {
