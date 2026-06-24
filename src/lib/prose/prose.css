@@ -75,12 +75,10 @@
     font-family: var(--font-hand);
 
     &,
-    &>p {
+    & p {
       font-size: 1.25rem;
       line-height: 1.15;
-
     }
-
 
     & strong,
     & code {
@@ -101,6 +99,40 @@
 
     :where(html.dark) &::before {
       border-left-color: var(--color-neu-600);
+    }
+
+    &:has(>q)::before {
+      margin-top: 1.25rem;
+    }
+
+    &>q {
+      background: linear-gradient(to bottom,
+          light-dark(var(--color-neu-800), var(--color-neu-200)),
+          light-dark(var(--color-accent-700), var(--color-accent-400)));
+      background-clip: text;
+      color: transparent;
+      display: block;
+      position: relative;
+      quotes: "\201C" "\201D" "\2018" "\2019";
+      -webkit-background-clip: text;
+
+      &::before {
+        content: "\201C";
+        position: absolute;
+        top: 0;
+        left: calc(-1 * var(--col-gap));
+        transform: translate(-50%, 0.45rem);
+        color: light-dark(var(--color-neu-400), var(--color-neu-600));
+        font-family: var(--font-serif);
+        font-size: 2rem;
+        font-style: normal;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      &::after {
+        content: none;
+      }
     }
 
     &>* {
@@ -134,6 +166,11 @@
 
       & figcaption {
         padding-inline: 0;
+
+        & p {
+          font-size: var(--text-xs);
+          line-height: var(--text-xs--line-height);
+        }
       }
     }
   }
