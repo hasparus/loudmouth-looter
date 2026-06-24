@@ -10,7 +10,7 @@ function Row(props: { children: JSX.Element; code: string }) {
       <code class="bg-neu-100 text-neu-600 dark:bg-neu-800 dark:text-neu-300 shrink-0 rounded px-1.5 py-0.5 font-mono text-xs">
         {props.code}
       </code>
-      <span class="text-neu-700 dark:text-neu-300 flex-1 text-sm">
+      <span class="text-neu-800 dark:text-neu-300 flex-1 text-sm">
         {props.children}
       </span>
     </div>
@@ -97,9 +97,9 @@ export function EditorHelpModal() {
               </span>
             </button>
           </header>
-          <p class="font-text text-neu-700 dark:text-neu-300 mt-4 text-lg">
+          <p class="font-text text-neu-800 dark:text-neu-300 mt-4 text-lg">
             Type{" "}
-            <code class="bg-neu-100 text-neu-700 dark:bg-neu-800 dark:text-neu-300 px-1 py-0.5 font-mono text-sm">
+            <code class="bg-neu-100 text-neu-800 dark:bg-neu-800 dark:text-neu-300 px-1 py-0.5 font-mono text-sm">
               /
             </code>{" "}
             for the command menu. Click any square, circle or rhomb to fill it

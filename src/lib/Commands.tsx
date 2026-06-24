@@ -173,7 +173,7 @@ export function CommandsPalette(props: {
         </span>
         <CommandInput
           aria-label="Commands"
-          class="placeholder:text-neu-400 dark:placeholder:text-neu-500 relative w-full bg-transparent py-2.5 text-lg focus:outline-none"
+          class="placeholder:text-neu-600 dark:placeholder:text-neu-500 relative w-full bg-transparent py-2.5 text-lg focus:outline-none"
           placeholder="What do you seek?"
           autofocus
         />
