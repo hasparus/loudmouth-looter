@@ -20,11 +20,11 @@ const posts = getPosts();
     <DialogueIntro />
   </div>
 
-  <ul>
+  <ul class="-my-4">
     {
       posts.map((post) => (
         <li>
-          <PostCard post={post} />
+          <PostCard post={post} class="py-4" />
         </li>
       ))
     }

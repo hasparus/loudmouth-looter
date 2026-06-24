@@ -9,14 +9,15 @@ import ReadMore from "./ReadMore.astro";
 
 interface Props {
   post: PostEntry;
+  class?: string;
 }
 
-const { post } = Astro.props;
+const { post, class: className } = Astro.props;
 const { frontmatter, Excerpt, sigil } = post;
 const date = new Date(frontmatter.date);
 ---
 
-<article class="group relative py-8">
+<article class:list={["group relative", className]}>
   <a
     href={frontmatter.path}
     aria-label={frontmatter.title}
