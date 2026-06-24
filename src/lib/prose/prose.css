@@ -192,7 +192,7 @@
    grid is a single centred column. At xl the right margin holds the <aside>
    column, so staying in the reading column avoids colliding with sidenotes. */
 .zaduma-prose p:has(> [zaduma-image]) {
-  @apply lg:-mx-16 xl:mx-0;
+  @apply xl:mx-0;
   max-width: none;
 }
 
