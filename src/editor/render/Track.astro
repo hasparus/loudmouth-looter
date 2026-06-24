@@ -6,6 +6,7 @@
 import { resolveTrackProps } from "../track-props";
 
 import "../editor-atoms.css";
+import { Show } from "solid-js";
 
 interface Props {
   shape?: string;
@@ -13,12 +14,17 @@ interface Props {
   value?: number | string;
   /** Uncontrolled initial fill count — renders interactive (clickable). */
   defaultValue?: number | string;
-  /** Toggle count. Aliases: total (legacy). */
+  /** Toggle count. */
   max?: number | string;
-  /** Legacy alias for max. */
+  /** Legacy alias for max.
+   * @todo Remove this and upgrade all tracks.
+   */
   total?: number | string;
-  /** Legacy alias for value. */
+  /** Legacy alias for value.
+   * @todo Remove this and upgrade all tracks.
+   */
   filled?: number | string;
+  name?: string;
 }
 
 const {
@@ -26,12 +32,16 @@ const {
   fill,
   max: maxVal,
   interactive: isInteractive,
+  name,
 } = resolveTrackProps(Astro.props);
 ---
 
 {
   isInteractive ? (
     <span class="te-track">
+      <Show when={name}>
+        <span>{name}</span>
+      </Show>
       {Array.from({ length: maxVal }, (_, i) => (
         <button
           type="button"
@@ -45,6 +55,9 @@ const {
     </span>
   ) : (
     <span aria-hidden="true" class="te-track" data-preview="1">
+      <Show when={name}>
+        <span>{name}</span>
+      </Show>
       {Array.from({ length: maxVal }, (_, i) => (
         <span
           aria-checked={i < fill ? "true" : "false"}

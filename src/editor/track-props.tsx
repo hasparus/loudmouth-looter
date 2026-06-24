@@ -1,4 +1,3 @@
-// Framework-free pure module — safe to import from both Astro and browser TS.
 
 export type Shape = "circle" | "rhomb" | "square";
 
@@ -15,6 +14,7 @@ export interface ResolvedTrack {
   fill: number;
   max: number;
   interactive: boolean;
+  name?: string;
 }
 
 export function resolveTrackProps(raw: {
@@ -24,6 +24,7 @@ export function resolveTrackProps(raw: {
   max?: unknown;
   total?: unknown;
   filled?: unknown;
+  name?: unknown;
 }): ResolvedTrack {
   const shape: Shape = TRACK_SHAPES.has(raw.shape as string)
     ? (raw.shape as Shape)
@@ -40,5 +41,7 @@ export function resolveTrackProps(raw: {
 
   const fill = Math.min(Math.max(Number(fillSource) || 0, 0), maxVal);
 
-  return { shape, fill, max: maxVal, interactive };
+  const name = typeof raw.name === "string" ? raw.name : undefined;
+
+  return { shape, fill, max: maxVal, interactive, name };
 }
