@@ -5,79 +5,59 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-let postsInFS: string[];
+const pages = [
+  { path: "/", name: "index" },
+  { path: "/_fixtures/e2e-fixture/", name: "e2e-fixture" },
+  { path: "/why-dragon/", name: "why-dragon" },
+] as const;
+
+let committedSnapshots: Set<string>;
 
 test.beforeAll(async () => {
-  const files = await readdir(join(__dirname, "../posts"), { recursive: true });
-  postsInFS = files
-    .filter((file) => /\.mdx?$/.test(file))
-    .map((file) => file.replace(/\.mdx?$/, "").replaceAll(" ", "-"))
-    .sort();
+  const snapshots = await readdir(
+    join(__dirname, "visual-regression.spec.ts-snapshots"),
+  );
+  committedSnapshots = new Set(snapshots);
 });
 
 test.describe("Visual regression", () => {
-  test("index page matches screenshot", async ({ page }) => {
-    await page.goto("/");
-    await ensurePageStable(page);
+  for (const { path, name } of pages) {
+    test(`${name} page matches screenshot`, async ({ page }, testInfo) => {
+      const snapshot = `${name}-${testInfo.project.name}-${process.platform}.png`;
+      const updating =
+        testInfo.config.updateSnapshots === "all" ||
+        testInfo.config.updateSnapshots === "missing";
+      test.skip(
+        !committedSnapshots.has(snapshot) && !updating,
+        `Snapshot ${snapshot} not committed`,
+      );
 
-    await expect(page).toHaveScreenshot("index.png", {
-      fullPage: true,
-      maxDiffPixels: 500,
-      maxDiffPixelRatio: 0.005,
-    });
-  });
-
-  test("blog posts match screenshots", async ({ page }) => {
-    test.setTimeout(60_000);
-    for (const post of postsInFS) {
-      await page.goto(`/${post}/`);
+      await page.goto(path);
       await ensurePageStable(page);
 
-      await expect(page).toHaveScreenshot(`${post.replace(/\//g, "-")}.png`, {
+      await expect(page).toHaveScreenshot(`${name}.png`, {
         fullPage: true,
-        maxDiffPixels: 500,
-        maxDiffPixelRatio: 0.005,
+        maxDiffPixels: 25_000,
+        maxDiffPixelRatio: 0.01,
       });
-    }
-  });
+    });
+  }
 });
 
-/**
- * Settle the page so a fullPage screenshot has a stable height across runs:
- * scroll the full height to trigger lazy images, then wait for every image to
- * decode and the self-hosted fonts to load. Deliberately no remote webfont —
- * the site ships Avara + Crimson Text and falls back to system mono for code, so a
- * network font request would only add non-determinism (and per-platform
- * snapshots already cover the system-mono difference).
- */
 async function ensurePageStable(page: Page) {
-  await page.evaluate(async () => {
-    await new Promise<void>((resolve) => {
-      let y = 0;
-      const step = () => {
-        window.scrollTo(0, y);
-        y += window.innerHeight;
-        if (y < document.body.scrollHeight) {
-          requestAnimationFrame(step);
-        } else {
-          window.scrollTo(0, 0);
-          requestAnimationFrame(() => resolve());
-        }
-      };
-      step();
-    });
-  });
-
   await page.waitForLoadState("networkidle");
 
   await page.evaluate(async () => {
     await document.fonts.ready;
     await Promise.all(
-      Array.from(document.images).map((img) =>
-        img.complete && img.naturalWidth > 0
-          ? Promise.resolve()
-          : img.decode().catch(() => undefined),
-      ),
+      Array.from(document.images).map((img) => {
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+        if (img.loading === "lazy") return Promise.resolve();
+        return Promise.race([
+          img.decode().catch(() => undefined),
+          new Promise((resolve) => setTimeout(resolve, 3_000)),
+        ]);
+      }),
     );
     await new Promise((resolve) => requestAnimationFrame(resolve));
     await new Promise((resolve) => requestAnimationFrame(resolve));

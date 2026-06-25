@@ -53,7 +53,7 @@ export function HeadingsIntersectionHighlight(
     onCleanup(() => {
       observer!.disconnect();
     });
-  }, [props.headings]);
+  });
 
   return null;
 }

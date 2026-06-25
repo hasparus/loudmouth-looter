@@ -20,6 +20,9 @@ async function clearEditor(page: import("@playwright/test").Page) {
 test.describe("editor", () => {
   test("loads and hydrates the writing surface", async ({ page }) => {
     await page.goto("/editor/");
+    await expect(page).toHaveTitle(
+      "The Plan of the Parliament of Erl — loudmouth looter",
+    );
     await expect(page.getByRole("textbox", EDITOR)).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Editor guide" }),
@@ -66,5 +69,76 @@ test.describe("editor", () => {
 
     await toggle.click();
     await expect(toggle).toBeChecked();
+  });
+
+  test("slash menu navigates with arrows, commits a block on Enter", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+
+    await editor.pressSequentially("/");
+    const menu = page.getByRole("listbox");
+    await expect(menu).toBeVisible();
+    await expect(menu.getByRole("option", { selected: true })).toHaveCount(1);
+
+    const before = await editor.getAttribute("aria-activedescendant");
+    await page.keyboard.press("ArrowDown");
+    await expect(editor).not.toHaveAttribute(
+      "aria-activedescendant",
+      before ?? "",
+    );
+
+    await page.keyboard.press("Escape");
+    await expect(menu).not.toBeVisible();
+
+    await editor.pressSequentially("arrow");
+    await expect(menu).toBeVisible();
+    await page.keyboard.press("Enter");
+    await expect(menu).not.toBeVisible();
+    await expect(editor.locator("p.te-arrow")).toHaveCount(1);
+  });
+
+  test("help modal opens, then closes via Escape and the close button", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const guide = page.getByRole("button", { name: "Editor guide" });
+
+    await guide.click();
+    const dialog = page.getByRole("dialog", { name: "Editor guide" });
+    await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByRole("heading", { name: "Editor guide" }),
+    ).toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await expect(dialog).not.toBeVisible();
+
+    await guide.click();
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole("button", { name: "Close" }).click();
+    await expect(dialog).not.toBeVisible();
+  });
+
+  test("updates document title from the first h1", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+
+    await editor.pressSequentially("# My Custom Title");
+    await page.keyboard.press("Enter");
+
+    await expect(page).toHaveTitle("My Custom Title — loudmouth looter");
+  });
+
+  test("spellcheck toggle flips its label", async ({ page }) => {
+    await page.goto("/editor/");
+    const turnOff = page.getByRole("button", { name: "Turn spellcheck off" });
+    await expect(turnOff).toBeVisible();
+
+    await turnOff.click();
+    await expect(
+      page.getByRole("button", { name: "Turn spellcheck on" }),
+    ).toBeVisible();
   });
 });

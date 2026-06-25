@@ -3,6 +3,8 @@
 // - value (controlled): inert aria-hidden spans, same as editor TrackPreview.
 // - defaultValue (uncontrolled): real buttons with click delegation via a
 //   module script so the published track is interactive.
+import { Show } from "solid-js";
+
 import { resolveTrackProps } from "../track-props";
 
 import "../editor-atoms.css";
@@ -13,25 +15,28 @@ interface Props {
   value?: number | string;
   /** Uncontrolled initial fill count — renders interactive (clickable). */
   defaultValue?: number | string;
-  /** Toggle count. Aliases: total (legacy). */
+  /** Toggle count. */
   max?: number | string;
-  /** Legacy alias for max. */
-  total?: number | string;
-  /** Legacy alias for value. */
-  filled?: number | string;
+  name?: string;
 }
 
 const {
   shape,
   fill,
   max: maxVal,
-  interactive: isInteractive,
+  interactive,
+  name,
 } = resolveTrackProps(Astro.props);
 ---
 
 {
-  isInteractive ? (
+  interactive ? (
     <span class="te-track">
+      <Show when={name}>
+        <span class="text-neu-600 dark:text-neu-300 trim-end-alphabetic mr-2 font-serif text-sm font-black">
+          {name}
+        </span>
+      </Show>
       {Array.from({ length: maxVal }, (_, i) => (
         <button
           type="button"
@@ -45,6 +50,11 @@ const {
     </span>
   ) : (
     <span aria-hidden="true" class="te-track" data-preview="1">
+      <Show when={name}>
+        <span class="text-neu-600 dark:text-neu-300 trim-end-alphabetic mr-2 font-serif text-sm font-black">
+          {name}
+        </span>
+      </Show>
       {Array.from({ length: maxVal }, (_, i) => (
         <span
           aria-checked={i < fill ? "true" : "false"}

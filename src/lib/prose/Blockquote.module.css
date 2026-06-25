@@ -18,19 +18,22 @@
   */
 
 .Blockquote {
-  font: 444 1.15em var(--serif);
-
   position: relative;
   quotes: "\201C" "\201D" "\2018" "\2019";
+  font: italic 444 1em var(--font-text);
+  border: 0.5px solid light-dark(var(--color-neu-200), var(--color-neu-700));
 
   &:after,
   &:before {
-    @apply text-4xl leading-none font-black;
-    color: var(--color-stone-300);
+    @apply text-4xl leading-none;
+    font-family: var(--font-serif);
+    color: var(--color-neu-400);
     position: absolute;
+    font-style: normal;
+    font-weight: 900;
 
     :global(.dark) & {
-      color: var(--color-stone-600);
+      color: var(--color-neu-600);
     }
   }
 
@@ -38,13 +41,22 @@
     content: open-quote;
     top: 0;
     left: 0;
-    transform: translate(-50%, -0.5rem);
+    transform: translate(-50%, calc(-0.5rem + 4px));
   }
 
   &:after {
     content: close-quote;
     bottom: 0;
     right: 0;
-    transform: translate(50%, calc(50% + 0.25rem));
+    transform: translate(calc(50% - 2px), calc(50% + 0.25rem + 8px));
+  }
+
+  &:global(.large) {
+    font: italic 444 22.5px var(--font-text);
+    line-height: 1.6;
+  }
+
+  &:has(span[data-no-italic]) {
+    font-style: normal;
   }
 }

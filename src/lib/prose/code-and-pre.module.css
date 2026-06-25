@@ -10,11 +10,11 @@
   &::before,
   &::after {
     @apply font-black;
-    color: var(--color-stone-400);
+    color: var(--color-neu-400);
     content: "`";
 
     :global(.dark) & {
-      color: var(--color-stone-600);
+      color: var(--color-neu-600);
     }
   }
 }

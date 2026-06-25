@@ -1,78 +1,32 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { formatDate } from "../lib/formatDate";
-import { isPostVisible } from "../lib/isPostVisible";
-import { Link } from "../lib/Link";
-import { Paragraph } from "../lib/prose/Paragraph";
+import DialogueIntro from "../lib/DialogueIntro.astro";
+import PostCard from "../lib/PostCard.astro";
+import { getPosts } from "../lib/posts";
 import { SITE_BLURB, SITE_NAME } from "../lib/siteMeta";
-import type { PostFrontmatter } from "../types";
 
-const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
-  "../../posts/**/*.mdx",
-  { eager: true },
-);
-const posts = Object.values(postModules).filter((post) =>
-  isPostVisible(post.frontmatter, { isProd: import.meta.env.PROD }),
-);
-
-posts.sort((a, b) => {
-  return (
-    new Date(b.frontmatter.date).getTime() -
-    new Date(a.frontmatter.date).getTime()
-  );
-});
+const posts = getPosts();
 ---
 
 <BaseLayout title={SITE_NAME} description={SITE_BLURB}>
   <h1
     slot="header-content"
-    class="font-serif font-bold text-stone-600 dark:text-stone-500"
+    class="text-neu-600 dark:text-neu-300 font-serif font-bold tracking-tighter"
   >
     {SITE_NAME}
   </h1>
-  <main class="zaduma-prose py-10">
-    <Paragraph>
-      Posts drafted in the <Link href="/editor">editor</Link> — built on{" "}
-      <Link href="https://github.com/hasparus/zaduma">zaduma</Link>.
-    </Paragraph>
-  </main>
-  <ul>
-    {
-      posts.map(({ frontmatter }) => {
-        const date = new Date(frontmatter.date);
 
-        return (
-          <li>
-            <Link
-              href={frontmatter.path}
-              class="flex flex-row justify-between gap-2"
-              noUnderline
-            >
-              <h2 class="font-serif font-bold text-stone-800 dark:text-stone-300">
-                {frontmatter.title}
-              </h2>
-              <time
-                datetime={date.toISOString()}
-                class="shrink-0 tracking-tighter text-stone-600 tabular-nums dark:text-stone-400"
-              >
-                {formatDate(date)}
-              </time>
-            </Link>
-          </li>
-        );
-      })
+  <div class="zaduma-prose py-10">
+    <DialogueIntro />
+  </div>
+
+  <ul class="-my-4">
+    {
+      posts.map((post) => (
+        <li>
+          <PostCard post={post} class="-mx-4 p-4 pt-2" />
+        </li>
+      ))
     }
   </ul>
-  <style>
-    @reference "../global-styles/base.css";
-
-    ul:hover li:not(:hover) :where(h2, time) {
-      color: var(--color-stone-600);
-      transition: color 150ms;
-
-      :global(.dark) & {
-        color: var(--color-stone-500);
-      }
-    }
-  </style>
 </BaseLayout>

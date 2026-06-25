@@ -1,7 +1,5 @@
-// ESLint flat config — replaces .eslintrc.cjs for ESLint 10+
 // Manually inlines @edgeandnode/eslint-config v2.0.3 rules since that
 // package uses @rushstack/eslint-patch which is incompatible with ESLint 10.
-// Uses @eslint/compat's fixupPluginRules to adapt ESLint-8-vintage plugins.
 
 import { fixupPluginRules } from "@eslint/compat";
 import { createRequire } from "module";
@@ -13,22 +11,24 @@ const __dirname = dirname(__filename);
 const require = createRequire(import.meta.url);
 
 // Load plugins (all installed as transitive deps of @edgeandnode/eslint-config)
-// fixupPluginRules adapts ESLint 8-era plugins to the ESLint 10 flat config API
 const tsPlugin = fixupPluginRules(require("@typescript-eslint/eslint-plugin"));
 const tsParser = require("@typescript-eslint/parser");
 const importPlugin = fixupPluginRules(require("eslint-plugin-import"));
 const simpleImportSortPlugin = fixupPluginRules(require("eslint-plugin-simple-import-sort"));
 // eslint-plugin-sonarjs v0.19 crashes with ESLint 10 even via fixupPluginRules
-// (the onCodePathSegmentLoop API changed). Dropping sonarjs until the
-// dependency can be upgraded to v1+ which has native ESLint 10 support.
-// const sonarjsPlugin = ...
 const reactPlugin = fixupPluginRules(require("eslint-plugin-react"));
 const reactHooksPlugin = fixupPluginRules(require("eslint-plugin-react-hooks"));
 const jsxA11yPlugin = fixupPluginRules(require("eslint-plugin-jsx-a11y"));
 const astroParser = require("astro-eslint-parser");
 
+// Project plugins ported from the old .eslintrc.cjs. eslint-plugin-solid is
+const solidPlugin = fixupPluginRules(require("eslint-plugin-solid"));
+const solidTypescriptRules =
+  require("eslint-plugin-solid").configs.typescript.rules;
+const betterTailwindPlugin = require("eslint-plugin-better-tailwindcss");
+const checkFilePlugin = require("eslint-plugin-check-file");
+
 // Note: eslint-plugin-sonarjs v0.19 is incompatible with ESLint 10 —
-// it crashes in onCodePathSegmentLoop. Sonarjs rules are omitted here.
 
 // Base rules from @edgeandnode/eslint-config (createEslintConfig)
 const baseRules = {
@@ -142,7 +142,6 @@ const baseRules = {
   "default-case": "off",
   "no-dupe-class-members": "off",
   "no-undef": "off",
-  // typescript-eslint base rules
   "@typescript-eslint/adjacent-overload-signatures": "error",
   "@typescript-eslint/ban-ts-comment": [
     "warn",
@@ -154,7 +153,6 @@ const baseRules = {
       minimumDescriptionLength: 3,
     },
   ],
-  // "@typescript-eslint/ban-types" removed in v7 — no replacement needed
   "@typescript-eslint/explicit-module-boundary-types": "off",
   "no-array-constructor": "off",
   "@typescript-eslint/no-array-constructor": "error",
@@ -163,7 +161,6 @@ const baseRules = {
   "@typescript-eslint/no-empty-interface": "off",
   "@typescript-eslint/no-explicit-any": "off",
   "@typescript-eslint/no-extra-non-null-assertion": "error",
-  // "@typescript-eslint/no-extra-semi" removed in v6 — use "no-extra-semi" from ESLint core
   "no-extra-semi": "off",
   "@typescript-eslint/no-inferrable-types": "error",
   "@typescript-eslint/no-misused-new": "error",
@@ -194,10 +191,7 @@ const baseRules = {
   "no-var": "off",
   "@typescript-eslint/array-type": "off",
   "@typescript-eslint/ban-tslint-comment": "off",
-  // sonarjs rules omitted: v0.19 is incompatible with ESLint 10
-  // import
   "import/no-anonymous-default-export": "error",
-  // simple-import-sort
   "simple-import-sort/exports": "warn",
   "simple-import-sort/imports": [
     "warn",
@@ -217,7 +211,6 @@ const baseRules = {
   ],
 };
 
-// TypeScript type-checked rules (applied to .ts/.tsx files with project info)
 const typescriptTypeCheckedRules = {
   "@typescript-eslint/await-thenable": "warn",
   "@typescript-eslint/no-floating-promises": "warn",
@@ -258,7 +251,6 @@ const typescriptTypeCheckedRules = {
   "@typescript-eslint/no-mixed-enums": "error",
   "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "error",
   "@typescript-eslint/no-redundant-type-constituents": "error",
-  // "@typescript-eslint/no-throw-literal" renamed to "only-throw-error" in v7
   "@typescript-eslint/only-throw-error": "error",
   "@typescript-eslint/no-unnecessary-type-constraint": "error",
   "@typescript-eslint/no-unsafe-argument": "error",
@@ -270,26 +262,20 @@ const typescriptTypeCheckedRules = {
   "@typescript-eslint/unified-signatures": "warn",
 };
 
-// Shared plugin registry — all plugins registered here are available to all
-// config blocks. Rules are still only enabled where explicitly configured.
 const plugins = {
   "@typescript-eslint": tsPlugin,
   "import": importPlugin,
   "simple-import-sort": simpleImportSortPlugin,
-  // React/JSX plugins registered globally so ESLint 10 can resolve rule
-  // references even when the active rules are scoped to src/editor/**/*.tsx.
   "react": reactPlugin,
   "react-hooks": reactHooksPlugin,
   "jsx-a11y": jsxA11yPlugin,
 };
 
 export default [
-  // Global ignores (replaces .eslintignore)
   {
-    ignores: ["**/*.mdx", "**/*.md"],
+    ignores: ["**/*.mdx", "**/*.md", "**/*.gitignored.*"],
   },
 
-  // Base config for all files
   {
     plugins,
     languageOptions: {
@@ -309,28 +295,22 @@ export default [
     rules: baseRules,
   },
 
-  // TypeScript files with type-checked rules
   {
     files: ["**/*.ts", "**/*.tsx"],
     plugins,
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: [
-          resolve(__dirname, "./tsconfig.json"),
-          resolve(__dirname, "./src/editor/tsconfig.json"),
-        ],
+        project: [resolve(__dirname, "./tsconfig.json")],
       },
     },
     rules: {
       ...typescriptTypeCheckedRules,
-      // Overrides from original .eslintrc.cjs
       "react/jsx-key": "off",
       "react/style-prop-object": "off",
     },
   },
 
-  // TSX files — add React/JSX rules (only editor, rest uses SolidJS)
   {
     files: ["src/editor/**/*.tsx"],
     plugins,
@@ -377,7 +357,6 @@ export default [
     },
   },
 
-  // CJS/JS files — allow require()
   {
     files: ["**/*.cjs", "**/*.cts", "**/*.js", "**/*.jsx"],
     rules: {
@@ -385,7 +364,6 @@ export default [
     },
   },
 
-  // Astro files
   {
     files: ["**/*.astro"],
     plugins,
@@ -397,5 +375,34 @@ export default [
       },
     },
     rules: {},
+  },
+
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    plugins: { solid: solidPlugin },
+    rules: solidTypescriptRules,
+  },
+
+  {
+    files: ["**/*.tsx", "**/*.astro"],
+    plugins: { "better-tailwindcss": betterTailwindPlugin },
+    settings: {
+      "better-tailwindcss": { entryPoint: "src/global-styles/base.css" },
+    },
+    rules: {
+      "better-tailwindcss/no-unknown-classes": [
+        "error",
+        { ignore: ["^zaduma-", "^te-", "^rm-arrow$", "^contains-task-list$"] },
+      ],
+    },
+  },
+
+  {
+    files: ["src/**/*.ts"],
+    ignores: ["**/*.d.ts", "**/*.xml.ts", "**/*.txt.ts", "**/*.md.ts"],
+    plugins: { "check-file": checkFilePlugin },
+    rules: {
+      "check-file/filename-blocklist": ["error", { "**/*.ts": "*.tsx" }],
+    },
   },
 ];

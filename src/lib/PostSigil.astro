@@ -1,0 +1,70 @@
+---
+interface Props {
+  sigil: string;
+}
+
+const { sigil } = Astro.props;
+---
+
+<span
+  aria-hidden="true"
+  set:html={sigil}
+  data-sigil
+  class="text-accent-800 dark:text-accent-400 pointer-events-none absolute top-11 -left-10 z-10 hidden font-serif text-3xl leading-none select-none md:block lg:-left-12 [&_svg]:h-[1.1em] [&_svg]:w-auto"
+/>
+
+<script>
+  /** px: width of the soft pull — like a gaussian blur radius */
+  const SIGMA = 55;
+  /** how far toward the cursor it leans at the center (0–1) */
+  const PULL = 0.3;
+  /** spring stiffness */
+  const STIFF = 0.08;
+  /** * velocity damping  */
+  const DAMP = 0.66;
+
+  const sigils = [
+    ...document.querySelectorAll<HTMLElement>("[data-sigil]"),
+  ].map((el) => ({ el, x: 0, y: 0, vx: 0, vy: 0 }));
+  const REST = 0.05; // px: below this a sigil is "at rest" and stops animating
+
+  let mx = -1e4,
+    my = -1e4;
+  let running = false;
+  const wake = () => running || ((running = true), requestAnimationFrame(tick));
+  // listen on <main>, not window: a modal dialog's backdrop sits in the top
+  // layer and swallows pointermove, so tracking pauses while a dialog is open
+  document.querySelector("main")?.addEventListener("pointermove", (e) => {
+    mx = e.clientX;
+    my = e.clientY;
+    wake();
+  });
+
+  function tick() {
+    let awake = false;
+    for (const s of sigils) {
+      const r = s.el.getBoundingClientRect();
+      const dx = mx - (r.left + r.width / 2 - s.x);
+      const dy = my - (r.top + r.height / 2 - s.y);
+      // gaussian falloff: ~1 at the cursor, fading softly to ~0 past ~3·SIGMA
+      const w = PULL * Math.exp(-(dx * dx + dy * dy) / (2 * SIGMA * SIGMA));
+      const tx = dx * w;
+      const ty = dy * w;
+      s.vx = (s.vx + (tx - s.x) * STIFF) * DAMP;
+      s.vy = (s.vy + (ty - s.y) * STIFF) * DAMP;
+      s.x += s.vx;
+      s.y += s.vy;
+      s.el.style.translate = `${s.x}px ${s.y}px`;
+      // keep going while still moving OR not yet settled at the target
+      if (
+        Math.abs(s.vx) > REST ||
+        Math.abs(s.vy) > REST ||
+        Math.abs(tx - s.x) > REST ||
+        Math.abs(ty - s.y) > REST
+      )
+        awake = true;
+    }
+    running = awake;
+    if (awake) requestAnimationFrame(tick);
+  }
+</script>

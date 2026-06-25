@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           # Empty on push/workflow_dispatch — falls back to default ref
-          ref: "${{ github.event.pull_request.merge_commit_sha }}"
+          ref: "${{ github.event.pull_request.number && format('refs/pull/{0}/merge', github.event.pull_request.number) || github.sha }}"
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
         with:
@@ -55,7 +55,7 @@ jobs:
           OG_IMAGE_SECRET: placeholder
 
       - name: Run linter
-        run: bun run lint --quiet
+        run: bun run lint
 
       - name: Typecheck
         run: bun run typecheck
@@ -150,8 +150,8 @@ jobs:
         with:
           urls: |
             https://${{ needs.build-and-deploy.outputs.deployment }}/
-            https://${{ needs.build-and-deploy.outputs.deployment }}/features/asides/
-            https://${{ needs.build-and-deploy.outputs.deployment }}/features/shiki-twoslash/
+            https://${{ needs.build-and-deploy.outputs.deployment }}/_fixtures/e2e-fixture/
+            https://${{ needs.build-and-deploy.outputs.deployment }}/why-dragon/
           budgetPath: ".github/lighthouse-budget.json"
           uploadArtifacts: true
           temporaryPublicStorage: true

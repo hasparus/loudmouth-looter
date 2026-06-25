@@ -7,10 +7,14 @@
 
     font-family: var(--font-serif);
     font-weight: 700;
-    color: var(--color-stone-800);
+    color: var(--color-neu-800);
 
     :global(.dark) & {
-      color: var(--color-stone-200);
+      color: var(--color-neu-200);
+    }
+
+    & > a:focus-visible {
+      outline: none;
     }
   }
 

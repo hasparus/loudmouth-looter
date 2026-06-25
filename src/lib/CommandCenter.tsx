@@ -58,7 +58,7 @@ export function CommandCenterTrigger(props: CommandCenterTriggerProps) {
         props.onClick?.(event);
       }}
     >
-      ⌘
+      <span>⌘</span>
     </button>
   );
 }
@@ -72,12 +72,9 @@ export function CommandCenter(props: CommandCenterProps) {
   const dialogRef = {
     current: undefined as HTMLDialogElement | undefined,
   };
-  let inputId = createUniqueId();
+  // eslint-disable-next-line solid/reactivity -- stable id, read once
+  const inputId = props.inputId ?? createUniqueId();
   const listId = createUniqueId();
-
-  if (props.inputId) {
-    inputId = props.inputId;
-  }
 
   const [inputValue, onInput] = createSignal("");
   const [selectedCommand, selectCommand] = createSignal<string>("");
@@ -230,6 +227,7 @@ export function CommandItem(props: CommandItemProps) {
     useCommandCenterCtx();
 
   const res = (
+    // eslint-disable-next-line solid/reactivity -- static href, element built once
     own.href ? (
       <a
         href={own.href}
@@ -256,10 +254,8 @@ export function CommandItem(props: CommandItemProps) {
 
     const selected = isSelected(text);
     res.ariaSelected = String(selected);
-    res.style.display = matchesFilter(text) ? "" : "none";
 
     const isVisible = matchesFilter(text);
-
     res.style.display = isVisible ? "" : "none";
     res.role = isVisible ? "option" : "none";
 
@@ -323,13 +319,14 @@ export function CommandCenterDialog(props: CommandCenterDialogProps) {
     <Dialog
       {...props}
       style={{
-        margin: "0 auto",
+        "margin-block": 0,
+        "margin-inline": "auto",
         position: "fixed",
-        "max-height": "361px",
+        "max-height": "70vh",
       }}
       classList={{
         ...props.classList,
-        "top-18 sm:top-[calc(50%-180px)]": true,
+        "inset-x-0 top-0": true,
       }}
       ref={(dialog) => {
         ctx.setDialogRef(dialog);
@@ -372,5 +369,5 @@ export function CommandList(
     }
   });
 
-  return <div id={listId} {...props} />;
+  return <div id={listId} tabIndex={-1} {...props} />;
 }

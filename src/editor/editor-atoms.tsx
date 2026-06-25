@@ -1,8 +1,7 @@
-/** @jsxImportSource react */
+import { Index } from "solid-js";
+
 // Primitive atoms shared by the text editor, its slash menu, and the help
 // modal. DOM builders produce the live, interactive elements embedded in the
-// contentEditable surface; TrackPreview renders the same look as inert React
-// for menus and documentation. Styling lives in editor-atoms.css.
 
 export type Shape = "circle" | "rhomb" | "square";
 
@@ -50,6 +49,12 @@ export const SLASH_COMMANDS: SlashCommand[] = [
     description: "Chevron line",
     kind: "block",
     name: "chevron",
+  },
+  {
+    defaultCount: 0,
+    description: "Move card",
+    kind: "block",
+    name: "move",
   },
 ];
 
@@ -122,17 +127,18 @@ interface TrackPreviewProps {
 // Inert illustration for menus and docs — aria-hidden so screen readers get
 // the surrounding prose instead of a redundant run of checkbox announcements.
 // Toggles here are spans (decorative); the live editor builds them as buttons.
-export function TrackPreview({ count, filled = 0, shape }: TrackPreviewProps) {
+export function TrackPreview(props: TrackPreviewProps) {
   return (
-    <span aria-hidden="true" className="te-track" data-preview="1">
-      {Array.from({ length: clampCount(count) }, (_, i) => (
-        <span
-          aria-checked={i < filled ? "true" : "false"}
-          className="te-toggle"
-          data-shape={shape}
-          key={i}
-        />
-      ))}
+    <span aria-hidden="true" class="te-track" data-preview="1">
+      <Index each={Array.from({ length: clampCount(props.count) })}>
+        {(_, i) => (
+          <span
+            aria-checked={i < (props.filled ?? 0) ? "true" : "false"}
+            class="te-toggle"
+            data-shape={props.shape}
+          />
+        )}
+      </Index>
     </span>
   );
 }

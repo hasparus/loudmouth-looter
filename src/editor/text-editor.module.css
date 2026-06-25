@@ -46,7 +46,7 @@
 }
 
 .editor li::marker {
-  color: var(--color-stone-400);
+  color: var(--color-neu-400);
 }
 
 .editor strong {
@@ -55,4 +55,15 @@
 
 .editor i {
   font-style: italic;
+}
+
+.editor a {
+  color: var(--color-link-600);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.editor img {
+  max-width: 100%;
+  height: auto;
 }

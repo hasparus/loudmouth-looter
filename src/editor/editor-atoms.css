@@ -1,89 +1,18 @@
-/* RPG primitive atoms for the story editor (see editor-atoms.tsx and
-   text-editor.tsx). Deliberately global and un-hashed: these class names
-   appear verbatim in saved editor HTML and in help-modal previews, so they
-   must survive the localStorage round-trip and must not be CSS-module-scoped. */
 
 .te-track {
   display: inline-flex;
   align-items: center;
-  /* Match the main page's progress-dot rhythm (move-card.tsx uses gap-0.75,
-     ~25% of the toggle width). */
   gap: 0.22em;
   vertical-align: -0.1em;
   white-space: nowrap;
   user-select: none;
 }
 
-/* Toggles are real <button>s in the editor (see editor-atoms.tsx) so reset the
-   UA button chrome here; spans in TrackPreview inherit only the visual rules. */
-.te-toggle {
-  appearance: none;
-  position: relative;
-  display: inline-block;
-  box-sizing: border-box;
-  width: 0.92em;
-  height: 0.92em;
-  flex-shrink: 0;
-  margin: 0;
-  padding: 0;
-  font: inherit;
-  color: inherit;
-  /* Match the main page's native checkboxes (index.css uses 0.15em). */
-  border: 0.15em solid currentColor;
-  background: transparent;
-  cursor: pointer;
-  transition: background-color 0.12s ease;
-}
-
-.te-toggle:hover {
-  background-color: color-mix(in srgb, currentColor 16%, transparent);
-}
-
-.te-toggle:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-}
-
-.te-toggle[data-shape="square"] {
-  border-radius: 0.1em;
-}
-
-.te-toggle[data-shape="circle"] {
-  border-radius: 50%;
-}
-
-.te-toggle[data-shape="rhomb"] {
-  width: 0.74em;
-  height: 0.74em;
-  /* The rotated square's diagonal overruns its layout box, so add margin to
-     keep adjacent diamonds from touching. */
-  margin: 0 0.08em;
-  border-radius: 0.08em;
-  transform: rotate(45deg);
-}
-
-.te-toggle[data-shape="circle"][aria-checked="true"],
-.te-toggle[data-shape="rhomb"][aria-checked="true"] {
-  background-color: currentColor;
-}
-
-/* Filled checkbox: the same checkmark polygon used by the site's native
-   checkboxes (index.css), so editor and compendium checkboxes look alike. */
-.te-toggle[data-shape="square"][aria-checked="true"]::before {
-  content: "";
-  position: absolute;
-  inset: 0.04em;
-  background-color: currentColor;
-  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-}
-
-/* Help-modal / slash-menu previews are illustration only. */
 .te-track[data-preview] .te-toggle {
   cursor: default;
   pointer-events: none;
 }
 
-/* Monster-move and GM-question lines: hanging-indent paragraphs with a marker. */
 .te-arrow,
 .te-chevron {
   margin-left: 1.7em;
@@ -92,12 +21,15 @@
 
 .te-arrow::before {
   content: "➤";
+  font-size: 0.8em;
   margin-right: 0.55em;
+  margin-bottom: 0.1em;
 }
+
 
 .te-chevron {
   font-style: italic;
-  color: var(--color-stone-600, #57534e);
+  color: var(--color-neu-600, #57534e);
 }
 
 .te-chevron::before {
@@ -107,55 +39,15 @@
   opacity: 0.55;
 }
 
-/* Class-based dark mode (zaduma toggles html.dark), rewritten from the
-   editor's original prefers-color-scheme rule. */
 .dark .te-chevron {
-  color: var(--color-stone-400, #a8a29e);
+  color: var(--color-neu-400, #a8a29e);
 }
 
-/* Move card: a move's heading + rules. Mirrors dungeon-motion's MoveCard
-   (the render side, render/Move.astro, uses that React component verbatim) so
-   the live editor surface matches the published card: borderless, a bold
-   tracking-wide title preceded by a square checkbox marker. The first heading
-   reads as the card's title; here it's styled in place to stay source-faithful. */
-.te-move {
-  padding: 1rem 0;
-  margin: 0;
-  break-inside: avoid;
-}
-.te-move > :first-child {
-  margin-top: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  font-size: 1.25em;
-  font-weight: 700;
-  letter-spacing: 0.025em;
-  color: var(--color-stone-800, #292524);
-}
-/* Decorative square checkbox in front of the title — the editor's heading is
-   contentEditable text, so the box is a marker rather than a live input. */
-.te-move > :first-child::before {
-  content: "";
-  flex-shrink: 0;
-  width: 0.7em;
-  height: 0.7em;
-  border: 0.13em solid currentColor;
-  border-radius: 0.1em;
-}
-.te-move > :last-child {
-  margin-bottom: 0;
-}
-.dark .te-move > :first-child {
-  color: var(--color-stone-100, #f5f5f4);
-}
-
-/* Task-list item: one clickable box followed by editable text. */
 .te-task {
   list-style: none;
 }
 
-.te-task > .te-toggle {
+.te-task>.te-toggle {
   margin-right: 0.5em;
   vertical-align: -0.08em;
 }

@@ -1,12 +1,14 @@
 @reference "./base.css";
 
+/* TODO: This should be either removed or updated to something medieval. */
+
 .zaduma-hover-before {
-  @apply selected:before:bg-stone-100 dark:selected:before:bg-stone-800/60 relative before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-md before:bg-transparent before:transition-colors before:content-[''] focus:before:bg-stone-100 dark:hover:before:bg-stone-800/60 dark:focus:before:bg-stone-800/60;
+  @apply selected:before:bg-black/5 dark:selected:before:bg-neu-800/60 relative before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-md before:bg-transparent before:transition-colors before:content-[''] focus:before:bg-black/5 dark:hover:before:bg-neu-800/60 dark:focus:before:bg-neu-800/60;
 }
 
 @media (hover: hover) {
   .zaduma-hover-before {
-    @apply hover:before:bg-stone-100;
+    @apply hover:before:bg-black/5 dark:hover:before:bg-neu-800/60 hover:before:duration-0;
   }
 }
 
@@ -15,6 +17,7 @@
  * IOS Safari zooms in on inputs on focus if their text size is smaller than 16px.
  */
 @supports (-webkit-overflow-scrolling: touch) {
+
   input,
   textarea,
   select {

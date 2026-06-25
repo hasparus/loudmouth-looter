@@ -66,7 +66,7 @@ pre.twoslash:hover .twoslash-hover {
   width: max-content;
   max-width: 80vw;
 
-  @apply rounded-sm border border-gray-200 bg-white p-2 px-3 text-gray-900 shadow-sm dark:border-gray-700 dark:bg-black dark:text-gray-50 dark:shadow-md;
+  @apply rounded-sm border border-neu-200 bg-white p-2 px-3 text-neu-900 shadow-sm dark:border-neu-700 dark:bg-black dark:text-neu-50 dark:shadow-md;
 
   text-align: left;
   white-space: pre-wrap;
@@ -120,7 +120,7 @@ pre .twoslash-error-line {
   white-space: pre-wrap;
   display: block;
   border-left: 2px solid #bf1818;
-  @apply bg-gray-100 dark:bg-gray-800 dark:text-white;
+  @apply bg-neu-100 dark:bg-neu-800 dark:text-white;
 }
 
 pre code {

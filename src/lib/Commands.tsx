@@ -1,6 +1,7 @@
 import {
   createEffect,
   createSignal,
+  For,
   type JSX,
   Match,
   onCleanup,
@@ -30,27 +31,29 @@ import { Shortcut } from "./Shortcut";
 
 const INPUT_ID = "command-input";
 
-export function Commands({
-  posts,
-}: {
+export function Commands(props: {
   posts: { title: string; href: string }[];
+  class?: string;
 }) {
   const [clientside, setClientside] = createSignal(false);
   onMount(() => setClientside(true)); // workaround for Astro + Solid Hydration issue
 
   return (
     <CommandCenter inputId={INPUT_ID}>
-      <CommandCenterTrigger class="zaduma-hover-before -mx-4 h-12 w-12 rounded-sm dark:text-stone-400 dark:hover:text-stone-300" />
+      <CommandCenterTrigger
+        classList={{
+          "zaduma-hover-before h-12 w-12 before:rounded-none! dark:text-neu-400 dark:hover:text-neu-300 hover:duration-0 trim-cap-alphabetic [&>span]:block [&>span]:translate-y-px": true,
+          [props.class ?? ""]: true,
+        }}
+      />
       <Show when={clientside()} keyed>
-        <CommandsPalette posts={posts} />
+        <CommandsPalette posts={props.posts} />
       </Show>
     </CommandCenter>
   );
 }
 
-export function CommandsPalette({
-  posts,
-}: {
+export function CommandsPalette(props: {
   posts: { title: string; href: string }[];
 }) {
   type CommandsPage = "posts" | "theme" | undefined;
@@ -69,12 +72,6 @@ export function CommandsPalette({
     dialog?.querySelector('[aria-selected="true"]') as HTMLElement | null;
 
   const keybindings = new Map<string, () => void>([
-    [
-      "backspace",
-      () => {
-        setPage(undefined);
-      },
-    ],
     [
       "escape",
       () => {
@@ -111,8 +108,17 @@ export function CommandsPalette({
         }
       },
     ],
+    [
+      "alt+h",
+      () => {
+        document.documentElement.classList.toggle("high-contrast");
+      },
+    ],
+    // eslint-disable-next-line solid/reactivity -- stable setter, runs on keypress
     ["1", () => setColorScheme("light")],
+    // eslint-disable-next-line solid/reactivity -- stable setter, runs on keypress
     ["2", () => setColorScheme("dark")],
+    // eslint-disable-next-line solid/reactivity -- stable setter, runs on keypress
     ["3", () => setColorScheme(null)],
     [
       "alt+slash",
@@ -155,28 +161,50 @@ export function CommandsPalette({
       onClose={() => setPage(undefined)}
       ref={(ref) => (dialog = ref)}
       class={
-        "relative mx-auto w-96 max-w-full transform flex-col overflow-hidden rounded-xl bg-white p-0 font-mono shadow-2xl ring-1 ring-black/5 backdrop:bg-stone-900/30 transition-all dark:bg-stone-950 [&[open]]:flex"
+        "border-neu-300 bg-neu-50 font-text shadow-neu-950/40 backdrop:bg-neu-950/20 dark:border-neu-700 dark:bg-neu-900 max-w-container relative w-full transform flex-col overflow-hidden p-0 transition-all [&[open]]:flex"
       }
     >
-      <div class="flex justify-end">
-        <DialogCloseButton class="group cursor-pointer p-2 focus:outline-none">
-          <Kbd aria-hidden>esc</Kbd>
+      <div class="flex items-center gap-2 px-3 pt-3">
+        <span
+          aria-hidden
+          class="text-accent-700 dark:text-accent-400 text-lg select-none"
+        >
+          ☞
+        </span>
+        <CommandInput
+          aria-label="Commands"
+          class="placeholder:text-neu-600 dark:placeholder:text-neu-500 relative w-full bg-transparent py-2.5 text-lg focus:outline-none"
+          placeholder="What do you seek?"
+          autofocus
+        />
+        <DialogCloseButton class="group h-min cursor-pointer p-1 focus:outline-none">
+          <Kbd class="inline-block" aria-hidden>
+            esc
+          </Kbd>
           <span class="sr-only">Close</span>
         </DialogCloseButton>
       </div>
-      <CommandInput
-        aria-label="Commands"
-        class="relative w-full bg-transparent p-2 indent-2 focus:outline-none"
-        placeholder="What do you need?"
-        autofocus
-      />
-      <div class="mx-2 border-b border-stone-200 dark:border-stone-800" />
+      <div
+        aria-hidden
+        class="text-neu-300 dark:text-neu-700 flex items-center gap-2 px-3 py-1"
+      >
+        <span class="h-px flex-1 bg-current" />
+        <span class="text-accent-700 dark:text-accent-400">❦</span>
+        <span class="h-px flex-1 bg-current" />
+      </div>
       <CommandList class="overflow-scroll p-2">
         <Switch
           fallback={
             <>
-              <CommandItem shortcut="alt+t" onClick={handleShortcut}>
+              <CommandItem
+                tabIndex={0}
+                shortcut="alt+t"
+                onClick={handleShortcut}
+              >
                 Set Theme
+              </CommandItem>
+              <CommandItem shortcut="alt+h" onClick={handleShortcut}>
+                Toggle High Contrast
               </CommandItem>
               <CommandGroup heading={<GroupHeading>Posts</GroupHeading>}>
                 <CommandItem shortcut="alt+slash" onClick={handleShortcut}>
@@ -211,9 +239,9 @@ export function CommandsPalette({
           </Match>
           <Match when={page() === "posts"}>
             <CommandGroup heading={<GroupHeading>Posts</GroupHeading>}>
-              {posts.map((p) => (
-                <CommandItem href={p.href}>{p.title}</CommandItem>
-              ))}
+              <For each={props.posts}>
+                {(p) => <CommandItem href={p.href}>{p.title}</CommandItem>}
+              </For>
             </CommandGroup>
           </Match>
         </Switch>
@@ -251,7 +279,7 @@ function CommandItem(props: CommandItemProps) {
   return (
     <CommandCenterItem
       class={
-        "zaduma-hover-before relative flex w-full cursor-pointer justify-between p-2 text-stone-700 focus-visible:outline-black dark:text-stone-300"
+        "zaduma-hover-before selected:text-neu-900 hover:text-neu-900 dark:selected:text-neu-100 dark:hover:text-neu-100 text-neu-700 dark:text-neu-300 relative flex w-full cursor-pointer items-center justify-between p-2 no-underline transition-colors before:rounded-none! hover:bg-none"
       }
       tabIndex={-1}
       onClick={() => {
@@ -266,7 +294,7 @@ function CommandItem(props: CommandItemProps) {
 
 function GroupHeading(props: { children: JSX.Element }) {
   return (
-    <span class="p-2 text-xs leading-none font-semibold tracking-wider text-stone-400 uppercase dark:text-stone-500">
+    <span class="all-small-caps text-neu-500 dark:text-neu-400 flex items-center gap-1.5 p-2 font-serif text-sm leading-none tracking-wide">
       {props.children}
     </span>
   );

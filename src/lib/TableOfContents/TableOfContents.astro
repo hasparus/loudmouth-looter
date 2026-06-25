@@ -16,11 +16,11 @@ const tocShown = headings.length > 2;
 
 {
   tocShown && (
-    <section class="fixed top-16 left-[max(0px,calc(50%-43rem/2-20rem-1rem))] hidden max-h-full w-[calc(20rem-(var(--wide-content-width)-var(--container-width))/2)] overflow-y-auto p-4 pr-0 xl:block">
-      <PostProgressBar client:media="(min-width: 1280px)">
+    <section class="fixed top-24 left-[max(0px,calc(50%-43rem/2-var(--toc-w)-1rem))] hidden max-h-full w-(--toc-w) overflow-y-auto p-4 pr-0 [--toc-w:225px] min-[1100px]:block xl:[--toc-w:20rem]">
+      <PostProgressBar client:media="(min-width: 1100px)">
         <ul
           id="table-of-contents"
-          class="text-sm leading-6 text-stone-700 dark:text-stone-400"
+          class="text-sm leading-6 text-neu-700 dark:text-neu-400"
         >
           {headings.map(({ text, depth, slug }) => {
             if (depth < 2 || depth > 3) return null;
@@ -41,31 +41,26 @@ const tocShown = headings.length > 2;
       </PostProgressBar>
       <HeadingsIntersectionHighlight
         headings={headings}
-        client:media="(min-width: 1280px)"
+        client:media="(min-width: 1100px)"
       />
     </section>
   )
 }
 
-{
-  /* Hoisted out of the conditional <section> above: Astro hoists styles
-regardless, and prettier-plugin-astro can't parse a <style> nested inside a
-JSX conditional expression. */
-}
 <style>
   @reference "../../global-styles/base.css";
 
-  #table-of-contents:hover {
+  #table-of-contents:has(a:hover) {
     & a:not(:hover) {
-      @apply text-stone-600 transition-colors;
+      @apply text-neu-600 transition-colors;
       :global(.dark) & {
-        @apply text-stone-500;
+        @apply text-neu-500;
       }
     }
 
     & a:hover {
       :global(.dark) & {
-        @apply text-stone-300;
+        @apply text-neu-300;
       }
     }
   }

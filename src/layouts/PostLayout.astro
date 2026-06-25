@@ -2,7 +2,7 @@
 import type { MarkdownLayoutProps } from "astro";
 
 import { createOgImageLink } from "../lib/createOgImageLink";
-import { formatDate } from "../lib/formatDate";
+import PostTime from "../lib/PostTime.astro";
 import Image from "../lib/prose/Image.astro";
 import { blogPostingSchema } from "../lib/seo/jsonLd";
 import JsonLd from "../lib/seo/JsonLd.astro";
@@ -45,27 +45,21 @@ const postSchema = blogPostingSchema({
   description={description}
 >
   <JsonLd data={postSchema} slot="head" />
-  <main class="zaduma-prose zaduma-prose-grid py-4">
-    <header
-      class="flex flex-col items-start justify-between sm:flex-row sm:items-center"
-    >
-      <h1 class="!my-0 font-serif font-bold">{frontmatter.title}</h1>
-      <div class="text-right text-stone-600 dark:text-stone-400">
+  <div class="zaduma-prose zaduma-prose-grid py-4">
+    <header>
+      <div
+        class="text-neu-600 dark:text-neu-400 flex items-center justify-between"
+      >
         {
           readingTime.minutes > 1 && (
-            <>
-              <span>{readingTime.text}</span>
-              {" · "}
-            </>
+            <span class="all-small-caps text-neu-500 h-[1.5cap] shrink-0 text-sm font-medium tracking-wide tabular-nums">
+              {readingTime.text}
+            </span>
           )
         }
-        <time
-          datetime={date.toISOString()}
-          class="tracking-tighter tabular-nums"
-        >
-          {formatDate(date)}
-        </time>
+        <PostTime date={date} />
       </div>
+      <h1 class="mt-2 font-serif text-3xl font-bold">{frontmatter.title}</h1>
     </header>
     {
       imgSrc && (
@@ -73,6 +67,6 @@ const postSchema = blogPostingSchema({
       )
     }
     <slot />
-  </main>
+  </div>
   <TableOfContents headings={headings} />
 </BaseLayout>

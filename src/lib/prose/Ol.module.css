@@ -5,16 +5,12 @@
   list-style-type: none;
   padding: 0;
 
-  & > li {
+  &>li {
     text-indent: -1.5em;
     padding-left: 1.5em;
 
     &:before {
-      color: var(--color-stone-600);
-
-      :global(.dark) & {
-        color: var(--color-stone-400);
-      }
+      color: light-dark(var(--color-neu-600), var(--color-neu-500));
 
       counter-increment: ol;
       content: counter(ol) ".";
@@ -28,16 +24,16 @@
 
       text-align: right;
       min-width: 0.75em;
-      margin-right: 0.5em;
+      margin-right: 0.75em;
       user-select: none;
     }
   }
 
   & li {
-    line-height: 1.75;
+    line-height: 1.6;
   }
 
-  & li > p {
+  & li>p {
     display: contents;
   }
 

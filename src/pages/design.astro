@@ -1,0 +1,213 @@
+---
+// Internal design-system showcase: type, color, cursors, links, prose, keys,
+// controls. Not linked from anywhere — reach it at /design.
+// ponytail: plain data arrays + raw markup under the global prose/skin styles,
+// no per-primitive abstraction.
+import { ControlButton } from "../editor/ControlButton";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { Dragon } from "../lib/Dragon";
+import { Kbd } from "../lib/Kbd";
+import { Link } from "../lib/Link";
+import { Shortcut } from "../lib/Shortcut";
+import { Spread } from "../lib/Spread";
+
+const palettes = ["neu", "accent", "link"] as const;
+const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
+
+// label · utility class · png · native fallback
+const cursors = [
+  ["default", "", "default.png", "auto"],
+  ["pointer", "cursor-pointer", "pointer.png", "pointer"],
+  ["pointer active", "cursor-pointer", "pointer-active.png", "pointer"],
+  ["text", "cursor-text", "text-select.png", "text"],
+  ["not-allowed", "cursor-not-allowed", "not-allowed.png", "not-allowed"],
+  ["wait", "cursor-wait", "wait.png", "wait"],
+  ["progress", "cursor-progress", "wait.png", "progress"],
+  ["help", "cursor-help", "help.png", "help"],
+  ["crosshair", "cursor-crosshair", "precision-select.png", "crosshair"],
+  ["move", "cursor-move", "move.png", "move"],
+  ["ew-resize", "cursor-ew-resize", "horizontal-resize.png", "ew-resize"],
+  ["ns-resize", "cursor-ns-resize", "vertical-resize.png", "ns-resize"],
+  ["col-resize", "cursor-col-resize", "column-resize.png", "col-resize"],
+  ["row-resize", "cursor-row-resize", "row-resize.png", "row-resize"],
+  ["nwse-resize", "cursor-nwse-resize", "diagonal-resize-1.png", "nwse-resize"],
+  ["nesw-resize", "cursor-nesw-resize", "diagonal-resize-2.png", "nesw-resize"],
+] as const;
+
+const fonts = [
+  ["Avara — display / serif", "font-serif"],
+  ["Crimson Text — body / text", "font-text"],
+  ["Caveat — hand / asides", "font-hand"],
+] as const;
+---
+
+<BaseLayout
+  title="design"
+  description="internal design-system showcase"
+  cursors={false}
+>
+  <div class="flex flex-col gap-12 py-10">
+    <header>
+      <h1 class="font-serif font-bold tracking-tighter">Design system</h1>
+      <p class="text-neu-500">Type, color, cursors, links, prose, controls.</p>
+    </header>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-serif">Typography</h2>
+      {
+        fonts.map(([label, cls]) => (
+          <div>
+            <div class="text-neu-500 text-sm">{label}</div>
+            <p class={`${cls} text-3xl`}>
+              Sphinx of black quartz, judge my vow.
+            </p>
+          </div>
+        ))
+      }
+    </section>
+
+    <section class="flex flex-col gap-6">
+      <h2 class="font-serif">Color</h2>
+      {
+        palettes.map((name) => (
+          <div>
+            <div class="text-neu-500 mb-1 text-sm">{name}</div>
+            <div class="flex flex-wrap gap-1">
+              {shades.map((shade) => (
+                <div class="flex flex-col items-center gap-1">
+                  <div
+                    class="border-neu-300 size-12 rounded border"
+                    style={`background: var(--color-${name}-${shade})`}
+                  />
+                  <span class="text-neu-500 text-xs tabular-nums">{shade}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-serif">Cursors</h2>
+      <p class="text-neu-500 text-sm">
+        Hover a tile to feel the cursor. Shown at actual 32px cursor size.
+      </p>
+      <ul class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {
+          cursors.map(([label, cls, png, native]) => (
+            <li
+              class={`${cls} border-neu-300 dark:border-neu-700 bg-neu-50 dark:bg-neu-800 flex flex-col items-center gap-2 rounded border p-4`}
+              style={
+                cls ? undefined : `cursor: url("/cursors/${png}"), ${native}`
+              }
+            >
+              <img
+                src={`/cursors/${png.replace(".png", "@2x.png")}`}
+                alt={label}
+                width="32"
+                height="32"
+                class="size-8"
+              />
+              <span class="text-neu-600 text-xs">{label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-serif">Links</h2>
+      <p>
+        Body copy with an <Link href="/design">underlined link</Link> that picks up
+        the link-600 underline on hover. The same <a href="/design"
+          >bare anchor inside a paragraph</a
+        > gets the prose baseline wash.
+      </p>
+      <p>
+        <Link href="/design" noUnderline>A noUnderline link</Link> drops the rule
+        — used for image and full-row links.
+      </p>
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-serif">Prose</h2>
+      <div class="zaduma-prose">
+        <h3>A third-level heading</h3>
+        <p>
+          A paragraph of <em>emphasized</em> and <strong>strong</strong> body text
+          in Crimson Text, with an <a href="/design">inline link</a> and a bit of
+          <code>inline code</code>.
+        </p>
+        <blockquote>
+          <p>A blockquote — the marginal voice of the manuscript.</p>
+        </blockquote>
+        <ul>
+          <li>Diamond-bulleted list item</li>
+          <li>Another item</li>
+        </ul>
+        <hr />
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-serif">Keyboard</h2>
+      <div class="flex flex-wrap items-center gap-4">
+        <Kbd client:visible>K</Kbd>
+        <Kbd client:visible>Esc</Kbd>
+        <Shortcut client:visible shortcut="cmd+k" />
+        <Shortcut client:visible shortcut="shift+slash" />
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-serif">Controls</h2>
+      <div class="flex flex-wrap items-center gap-4">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" checked /> Checkbox
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" data-checkbox-marker="x" checked /> Cross marker
+        </label>
+      </div>
+      <p class="text-neu-500 text-sm">The two real button styles in the app:</p>
+      <div class="flex flex-wrap items-center gap-4">
+        {
+          /* .zaduma-hover-before — command palette / menu, src/lib/Commands.tsx */
+        }
+        <button class="zaduma-hover-before rounded px-3 py-1"
+          >zaduma-hover-before</button
+        >
+        {/* the editor's toolbar button, src/editor/ControlButton.tsx */}
+        <ControlButton>ControlButton (editor toolbar)</ControlButton>
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-serif">Two-column flow around shapes</h2>
+      <p class="text-neu-500 text-sm">
+        One text stream fills the left column, then continues in the right,
+        wrapping around two shapes. Pretext computes the layout off-DOM. Click a
+        shape to spin it and the text re-wraps live. After
+        <Link href="https://chenglou.me/pretext/dynamic-layout/">
+          pretext's dynamic-layout
+        </Link>.
+      </p>
+      <Spread client:visible />
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-serif">Here be dragons</h2>
+      <p class="text-neu-500 text-sm">
+        Pretext lays the text out as individual characters. A serpent of glyphs
+        follows your cursor and shoves the words aside as it passes; they settle
+        back once it's gone. It runs on canvas and never triggers a DOM reflow.
+        After
+        <Link href="https://pretext-playground.builderz.dev/">
+          pretext-playground
+        </Link>.
+      </p>
+      <Dragon client:visible />
+    </section>
+  </div>
+</BaseLayout>
