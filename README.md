@@ -1,7 +1,7 @@
 # loudmouth-looter
 
 Personal site with a rich-text MDX editor, live at [lol.haspar.us]. Scaffolded
-from [zaduma] — an Astro starter for understated personal websites.
+from [zaduma], an Astro starter for understated personal websites.
 
 [lol.haspar.us]: https://lol.haspar.us
 [zaduma]: https://github.com/hasparus/zaduma
@@ -13,12 +13,12 @@ bun install
 cp .env.example .env.local   # fill in OG_IMAGE_SECRET (placeholder is fine locally)
 bun run dev                  # → http://localhost:4321
 # open http://localhost:4321/editor to try the MDX editor
-```sh
+```
 
 ## The editor
 
-`/editor` is a contenteditable React island backed by the File System Access API
-— open a `.mdx` post, edit, save. No server round-trips.
+`/editor` is a contenteditable React island backed by the File System Access
+API. Open a `.mdx` post, edit, save. Nothing hits a server.
 
 - **Slash menu**: type `/squares 4` (or `/circles`, `/rhombs`) to insert a Track
   atom; `/arrow` and `/chevron` insert marker lines. Move cards are authored as
@@ -57,7 +57,7 @@ src/
   pages/            Astro routes
 api/                Vercel serverless functions
 e2e/                Playwright visual-regression + e2e tests
-```text
+```
 
 ## Deploying
 
