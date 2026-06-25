@@ -1,5 +1,6 @@
 ---
 import crimsonPath from "@fontsource/crimson-text/files/crimson-text-latin-400-normal.woff2";
+import crimsonItalicPath from "@fontsource/crimson-text/files/crimson-text-latin-400-italic.woff2";
 
 import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
 import { Commands } from "../lib/Commands";
@@ -75,7 +76,7 @@ const hasHeaderContent = Astro.slots.has("header-content");
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     {
-      [crimsonPath].map((href) => (
+      [crimsonPath, crimsonItalicPath].map((href) => (
         <link
           rel="preload"
           href={href}
