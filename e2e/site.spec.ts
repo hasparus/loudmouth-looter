@@ -60,18 +60,18 @@ test.describe("OG images", () => {
 });
 
 test.describe("Move cards (published)", () => {
-  test("why-dragon renders move cards with a heading and a checkbox", async ({
+  test("why-dragon renders basic move cards with a heading and no checkbox", async ({
     page,
   }) => {
     await page.goto("/why-dragon/");
     const move = page
       .locator("article.group")
-      .filter({ has: page.getByRole("heading", { name: "Hear Me Roar" }) });
+      .filter({ has: page.getByRole("heading", { name: "Bellow" }) });
     await expect(move).toBeVisible();
 
-    const checkbox = move.getByRole("checkbox").first();
-    await checkbox.check();
-    await expect(checkbox).toBeChecked();
+    // These are basic moves, not player advancement moves, so they have no
+    // checkbox to tick off.
+    await expect(move.getByRole("checkbox")).toHaveCount(0);
   });
 });
 

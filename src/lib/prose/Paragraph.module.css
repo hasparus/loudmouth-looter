@@ -14,7 +14,7 @@
   }
 
   & a {
-    white-space: nowrap;
+    overflow-wrap: break-word;
     max-width: var(--container-width);
   }
 }

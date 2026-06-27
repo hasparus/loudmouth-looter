@@ -11,19 +11,19 @@ test.describe("published post render parity", () => {
     }
   });
 
-  test("renders a move card with its heading lifted to title/id", async ({
+  test("renders a basic move card with its heading lifted to title/id and no checkbox", async ({
     page,
   }) => {
-    const card = page.locator("article.group", { hasText: "Hear Me Roar" });
+    const card = page.locator("article.group", { hasText: "Bellow" });
     await expect(card).toHaveCount(1);
 
-    await expect(card.locator('input[type="checkbox"]')).toHaveAttribute(
+    // Basic moves are not player advancement moves, so they render without a
+    // checkbox.
+    await expect(card.locator('input[type="checkbox"]')).toHaveCount(0);
+    await expect(card.getByRole("heading", { name: "Bellow" })).toHaveAttribute(
       "id",
-      "hear-me-roar",
+      "bellow-title",
     );
-    await expect(
-      card.getByRole("heading", { name: "Hear Me Roar" }),
-    ).toHaveAttribute("id", "hear-me-roar-title");
     await expect(card).toContainText(
       "introduce a fact or narrative detail from your past life",
     );
