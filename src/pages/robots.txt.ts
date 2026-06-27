@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 
-// AI/LLM training & answer-engine crawlers. Default to Allow so the starter
-// is "agent-ready"; downstream sites can override this list.
+// AI/LLM training & answer-engine crawlers, explicitly allowed so the site
+// stays "agent-ready".
 const AI_BOTS = [
   "GPTBot",
   "ClaudeBot",
@@ -14,8 +14,14 @@ const AI_BOTS = [
   "Amazonbot",
 ];
 
-// https://contentsignals.org — opt-in signal for how crawled content may be used.
-const CONTENT_SIGNALS = "search, ai-train: yes";
+// Content Signals — declare how crawled content may be used.
+// https://contentsignals.org, https://datatracker.ietf.org/doc/draft-romm-aipref-contentsignals/
+// The `Content-Signal` directive lives inside a User-agent group; each signal
+// is `yes`/`no`. This site opts in across the board to stay "agent-ready".
+//   search   — index the content and surface it in search results
+//   ai-input — feed the content to an AI model at inference time (e.g. RAG)
+//   ai-train — train or fine-tune AI models on the content
+const CONTENT_SIGNAL = "search=yes, ai-input=yes, ai-train=yes";
 
 export const GET: APIRoute = ({ site }) => {
   if (!site) {
@@ -25,6 +31,7 @@ export const GET: APIRoute = ({ site }) => {
   const lines: string[] = [];
 
   lines.push("User-agent: *");
+  lines.push(`Content-Signal: ${CONTENT_SIGNAL}`);
   lines.push("Allow: /");
   lines.push("");
 
@@ -34,7 +41,6 @@ export const GET: APIRoute = ({ site }) => {
     lines.push("");
   }
 
-  lines.push(`Content-Signals: ${CONTENT_SIGNALS}`);
   lines.push(`Sitemap: ${new URL("sitemap-index.xml", site).href}`);
 
   return new Response(lines.join("\n") + "\n", {
