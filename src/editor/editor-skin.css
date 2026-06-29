@@ -27,3 +27,7 @@ html.dark {
 h5 {
   line-height: 1.25;
 }
+
+[contenteditable] a {
+  @apply link-highlight;
+}

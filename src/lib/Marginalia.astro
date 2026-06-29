@@ -6,7 +6,11 @@ interface MarginaliaItem {
 
 const rails: Record<"left" | "right", MarginaliaItem[]> = {
   left: [
-    { label: "dungeon motion", href: "https://dungeon-motion.haspar.us/" },
+    {
+      // todo: this should be a link to itch.io later
+      label: "character sheet",
+      href: "https://dungeon-motion.haspar.us/character-sheet",
+    },
     { label: "astra mortemque superare gradatim" },
   ],
   right: [
@@ -23,13 +27,13 @@ const sides = ["left", "right"] as const;
   sides.map((side) => (
     <div
       class:list={[
-        "pointer-events-none fixed top-1/2 hidden -translate-y-1/2 flex-col items-center gap-12 text-neu-400 xl:flex dark:text-neu-600",
+        "text-neu-400 dark:text-neu-600 pointer-events-none fixed top-1/2 hidden -translate-y-1/2 flex-col items-center gap-12 xl:flex",
         side === "left" ? "left-12" : "right-12",
       ]}
     >
       {rails[side].map((item, i) => (
         <Fragment>
-          {i > 0 && <span class="h-32 w-px bg-neu-300 dark:bg-neu-700" />}
+          {i > 0 && <span class="bg-neu-300 dark:bg-neu-700 h-32 w-px" />}
           {item.href ? (
             <a
               href={item.href}

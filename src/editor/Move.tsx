@@ -1,5 +1,7 @@
 import { Index, type JSX, mergeProps, Show } from "solid-js";
 
+import { Heading } from "../lib/prose/Heading";
+
 import { cn } from "./cn";
 import { MOVE_ARTICLE_CLASS } from "./move-dom";
 import { slugFromTitle } from "./move-props";
@@ -49,14 +51,16 @@ function MoveWithTitle(props: MoveWithTitleProps) {
               type="checkbox"
             />
           </Show>
-          <h3
-            class={`text-neu-800 dark:text-neu-200 font-serif font-bold tracking-wide ${
-              isSmall() ? "" : "text-xl [text-box-trim:trim-end]"
-            }`}
-            id={`${id()}-title`}
+          <Heading
+            level="h3"
+            class={cn(
+              "text-neu-800 dark:text-neu-200 my-0! font-serif font-bold tracking-wide",
+              isSmall() ? "" : "text-xl [text-box-trim:trim-end]",
+            )}
+            id={id()}
           >
             {props.title}
-          </h3>
+          </Heading>
           <Show when={!!props.resources}>
             <div class="text-neu-500 dark:text-neu-100 ml-auto flex items-center gap-1 text-sm">
               <span

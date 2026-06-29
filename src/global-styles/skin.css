@@ -328,27 +328,6 @@
     text-decoration-color: var(--color-neu-600);
   }
 
-  @media (hover: hover) {
-    a:hover {
-      color: var(--color-neu-900);
-      text-decoration-color: var(--color-link-600);
-      background-image: linear-gradient(to bottom,
-          transparent 0%,
-          color-mix(in srgb, var(--color-link-500) 10%, transparent 100%) 100%);
-      background-repeat: no-repeat;
-      background-position: bottom;
-      background-size: 100% min(100%, 1.6em);
-    }
-
-    html.dark a:hover {
-      color: var(--color-neu-50);
-      text-decoration-color: var(--color-link-500);
-      background-image: linear-gradient(to bottom,
-          transparent 0%,
-          color-mix(in srgb, var(--color-link-500) 18%, transparent 100%) 100%);
-    }
-  }
-
   html.dark figure.zaduma-line-art [zaduma-image] {
     background-color: var(--color-accent-500);
     -webkit-mask: var(--zaduma-img-src) center / contain no-repeat;
@@ -404,6 +383,46 @@
 
     .fixed {
       display: none !important;
+    }
+  }
+}
+
+@property --link-highlight {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@utility link-highlight {
+  @media (hover: hover) {
+    --link-highlight: 0;
+    background-image: linear-gradient(to bottom,
+        transparent 0%,
+        color-mix(in srgb, var(--color-link-500) calc(var(--link-highlight) * 10%), transparent) 100%);
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: 100% min(100%, 1.6em);
+    transition:
+      --link-highlight 150ms ease-out,
+      color 150ms ease-out,
+      text-decoration-color 150ms ease-out;
+
+    &:hover {
+      --link-highlight: 1;
+      color: var(--color-neu-900);
+      text-decoration-color: var(--color-link-600);
+      transition-duration: 0s;
+    }
+
+    html.dark & {
+      background-image: linear-gradient(to bottom,
+          transparent 0%,
+          color-mix(in srgb, var(--color-link-500) calc(var(--link-highlight) * 18%), transparent) 100%);
+    }
+
+    html.dark &:hover {
+      color: var(--color-neu-50);
+      text-decoration-color: var(--color-link-500);
     }
   }
 }

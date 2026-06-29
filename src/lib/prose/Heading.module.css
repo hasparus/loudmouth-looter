@@ -13,13 +13,13 @@
       color: var(--color-neu-200);
     }
 
-    & > a:focus-visible {
+    &>a:focus-visible {
       outline: none;
     }
   }
 
-  & > a::after {
-    @apply transition-opacity;
+  &>a::after {
+    @apply transition-opacity link-highlight;
 
     content: "🔗";
     display: inline-flex;
@@ -30,7 +30,7 @@
     opacity: 0;
   }
 
-  &:hover > a::after {
+  &:hover>a::after {
     opacity: 1;
   }
 }
