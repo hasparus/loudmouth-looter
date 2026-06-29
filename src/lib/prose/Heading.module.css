@@ -23,7 +23,7 @@
   }
 
   &>a::before {
-    @apply absolute -inset-2 -z-10 rounded-sm opacity-0 transition-opacity ease-out;
+    @apply absolute -inset-x-2 -inset-y-1.5 -z-10 rounded-sm opacity-0 transition-opacity ease-out;
 
     content: "";
     background-image: linear-gradient(to bottom, transparent,

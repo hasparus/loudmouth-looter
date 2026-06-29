@@ -131,7 +131,7 @@ When your Goal _leads you into danger or costs you_ something, take **1 XP**.
 The **Pyre** is your doom track. Think inverse health pool. Fill the fourth box
 and you're **consumed**, dead or worse.
 
-<Track name="Pyre" defaultValue={2} max={4} />
+<Track name="Pyre" defaultValue={2} max={4} className="" />
 
 The game is about the Dragon, tactical storytelling and problem-solving, sure,
 but also about the relation of our heroes to the Dragon and what they are
@@ -140,8 +140,10 @@ willing to sacrifice to defeat it.
 **Consumed** doesn't mean "out of the game". If dying is boring, maybe you turn
 against your friends as corrupted villains or undead servants of the dracolich.
 The DM will feel responsible for time management, so we leave the exact timing
-and nature of your fall to them. This is usually an "opportunity for a cost"
-moment.
+and nature of your fall to them.
+
+This is usually an "opportunity for a cost" moment. Fáfnir was born a dwarf; his
+greed turned him into a dragon.
 
 That's goals, the _"Why"_ part of the title. We know something about the _"You"_
 part: the Hunters, their Classes, though I don't think it's enough. How else do
@@ -151,16 +153,15 @@ We need some baseline dice resolution, stats and a catch-all move.
 
 ### Stats
 
-I'm taking 3 stats, Body, Wits and Soul. I reserve the right to attack them as a
-DM move if it doesn't make sense to bump **Pyre**, or the time management of the
-game demands that. From the perspective of the genre, fighting a dragon is
-_exhausting_.
+I'm taking 3 stats, Body, Wits and Soul. The Dragon will attack them, dealing
+damage like **-2 Body** or **-1 Soul**. From the perspective of the genre,
+fighting a dragon is _exhausting_.
 
 > Distribute values from -2 to +2 so that their total equals +1. Ignoring order:
 > `(+2, 0, -1); (+1, +1, -1); (+1, 0, 0); (+2, +1, -2)`
 >
-> **Body:** Physical strength and stamina.\
-> **Wits:** Mental acuity and perception.\
+> **Body:** Physical strength and stamina.\ **Wits:** Mental acuity and
+> perception.\
 > **Soul:** Arcane potency and spiritual force.
 >
 > <span data-no-italic />
@@ -203,7 +204,7 @@ makes a move.
 
 **Face Fury** is the baseline: you against the obstacle, you against the Dragon.
 Most often, it won't be just you. Others will jump in to help or, chasing their
-own goals, interfere with your actions.
+own Goals, interfere with your actions.
 
 <Move illuminated isBaseMove>
 
@@ -231,6 +232,25 @@ to stop what they're doing and get 1 XP.\
 **On 10+** you also avoid the consequences.
 
 </Move>
+
+<Move illuminated isBaseMove>
+
+### Turn to Ash
+
+When one of your Stats gets to **-3** or lower, set it to **-3** and raise Pyre
+by **1**. If your Pyre is **4**, you're consumed. Otherwise, you're downed: you
+succumb to your wounds for the time being.
+
+</Move>
+
+A downed Hunter goes back up when his companions help him or the smoke clears
+and the scene ends.
+
+<aside>
+  Can you **Stoke the Fire** while your stat gets lowered to **-3** to raise
+  Pyre anyway, but eke out a fail forward? Maybe. I leave it to the DM's
+  discretion and player munchkin instincts.
+</aside>
 
 <Move illuminated isBaseMove>
 
@@ -292,7 +312,7 @@ Tis but a write-up for people who already played a lot of games. I'm playing
 this with a list yoinked from Stonetop, because I have it engraved in my brain.
 _"Reveal an unwelcome truth"_ creates a new situational armor or tells us
 something about existing legendary armor. "Hurt someone" allows me to hurt them
-narratively and also mark _**Pyre**_.
+narratively and burn their stats.
 
 <aside>
   If you've read this far without reading [1 HP Dragon], "Armor" is an obstacle,
@@ -317,6 +337,13 @@ _Escape_.
     What do you do?
   </q>
 </aside>
+
+### Marking Pyre
+
+I feel like it'd be rude for me, a mere Dragon Minder, to force them to mark
+Pyre directly. I'd rather attack their stats. Instead of falling down the
+Hunters may say "Hell no, I'm not going down like that!" and trigger **Stoke the
+Fire** or **Relinquish their Goal**.
 
 ## Narrative Structure
 
@@ -369,3 +396,9 @@ All the images in this article are public domain.
 </figcaption>
 
 </figure>
+
+## Addendum
+
+- If you'd like to get some more flavor and immersion for the price of lowered
+  accessiblity, you can say _Raise Pyre_ instead of _Mark 1 Pyre_ and _Burn 1
+  Body_ instead of _Take -1 Body_.
