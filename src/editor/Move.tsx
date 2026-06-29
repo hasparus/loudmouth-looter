@@ -41,12 +41,12 @@ function MoveWithTitle(props: MoveWithTitleProps) {
         <div class={cn("flex items-center", isSmall() ? "gap-2" : "gap-2.5")}>
           <Show when={!props.isBaseMove}>
             <input
-              aria-describedby={`${id()}-title`}
+              aria-describedby={id()}
               class={cn(
                 "aspect-square shrink-0",
                 isSmall() ? "mt-[-3.5px] size-4" : "-mt-0.75 size-4.5",
               )}
-              id={id()}
+              id={`${id()}-checkbox`}
               name={id()}
               type="checkbox"
             />
