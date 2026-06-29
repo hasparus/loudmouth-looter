@@ -18,8 +18,29 @@
     }
   }
 
+  &>a {
+    @apply relative isolate;
+  }
+
+  &>a::before {
+    @apply absolute -inset-2 -z-10 rounded-sm opacity-0 transition-opacity ease-out;
+
+    content: "";
+    background-image: linear-gradient(to bottom, transparent,
+        color-mix(in srgb, var(--color-link-500) 10%, transparent));
+  }
+
+  :global(.dark) &>a::before {
+    background-image: linear-gradient(to bottom, transparent,
+        color-mix(in srgb, var(--color-link-500) 18%, transparent));
+  }
+
+  &:hover>a::before {
+    @apply opacity-100 duration-0;
+  }
+
   &>a::after {
-    @apply transition-opacity link-highlight;
+    @apply transition-opacity;
 
     content: "🔗";
     display: inline-flex;
