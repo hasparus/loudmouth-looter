@@ -4,7 +4,7 @@ import { cn } from "./cn";
 import { MOVE_ARTICLE_CLASS } from "./move-dom";
 import { slugFromTitle } from "./move-props";
 
-export interface MoveProps {
+export interface MoveProps extends JSX.HTMLAttributes<HTMLElement> {
   checkboxes?: number;
   children: JSX.Element;
   className?: string;
@@ -18,26 +18,26 @@ export interface MoveProps {
   title?: string;
 }
 
-function MoveWithTitle(props: MoveProps & { title: string }) {
-  const merged = mergeProps(
-    { className: "", isBaseMove: false, resourceName: "" },
-    props,
-  );
-  const isSmall = () => merged.size === "sm";
-  const id = () => merged.id ?? slugFromTitle(merged.title);
+interface MoveWithTitleProps extends MoveProps {
+  title: string;
+}
+
+function MoveWithTitle(props: MoveWithTitleProps) {
+  const isSmall = () => props.size === "sm";
+  const id = () => props.id ?? slugFromTitle(props.title);
 
   return (
     <article
       class={cn(
         MOVE_ARTICLE_CLASS,
-        merged.illuminated ? "te-move-illuminated" : undefined,
-        merged.className,
+        props.illuminated ? "te-move-illuminated" : undefined,
+        props.className,
         isSmall() ? "space-y-2" : undefined,
       )}
     >
       <div class="flex-1">
         <div class={cn("flex items-center", isSmall() ? "gap-2" : "gap-2.5")}>
-          <Show when={!merged.isBaseMove}>
+          <Show when={!props.isBaseMove}>
             <input
               aria-describedby={`${id()}-title`}
               class={cn(
@@ -55,9 +55,9 @@ function MoveWithTitle(props: MoveProps & { title: string }) {
             }`}
             id={`${id()}-title`}
           >
-            {merged.title}
+            {props.title}
           </h3>
-          <Show when={!!merged.resources}>
+          <Show when={!!props.resources}>
             <div class="text-neu-500 dark:text-neu-100 ml-auto flex items-center gap-1 text-sm">
               <span
                 class={cn(
@@ -65,10 +65,10 @@ function MoveWithTitle(props: MoveProps & { title: string }) {
                   isSmall() ? "text-xs" : "",
                 )}
               >
-                {merged.resourceName}
+                {props.resourceName}
               </span>
               <div class="ml-1 flex gap-0.5">
-                <Index each={Array.from({ length: merged.resources ?? 0 })}>
+                <Index each={Array.from({ length: props.resources ?? 0 })}>
                   {(_, i) => (
                     <input
                       class={
@@ -85,10 +85,10 @@ function MoveWithTitle(props: MoveProps & { title: string }) {
               </div>
             </div>
           </Show>
-          <Show when={!!merged.checkboxes}>
+          <Show when={!!props.checkboxes}>
             <div class="text-neu-500 dark:text-neu-200 ml-auto flex items-center gap-1 text-sm">
               <div class="ml-1 flex gap-0.75">
-                <Index each={Array.from({ length: merged.checkboxes ?? 0 })}>
+                <Index each={Array.from({ length: props.checkboxes ?? 0 })}>
                   {(_, i) => (
                     <input
                       class="aspect-square size-3.5 shrink-0"
@@ -101,9 +101,9 @@ function MoveWithTitle(props: MoveProps & { title: string }) {
             </div>
           </Show>
         </div>
-        <Show when={merged.requirement}>
+        <Show when={props.requirement}>
           <p class="text-neu-500 dark:text-neu-200 mt-0.75 text-sm">
-            (Requires {merged.requirement})
+            (Requires {props.requirement})
           </p>
         </Show>
         <div
@@ -113,7 +113,7 @@ function MoveWithTitle(props: MoveProps & { title: string }) {
           )}
           data-move-body=""
         >
-          {merged.children}
+          {props.children}
         </div>
       </div>
     </article>
@@ -121,26 +121,21 @@ function MoveWithTitle(props: MoveProps & { title: string }) {
 }
 
 export function Move(props: MoveProps) {
-  const merged = mergeProps(
-    { className: "", isBaseMove: false, resourceName: "" },
-    props,
-  );
-
   return (
     <Show
-      when={merged.title}
+      when={props.title}
       fallback={
         <article
           class={cn(
             "te-move",
-            merged.illuminated ? "te-move-illuminated" : undefined,
+            props.illuminated ? "te-move-illuminated" : undefined,
           )}
         >
-          {merged.children}
+          {props.children}
         </article>
       }
     >
-      {(title) => <MoveWithTitle {...merged} title={title()} />}
+      {(title) => <MoveWithTitle {...props} title={title()} />}
     </Show>
   );
 }
