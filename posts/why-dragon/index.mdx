@@ -131,7 +131,15 @@ When your Goal _leads you into danger or costs you_ something, take **1 XP**.
 The **Pyre** is your doom track. Think inverse health pool. Fill the fourth box
 and you're **consumed**, dead or worse.
 
-<Track name="Pyre" defaultValue={2} max={4} className="" />
+import fire from "../../src/fire.svg?url";
+
+<Track
+  name="Pyre"
+  defaultValue={2}
+  max={4}
+  style={`--fire: url(${fire})`}
+  class="[&_.te-toggle:last-child[aria-checked=true]]:text-accent-700! dark:[&_.te-toggle:last-child[aria-checked=true]]:text-accent-400! [&_.te-toggle:last-child]:before:bg-neu-600! dark:[&_.te-toggle:last-child]:before:bg-neu-400! [&_.te-toggle:last-child[aria-checked=true]]:before:bg-accent-700! dark:[&_.te-toggle:last-child[aria-checked=true]]:before:bg-accent-400! [&_.te-toggle:last-child]:before:size-[0.72em]! [&_.te-toggle:last-child]:before:[transform:none]! [&_.te-toggle:last-child]:before:shadow-none! [&_.te-toggle:last-child]:before:[clip-path:none]! [&_.te-toggle:last-child]:before:[mask:var(--fire)_center/contain_no-repeat]!"
+/>
 
 The game is about the Dragon, tactical storytelling and problem-solving, sure,
 but also about the relation of our heroes to the Dragon and what they are
@@ -243,14 +251,14 @@ succumb to your wounds for the time being.
 
 </Move>
 
-A downed Hunter goes back up when his companions help him or the smoke clears
-and the scene ends.
-
 <aside>
   Can you **Stoke the Fire** while your stat gets lowered to **-3** to raise
   Pyre anyway, but eke out a fail forward? Maybe. I leave it to the DM's
   discretion and player munchkin instincts.
 </aside>
+
+A downed Hunter goes back up when his companions help him or the smoke clears
+and the scene ends.
 
 <Move illuminated isBaseMove>
 
@@ -262,6 +270,13 @@ one of your stats by **+1** (up to **+3**) or clear **1 Pyre**.
 </Move>
 
 <Move illuminated isBaseMove>
+
+{/* ![Hero's Journey](./heros-journey.svg) */}
+
+The Hero's Journey doesn't end when the Dragon is defeated. There's still
+Transformation, Atonement and Return. Our session time is limited, so instead of
+playing it out, please forgive me and brace for the longest procedure you've
+ever read in a game.
 
 ### Aftermath
 
