@@ -135,9 +135,7 @@ export function Move(props: MoveProps) {
             "te-move",
             props.illuminated ? "te-move-illuminated" : undefined,
           )}
-        >
-          {props.children}
-        </article>
+        />
       }
     >
       {(title) => <MoveWithTitle {...props} title={title()} />}
