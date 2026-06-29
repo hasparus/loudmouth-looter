@@ -28,11 +28,11 @@ test.describe("e2e fixture post", () => {
 
     await expect(card.locator('input[type="checkbox"]')).toHaveAttribute(
       "id",
-      "learn-and-grow",
+      "learn-and-grow-checkbox",
     );
     await expect(
       card.getByRole("heading", { name: "Learn and Grow" }),
-    ).toHaveAttribute("id", "learn-and-grow-title");
+    ).toHaveAttribute("id", "learn-and-grow");
     await expect(card).toContainText(
       "discuss with the table what move or compendium fits",
     );
