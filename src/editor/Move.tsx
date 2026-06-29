@@ -1,4 +1,4 @@
-import { Index, type JSX, mergeProps, Show } from "solid-js";
+import { Index, type JSX, Show } from "solid-js";
 
 import { Heading } from "../lib/prose/Heading";
 
@@ -130,6 +130,7 @@ export function Move(props: MoveProps) {
       when={props.title}
       fallback={
         <article
+          {...props}
           class={cn(
             "te-move",
             props.illuminated ? "te-move-illuminated" : undefined,
