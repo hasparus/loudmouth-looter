@@ -5,6 +5,7 @@
   vertical-align: -0.1em;
   white-space: nowrap;
   user-select: none;
+  width: fit-content;
 }
 
 .te-track[data-preview] .te-toggle {
@@ -50,7 +51,7 @@
   list-style: none;
 }
 
-.te-task > .te-toggle {
+.te-task>.te-toggle {
   margin-right: 0.5em;
   vertical-align: -0.08em;
 }

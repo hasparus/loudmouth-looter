@@ -166,7 +166,7 @@ const hasHeaderContent = Astro.slots.has("header-content");
       // recompute. CSS handles the rest via [data-cursor-pressed].
       // Keep this list in sync with the clickable selector in cursors.css.
       const SELECTOR =
-        'a[href],button,summary,label,select,input[type="button"],input[type="checkbox"],input[type="color"],input[type="file"],input[type="radio"],input[type="range"],input[type="reset"],input[type="submit"],[role="button"],[role="checkbox"],[role="link"],[role="menuitem"],[role="option"],[role="radio"],[role="switch"],[role="tab"],[onclick]';
+        'a[href],button,summary,label,select,input[type="button"],input[type="checkbox"],input[type="color"],input[type="file"],input[type="radio"],input[type="range"],input[type="reset"],input[type="submit"],[role="button"],[role="checkbox"],[role="link"],[role="menuitem"],[role="option"],[role="radio"],[role="slider"],[role="switch"],[role="tab"],[onclick]';
 
       let held: Element | null = null;
       const clear = () => {
