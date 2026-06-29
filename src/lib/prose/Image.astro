@@ -65,7 +65,7 @@ let height = props.height;
 
 const srcInput = await props.src;
 let src: string;
-if (typeof srcInput === "object") {
+if (typeof srcInput === "object" || typeof srcInput === "function") {
   const image = "default" in srcInput ? srcInput.default : srcInput;
   width ??= image.width;
   height ??= image.height;

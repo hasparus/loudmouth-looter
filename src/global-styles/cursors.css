@@ -6,6 +6,8 @@ html {
   --cur-pointer-active:
     url("/cursors/pointer-active.png") 1x,
     url("/cursors/pointer-active@2x.png") 2x;
+  --cur-match:
+    url("/cursors/match.png") 1x, url("/cursors/match@2x.png") 2x;
   --cur-text:
     url("/cursors/text-select.png") 1x, url("/cursors/text-select@2x.png") 2x;
   --cur-not-allowed:
@@ -144,6 +146,15 @@ textarea,
       pointer;
     cursor:
       image-set(var(--cur-pointer-active)) 13 3,
+      pointer;
+  }
+
+  .cursor-match {
+    cursor:
+      -webkit-image-set(var(--cur-match)) 15 14,
+      pointer;
+    cursor:
+      image-set(var(--cur-match)) 15 14,
       pointer;
   }
 

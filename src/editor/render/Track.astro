@@ -18,6 +18,8 @@ interface Props {
   /** Toggle count. */
   max?: number | string;
   name?: string;
+  class?: string;
+  style?: string | Record<string, string>;
 }
 
 const {
@@ -27,11 +29,13 @@ const {
   interactive,
   name,
 } = resolveTrackProps(Astro.props);
+const className = Astro.props.class;
+const style = Astro.props.style;
 ---
 
 {
   interactive ? (
-    <span class="te-track">
+    <span class:list={["te-track", className]} style={style}>
       <Show when={name}>
         <span class="text-neu-600 dark:text-neu-300 trim-end-alphabetic mr-2 font-serif text-sm font-black">
           {name}
@@ -49,7 +53,7 @@ const {
       ))}
     </span>
   ) : (
-    <span aria-hidden="true" class="te-track" data-preview="1">
+    <span aria-hidden="true" class:list={["te-track", className]} style={style} data-preview="1">
       <Show when={name}>
         <span class="text-neu-600 dark:text-neu-300 trim-end-alphabetic mr-2 font-serif text-sm font-black">
           {name}
@@ -68,14 +72,26 @@ const {
 
 <script>
   // Module script — Astro deduplicates this across all Track instances.
-  // Delegation handles click on any interactive track toggle on the page.
+  // Cumulative fill: clicking box i marks 1..i; clicking the topmost marked
+  // box clears it. Tracks are progress meters, not independent checkboxes.
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
     const toggle = e.target.closest<HTMLElement>(
       ".te-track:not([data-preview]) > .te-toggle",
     );
-    if (!toggle) return;
-    const checked = toggle.getAttribute("aria-checked") === "true";
-    toggle.setAttribute("aria-checked", checked ? "false" : "true");
+    if (!toggle?.parentElement) return;
+    const toggles = [
+      ...toggle.parentElement.querySelectorAll<HTMLElement>(
+        ":scope > .te-toggle",
+      ),
+    ];
+    const i = toggles.indexOf(toggle);
+    const isChecked = (el: HTMLElement | undefined) =>
+      el?.getAttribute("aria-checked") === "true";
+    const isTop = isChecked(toggle) && !isChecked(toggles[i + 1]);
+    const fill = isTop ? i : i + 1;
+    toggles.forEach((t, j) =>
+      t.setAttribute("aria-checked", j < fill ? "true" : "false"),
+    );
   });
 </script>

@@ -14,11 +14,12 @@ import { Spread } from "../lib/Spread";
 const palettes = ["neu", "accent", "link"] as const;
 const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
 
-// label · utility class · png · native fallback
+// label · utility class · png · native fallback · preview size
 const cursors = [
   ["default", "", "default.png", "auto"],
   ["pointer", "cursor-pointer", "pointer.png", "pointer"],
   ["pointer active", "cursor-pointer", "pointer-active.png", "pointer"],
+  ["match", "cursor-match", "match.png", "pointer", "size-12"],
   ["text", "cursor-text", "text-select.png", "text"],
   ["not-allowed", "cursor-not-allowed", "not-allowed.png", "not-allowed"],
   ["wait", "cursor-wait", "wait.png", "wait"],
@@ -95,7 +96,7 @@ const fonts = [
       </p>
       <ul class="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {
-          cursors.map(([label, cls, png, native]) => (
+          cursors.map(([label, cls, png, native, size = "size-8"]) => (
             <li
               class={`${cls} border-neu-300 dark:border-neu-700 bg-neu-50 dark:bg-neu-800 flex flex-col items-center gap-2 rounded border p-4`}
               style={
@@ -105,9 +106,9 @@ const fonts = [
               <img
                 src={`/cursors/${png.replace(".png", "@2x.png")}`}
                 alt={label}
-                width="32"
-                height="32"
-                class="size-8"
+                width={size === "size-12" ? "48" : "32"}
+                height={size === "size-12" ? "48" : "32"}
+                class={size}
               />
               <span class="text-neu-600 text-xs">{label}</span>
             </li>
