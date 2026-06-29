@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" fill="currentColor">
-<g transform="translate(0.000000,1254.000000) scale(0.100000,-0.100000)"
+  <g transform="translate(0.000000,1254.000000) scale(0.100000,-0.100000)"
 fill="currentColor" stroke="none">
-<path d="M5913 12175 c-19 -20 -33 -45 -33 -60 0 -24 25 -58 48 -66 6 -2 12
+    <path transform="translate(-150, 0)" d="M5913 12175 c-19 -20 -33 -45 -33 -60 0 -24 25 -58 48 -66 6 -2 12
 -40 14 -86 4 -88 6 -84 -47 -87 -15 -1 -20 -8 -20 -31 0 -26 4 -30 27 -30 14
 0 28 -2 31 -5 3 -3 7 -52 8 -110 l3 -105 -57 -54 c-39 -37 -58 -49 -62 -40
 -27 77 -55 176 -55 194 0 14 9 26 26 33 20 10 25 18 22 40 -3 28 -17 32 -64
@@ -109,21 +109,21 @@ c38 -91 81 -213 86 -248 5 -32 13 -44 32 -51 14 -5 42 -23 63 -40 42 -33 42
 -39 26 -53 55 -47 11 3 52 8 90 11 l70 7 -24 -25 c-35 -38 -183 -108 -233
 -110 -39 -2 -42 0 -49 28 -8 35 -28 93 -40 117 -12 24 -49 131 -46 134 1 1 31
 15 67 31 l65 29 18 -70 c10 -39 22 -86 27 -105z"/>
-<path d="M6263 10904 c-7 -18 14 -35 34 -27 7 3 13 14 13 24 0 24 -38 26 -47
-3z"/>
-<path d="M6511 11886 c-14 -16 -9 -46 7 -46 5 0 15 7 22 16 11 12 11 18 -2 30
--13 13 -16 13 -27 0z"/>
-<path d="M6604 11886 c-3 -8 10 -42 30 -75 31 -53 33 -62 19 -69 -22 -13 -8
--32 23 -32 39 0 39 25 -2 109 -38 77 -59 97 -70 67z"/>
-<path d="M4434 11335 c-4 -9 -1 -22 5 -28 14 -14 87 -37 119 -37 12 0 22 -4
+    <path d="M6263 10904 c-7 -18 14 -35 34 -27 7 3 13 14 13 24 0 24 -38 26 -47
+3z" transform="translate(-150, 0)" />
+    <path d="M6511 11886 c-14 -16 -9 -46 7 -46 5 0 15 7 22 16 11 12 11 18 -2 30
+-13 13 -16 13 -27 0z" transform="translate(-150, 0)" />
+    <path d="M6604 11886 c-3 -8 10 -42 30 -75 31 -53 33 -62 19 -69 -22 -13 -8
+-32 23 -32 39 0 39 25 -2 109 -38 77 -59 97 -70 67z" transform="translate(-150, 0)" />
+    <path d="M4434 11335 c-4 -9 -1 -22 5 -28 14 -14 87 -37 119 -37 12 0 22 -4
 22 -10 0 -5 -7 -10 -16 -10 -28 0 -320 -88 -399 -121 -65 -26 -173 -76 -235
 -108 -36 -19 -110 -56 -165 -84 -334 -165 -754 -452 -755 -515 0 -30 10 -24
 97 54 73 65 299 217 453 306 130 76 496 259 600 301 47 19 126 47 175 62 50
 14 101 31 115 35 30 11 144 40 156 40 4 0 -20 -21 -55 -46 -57 -41 -70 -63
 -45 -71 5 -2 47 24 93 57 46 33 92 62 102 65 20 7 34 39 24 55 -3 5 -21 10
 -39 10 -31 0 -188 38 -228 55 -12 5 -20 2 -24 -10z"/>
-<path d="M1683 9803 c4 -3 10 -3 14 0 3 4 0 7 -7 7 -7 0 -10 -3 -7 -7z"/>
-<path d="M1359 8724 c-13 -14 -59 -51 -101 -82 -43 -30 -78 -61 -78 -68 0 -29
+    <path d="M1683 9803 c4 -3 10 -3 14 0 3 4 0 7 -7 7 -7 0 -10 -3 -7 -7z"/>
+    <path d="M1359 8724 c-13 -14 -59 -51 -101 -82 -43 -30 -78 -61 -78 -68 0 -29
 23 -23 80 21 33 25 60 44 60 42 0 -3 -15 -31 -33 -64 -45 -81 -117 -238 -117
 -257 0 -8 -4 -17 -9 -20 -4 -3 -11 -19 -15 -36 -3 -17 -11 -30 -18 -29 -39 5
 -54 -21 -22 -39 14 -8 13 -18 -6 -98 -11 -49 -28 -123 -36 -164 -14 -72 -62
@@ -143,15 +143,15 @@ c38 -91 81 -213 86 -248 5 -32 13 -44 32 -51 14 -5 42 -23 63 -40 42 -33 42
 -374 -2 -550 6 -157 7 -403 13 -547 14 -144 1 -264 4 -268 7 -9 9 37 124 105
 264 34 69 62 125 63 125 1 0 2 -35 2 -77 0 -71 2 -78 20 -78 18 0 20 6 17 55
 -2 30 4 90 13 133 9 42 13 82 10 87 -10 17 -31 11 -56 -16z"/>
-<path d="M1336 4932 c-3 -5 -8 -33 -11 -63 -4 -30 -14 -80 -22 -111 -9 -32
+    <path d="M1336 4932 c-3 -5 -8 -33 -11 -63 -4 -30 -14 -80 -22 -111 -9 -32
 -12 -65 -9 -74 12 -31 33 5 49 81 8 39 17 63 20 55 3 -8 21 -67 41 -130 57
 -179 101 -293 175 -453 23 -49 41 -90 41 -93 0 -9 96 -198 148 -291 169 -303
 452 -661 720 -913 102 -95 147 -124 147 -94 0 6 -56 64 -124 128 -343 324
 -614 688 -805 1081 -40 83 -80 166 -89 185 -8 19 -26 60 -40 90 -44 98 -191
 510 -182 510 1 0 25 -22 52 -50 49 -49 83 -64 83 -37 0 15 -166 187 -180 187
 -5 0 -11 -4 -14 -8z"/>
-<path d="M7373 2403 c4 -3 10 -3 14 0 3 4 0 7 -7 7 -7 0 -10 -3 -7 -7z"/>
-<path d="M5668 2353 c-18 -27 -50 -73 -71 -103 -21 -30 -52 -76 -69 -102 -16
+    <path d="M7373 2403 c4 -3 10 -3 14 0 3 4 0 7 -7 7 -7 0 -10 -3 -7 -7z"/>
+    <path d="M5668 2353 c-18 -27 -50 -73 -71 -103 -21 -30 -52 -76 -69 -102 -16
 -27 -35 -48 -41 -48 -13 0 -145 49 -272 100 -101 41 -244 90 -263 90 -15 0
 -13 -39 8 -155 5 -27 17 -105 27 -172 15 -108 20 -123 37 -123 16 0 18 5 12
 43 -28 179 -53 353 -51 355 5 6 101 -26 230 -78 208 -83 281 -109 292 -102 6
@@ -164,13 +164,13 @@ c38 -91 81 -213 86 -248 5 -32 13 -44 32 -51 14 -5 42 -23 63 -40 42 -33 42
 -31 -2 -4 4 -26 82 -49 173 -24 91 -46 169 -51 173 -4 5 -103 -53 -220 -128
 -117 -75 -217 -134 -224 -132 -6 3 -82 68 -168 146 -86 78 -159 141 -162 141
 -3 0 -20 -21 -38 -47z"/>
-<path d="M3115 2030 c-3 -5 6 -46 20 -92 14 -46 31 -100 37 -121 13 -43 25
+    <path d="M3115 2030 c-3 -5 6 -46 20 -92 14 -46 31 -100 37 -121 13 -43 25
 -54 40 -39 8 8 5 32 -10 84 -12 40 -22 76 -22 80 0 5 27 -12 60 -36 81 -60
 245 -162 355 -221 202 -108 606 -306 615 -300 6 3 10 12 10 18 0 7 -118 70
 -262 141 -143 71 -311 157 -373 191 -110 61 -368 225 -363 231 2 1 37 -4 78
 -12 76 -14 98 -9 87 20 -4 10 -19 16 -39 16 -18 0 -74 11 -123 25 -103 28
 -102 28 -110 15z"/>
-<path d="M4293 1873 c-31 -11 -27 -16 240 -296 77 -80 145 -154 153 -165 14
+    <path d="M4293 1873 c-31 -11 -27 -16 240 -296 77 -80 145 -154 153 -165 14
 -20 8 -22 -163 -77 -98 -32 -184 -63 -191 -69 -17 -17 -13 -20 123 -91 276
 -144 277 -145 263 -165 -7 -10 -65 -76 -128 -147 -204 -228 -231 -263 -197
 -263 43 1 352 33 512 54 105 14 210 28 235 31 169 19 251 25 258 21 7 -4 -3
@@ -188,43 +188,52 @@ c38 -91 81 -213 86 -248 5 -32 13 -44 32 -51 14 -5 42 -23 63 -40 42 -33 42
 104 0 3 33 16 73 28 232 70 272 86 272 108 0 15 -62 86 -190 219 -104 108
 -196 204 -203 214 -12 17 -5 18 145 14 249 -8 369 -14 387 -21 11 -4 16 -1 16
 10 0 11 10 16 33 17 63 3 -52 18 -173 24 -205 8 -455 13 -467 8z"/>
-<path d="M7490 1759 c0 -18 25 -24 117 -31 l32 -3 -74 -80 c-58 -63 -74 -87
+    <path d="M7490 1759 c0 -18 25 -24 117 -31 l32 -3 -74 -80 c-58 -63 -74 -87
 -74 -110 l0 -30 19 24 c11 13 57 64 103 113 45 49 83 94 85 99 5 13 -13 17
 -115 27 -85 7 -93 6 -93 -9z"/>
-<path d="M7490 1311 c0 -14 31 -38 113 -87 61 -37 127 -77 145 -89 l32 -22
+    <path d="M7490 1311 c0 -14 31 -38 113 -87 61 -37 127 -77 145 -89 l32 -22
 -87 -26 c-49 -14 -114 -33 -145 -42 -46 -13 -58 -21 -58 -36 0 -15 5 -19 18
 -15 9 3 67 19 127 36 172 49 205 61 205 75 0 7 -24 29 -52 47 -75 49 -287 178
 -293 178 -3 0 -5 -9 -5 -19z"/>
-</g>
-
-<g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-<path d="M700,118 C795,92 858,120 888,182"/>
-<path d="M872,160 L890,186 L902,158"/>
-<path d="M1040,272 C1078,300 1104,355 1106,408"/>
-<path d="M1092,386 L1107,412 L1121,388"/>
-<path d="M1086,580 C1112,690 1066,830 968,930 C905,994 852,1042 802,1086"/>
-<path d="M822,1074 L800,1088 L811,1059"/>
-</g>
-<path id="ctp" d="M802,1086 C852,1042 905,994 968,930 C1066,830 1112,690 1086,580" fill="none" stroke="none"/>
-<text font-size="40" font-family="var(--font-hand),'Caveat',cursive" transform="translate(2,-4)"><textPath href="#ctp" startOffset="6%">Challenges and Temptations</textPath></text>
-<text x="218" y="262" font-size="64" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >Return</text>
-<text x="235" y="318" font-size="40" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >(Gift of</text>
-<text x="235" y="358" font-size="40" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >the Goddess)</text>
-<text x="798" y="212" font-size="46" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >Call to</text>
-<text x="798" y="250" font-size="46" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >Adventure</text>
-<text x="1050" y="245" font-size="46" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >Supernatural</text>
-<text x="1050" y="285" font-size="46" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >aid</text>
-<text x="980" y="375" font-size="46" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >Threshold</text>
-<text x="980" y="410" font-size="46" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >Guardian(s)</text>
-<text x="1088" y="490" font-size="42" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >Threshold</text>
-<text x="1088" y="527" font-size="42" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >(beginning of</text>
-<text x="1088" y="562" font-size="42" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >transformation)</text>
-<text x="150" y="728" font-size="46" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >Atonement</text>
-<text x="268" y="1020" font-size="46" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >Transformation</text>
-<text x="590" y="1118" font-size="42" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >Abyss</text>
-<text x="590" y="1156" font-size="40" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" >death &amp; rebirth</text>
-<text x="600" y="1018" font-size="40" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" letter-spacing='3'>+ REVELATION +</text>
-<text x="602" y="408" font-size="46" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" letter-spacing='2'>known</text>
-<text x="607" y="498" font-size="46" font-family="var(--font-hand),'Caveat',cursive" text-anchor="middle" letter-spacing='2'>unknown</text>
-<text x="600" y="745" font-size="72" font-family="var(--font-serif),Georgia,serif" text-anchor="middle" >The Hero's Journey</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M728,120 C800,140 855,162 892,182"/>
+    <path d="M875,180 L897,185 L888,160" transform="rotate(-13 910 170)"/>
+    <path d="M1040,272 C1078,300 1104,355 1106,408"/>
+    <path d="M1092,386 L1107,412 L1121,388"/>
+    <path d="M1110,580 C1112,690 1066,830 968,930 C900,1000 848,1056 790,1086"/>
+    <path d="M787,1062 L788,1088 L812,1090"/>
+  </g>
+  <path id="ctp" d="M802,1086 C852,1042 905,994 968,930 C1066,830 1112,690 1086,580" fill="none" stroke="none"/>
+  <text font-size="40" transform="translate(0,-24)">
+    <textPath href="#ctp" startOffset="6%" text-anchor="start">Challenges and Temptations</textPath>
+  </text>
+  <text x="218" y="262" font-size="64" >Return</text>
+  <text x="195" y="318" font-size="40" >(Gift of</text>
+  <text x="215" y="358" font-size="40" >the Goddess)</text>
+  <text x="798" y="212" font-size="46" >Call to</text>
+  <text x="798" y="250" font-size="46" >Adventure</text>
+  <text x="1042" y="242" font-size="46" >Supernatural aid</text>
+  <text x="980" y="375" font-size="46" >Threshold</text>
+  <text x="980" y="410" font-size="46" >Guardian(s)</text>
+  <text x="1088" y="490" font-size="42" >Threshold</text>
+  <text x="1088" y="527" font-size="42" >(beginning of</text>
+  <text x="1088" y="562" font-size="42" >transformation)</text>
+  <text x="150" y="728" font-size="46" >Atonement</text>
+  <text x="268" y="1020" font-size="46" >Transformation</text>
+  <text x="600" y="1105" font-size="42" >Abyss</text>
+  <text x="600" y="1140" font-size="40" >death &amp; rebirth</text>
+  <text x="600" y="980" font-size="40" letter-spacing='3'>+ REVELATION +</text>
+  <text x="602" y="408" font-size="46" letter-spacing='2'>known</text>
+  <text x="607" y="498" font-size="46" letter-spacing='2'>unknown</text>
+  <text x="600" y="740" font-size="60" class="serif">The Hero's Journey</text>
+  <style>
+  text {
+    font-family: var(--font-hand);
+    text-anchor: middle;
+  }
+  .serif {
+    font-family: var(--font-serif);
+  }
+</style>
 </svg>
