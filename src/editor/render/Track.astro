@@ -1,8 +1,8 @@
 ---
 // Render-side counterpart to the editor's <Track> atom. Two variants:
 // - value (controlled): inert aria-hidden spans, same as editor TrackPreview.
-// - defaultValue (uncontrolled): real buttons with click delegation via a
-//   module script so the published track is interactive.
+// - defaultValue (uncontrolled): one interactive ARIA slider with click +
+//   keyboard delegation via a module script so the published track works.
 import { Show } from "solid-js";
 
 import { resolveTrackProps } from "../track-props";
@@ -35,25 +35,40 @@ const style = Astro.props.style;
 
 {
   interactive ? (
-    <span class:list={["te-track", className]} style={style}>
+    // Cumulative fill = a range control, not independent checkboxes. Expose
+    // the whole track as one slider; segments are presentational fill hooks.
+    <span
+      class:list={["te-track", className]}
+      style={style}
+      role="slider"
+      tabindex="0"
+      aria-valuemin={0}
+      aria-valuemax={maxVal}
+      aria-valuenow={fill}
+      aria-valuetext={`${fill} of ${maxVal}`}
+      aria-label={name ?? shape}
+    >
       <Show when={name}>
         <span class="text-neu-600 dark:text-neu-300 trim-end-alphabetic mr-2 font-serif text-sm font-black">
           {name}
         </span>
       </Show>
       {Array.from({ length: maxVal }, (_, i) => (
-        <button
-          type="button"
+        <span
           class="te-toggle"
           data-shape={shape}
-          role="checkbox"
+          aria-hidden="true"
           aria-checked={i < fill ? "true" : "false"}
-          aria-label={shape}
         />
       ))}
     </span>
   ) : (
-    <span aria-hidden="true" class:list={["te-track", className]} style={style} data-preview="1">
+    <span
+      aria-hidden="true"
+      class:list={["te-track", className]}
+      style={style}
+      data-preview="1"
+    >
       <Show when={name}>
         <span class="text-neu-600 dark:text-neu-300 trim-end-alphabetic mr-2 font-serif text-sm font-black">
           {name}
@@ -72,26 +87,68 @@ const style = Astro.props.style;
 
 <script>
   // Module script — Astro deduplicates this across all Track instances.
-  // Cumulative fill: clicking box i marks 1..i; clicking the topmost marked
-  // box clears it. Tracks are progress meters, not independent checkboxes.
+  // The track is one ARIA slider; segments are presentational fill. Sync the
+  // segment fill (CSS hook) and the slider's reported value together.
+  function setFill(track: Element, fill: number) {
+    const toggles = [
+      ...track.querySelectorAll<HTMLElement>(":scope > .te-toggle"),
+    ];
+    const next = Math.max(0, Math.min(fill, toggles.length));
+    toggles.forEach((t, j) =>
+      t.setAttribute("aria-checked", j < next ? "true" : "false"),
+    );
+    track.setAttribute("aria-valuenow", String(next));
+    track.setAttribute("aria-valuetext", `${next} of ${toggles.length}`);
+  }
+
+  // Pointer: clicking segment i fills 1..i; clicking the topmost filled
+  // segment clears it.
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
     const toggle = e.target.closest<HTMLElement>(
       ".te-track:not([data-preview]) > .te-toggle",
     );
-    if (!toggle?.parentElement) return;
+    const track = toggle?.parentElement;
+    if (!track) return;
     const toggles = [
-      ...toggle.parentElement.querySelectorAll<HTMLElement>(
-        ":scope > .te-toggle",
-      ),
+      ...track.querySelectorAll<HTMLElement>(":scope > .te-toggle"),
     ];
     const i = toggles.indexOf(toggle);
     const isChecked = (el: HTMLElement | undefined) =>
       el?.getAttribute("aria-checked") === "true";
     const isTop = isChecked(toggle) && !isChecked(toggles[i + 1]);
-    const fill = isTop ? i : i + 1;
-    toggles.forEach((t, j) =>
-      t.setAttribute("aria-checked", j < fill ? "true" : "false"),
+    setFill(track, isTop ? i : i + 1);
+  });
+
+  // Keyboard: slider arrow/Home/End semantics.
+  document.addEventListener("keydown", (e) => {
+    if (!(e.target instanceof Element)) return;
+    const track = e.target.closest<HTMLElement>(
+      '.te-track[role="slider"]:not([data-preview])',
     );
+    if (!track) return;
+    const now = Number(track.getAttribute("aria-valuenow")) || 0;
+    const max = track.querySelectorAll(":scope > .te-toggle").length;
+    let next: number;
+    switch (e.key) {
+      case "ArrowRight":
+      case "ArrowUp":
+        next = now + 1;
+        break;
+      case "ArrowLeft":
+      case "ArrowDown":
+        next = now - 1;
+        break;
+      case "Home":
+        next = 0;
+        break;
+      case "End":
+        next = max;
+        break;
+      default:
+        return;
+    }
+    e.preventDefault();
+    setFill(track, next);
   });
 </script>
