@@ -13,10 +13,10 @@ export function Link(props: LinkProps) {
     <a
       classList={{
         ...own.classList,
-        "underline underline-offset-4 decoration-neu-300 [.zaduma-prose_&:not(:hover)]:decoration-neu-400 dark:decoration-neu-600 dark:[.zaduma-prose_&:not(:hover)]:decoration-neu-500 hover:decoration-link-600 dark:hover:decoration-link-500 focus:decoration-link-600 dark:focus:decoration-link-500":
+        "underline underline-offset-4 decoration-neu-300 [.zaduma-prose_&:not(:hover)]:decoration-neu-400 dark:decoration-neu-600 dark:[.zaduma-prose_&:not(:hover)]:decoration-neu-500 hover:decoration-link-600 dark:hover:decoration-link-500 focus:decoration-link-600 dark:focus:decoration-link-500 link-highlight":
           !own.noUnderline,
         "no-underline": !!own.noUnderline,
-        "p-2 -mx-2 transition-colors relative": true,
+        "p-2 -mx-2 relative": true,
         "zaduma-image-box": childIsImg(),
       }}
       {...rest}

@@ -7,7 +7,9 @@ test.describe("published post render parity", () => {
 
   test("renders section headings", async ({ page }) => {
     for (const name of ["Mechanics", "Goals", "Pyre", "DM Moves"]) {
-      await expect(page.getByRole("heading", { name })).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: new RegExp(`^${name}`) }),
+      ).toBeVisible();
     }
   });
 
@@ -22,7 +24,7 @@ test.describe("published post render parity", () => {
     await expect(card.locator('input[type="checkbox"]')).toHaveCount(0);
     await expect(card.getByRole("heading", { name: "Bellow" })).toHaveAttribute(
       "id",
-      "bellow-title",
+      "bellow",
     );
     await expect(card).toContainText(
       "introduce a fact or narrative detail from your past life",

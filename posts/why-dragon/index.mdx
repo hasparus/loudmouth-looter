@@ -6,6 +6,8 @@ excerpt:
   blocks: 3
 ---
 
+import HerosJourney from "./heros-journey.svg";
+
 tldr: I wrote a small game kinda by accident. get it [on itch.io]
 
 [on itch.io]: https://hasparus.itch.io/
@@ -85,8 +87,10 @@ Dragon's Armor, while we learn who they are and where they come from.
 > A Bard: "I sang for the duke and then we partied way too much. The guy loves
 > me. He'll help us for sure."
 
-Instead of paying with a meta-currency, we get it once per game. We know
-something about the Hunters' past, but not _why_ they face the Dragon.
+Instead of paying with a meta-currency, we get it once per game. Fits my 2-hour
+constraint and leaves me room for meta-currencies I wanna explore later.
+
+We know something about the Hunters' past, but not _why_ they face the Dragon.
 
 ### Goals
 
@@ -129,7 +133,30 @@ When your Goal _leads you into danger or costs you_ something, take **1 XP**.
 The **Pyre** is your doom track. Think inverse health pool. Fill the fourth box
 and you're **consumed**, dead or worse.
 
-<Track name="Pyre" defaultValue={2} max={4} />
+import fire from "../../src/fire.svg?url";
+
+<Track
+  name="Pyre"
+  defaultValue={2}
+  max={4}
+  style={`--fire: url("${fire}")`}
+  class="[&:has(.te-toggle:last-child[aria-checked=true])_.te-toggle]:text-accent-700! dark:[&:has(.te-toggle:last-child[aria-checked=true])_.te-toggle]:text-accent-400! [&_.te-toggle:last-child]:before:bg-neu-400! [&_.te-toggle:last-child:hover]:before:bg-neu-800! dark:[&_.te-toggle:last-child]:before:bg-neu-300! [&:has(.te-toggle:last-child[aria-checked=true])_.te-toggle:last-child]:before:bg-accent-700! dark:[&:has(.te-toggle:last-child[aria-checked=true])_.te-toggle:last-child]:before:bg-accent-400! [&_.te-toggle:last-child]:cursor-match [&:has(.te-toggle:last-child:hover)_.te-toggle]:animate-jitter [&_.te-toggle:last-child]:before:size-[0.82em]! [&_.te-toggle:last-child]:before:transform-none! [&_.te-toggle:last-child]:before:shadow-none! [&_.te-toggle:last-child]:before:[clip-path:none]! [&_.te-toggle:last-child]:before:[mask:var(--fire)_center/contain_no-repeat]!"
+/>
+
+<style>
+  {
+    /* css */ `
+    .te-track:has(.te-toggle:last-child:hover) .te-toggle:nth-last-child(2) {
+      animation-delay: 33ms;
+    }
+    .te-track:has(.te-toggle:last-child:hover) .te-toggle:nth-last-child(3) {
+      animation-delay: 66ms;
+    }
+    .te-track:has(.te-toggle:last-child:hover) .te-toggle:nth-last-child(4) {
+      animation-delay: 99ms;
+    }`
+  }
+</style>
 
 The game is about the Dragon, tactical storytelling and problem-solving, sure,
 but also about the relation of our heroes to the Dragon and what they are
@@ -138,27 +165,33 @@ willing to sacrifice to defeat it.
 **Consumed** doesn't mean "out of the game". If dying is boring, maybe you turn
 against your friends as corrupted villains or undead servants of the dracolich.
 The DM will feel responsible for time management, so we leave the exact timing
-and nature of your fall to them. This is usually an "opportunity for a cost"
-moment.
+and nature of your fall to them.
 
-That's goals, but we need some baseline dice resolution, stats and a catch-all
-move.
+This is usually an "opportunity for a cost" moment. Fáfnir was born a dwarf; his
+greed turned him into a dragon.
 
-I'm taking 3 stats, Body, Wits and Soul. I reserve the right to attack them as a
-DM move if it doesn't make sense to bump **Pyre**, or the time management of the
-game demands that. From the perspective of the genre, fighting a dragon is
-_exhausting_.
+That's goals, the _"Why"_ part of the title. We know something about the _"You"_
+part: the Hunters, their Classes, though I don't think it's enough. How else do
+they differ from each other? And how do they _"Fight"_?
+
+We need some baseline dice resolution, stats and a catch-all move.
+
+### Stats
+
+I'm taking 3 stats, Body, Wits and Soul. The Dragon will attack them, dealing
+damage like **-2 Body** or **-1 Soul**. From the perspective of the genre,
+fighting a dragon is _exhausting_.
 
 > Distribute values from -2 to +2 so that their total equals +1. Ignoring order:
 > `(+2, 0, -1); (+1, +1, -1); (+1, 0, 0); (+2, +1, -2)`
 >
-> **Body:** Physical strength and stamina.\
-> **Wits:** Mental acuity and perception.\
+> **Body:** Physical strength and stamina.\ **Wits:** Mental acuity and
+> perception.\
 > **Soul:** Arcane potency and spiritual force.
 >
 > <span data-no-italic />
 
-I'm gonna base a catch-all on Jeremy Strandberg's [Defy Danger, Restated]. In
+I'm gonna base the catch-all on Jeremy Strandberg's [Defy Danger, Restated]. In
 the small little village called ~~Stonetop~~ CC BY-SA 4.0, sharing is caring.
 
 [Defy Danger, Restated]:
@@ -171,8 +204,7 @@ the small little village called ~~Stonetop~~ CC BY-SA 4.0, sharing is caring.
 When the _stakes are dire, danger is imminent, and you act anyway_, roll:
 
 - **+Body** to endure, act fast or with finesse
-- **+Wits** to apply expertise, diplomacy, enact a clever plan, or rely on
-  senses
+- **+Wits** to apply expertise, enact a clever plan, or rely on senses
 - **+Soul** to invoke the arcane, unleash mystical forces, resist esoteric
   energies
 
@@ -194,6 +226,10 @@ complication.
 
 In all moves calling for a roll: **On 6-**, the player marks **1 XP** and the DM
 makes a move.
+
+**Face Fury** is the baseline: you against the obstacle, you against the Dragon.
+Most often, it won't be just you. Others will jump in to help or, chasing their
+own Goals, interfere with your actions.
 
 <Move illuminated isBaseMove>
 
@@ -224,12 +260,50 @@ to stop what they're doing and get 1 XP.\
 
 <Move illuminated isBaseMove>
 
+### Turn to Ash
+
+When one of your Stats gets to **-3** or lower, set it to **-3** and raise Pyre
+by **1**. If your Pyre is **4**, you're consumed. Otherwise, you're downed: you
+succumb to your wounds for the time being.
+
+</Move>
+
+<aside>
+  Can you **Stoke the Fire** while your stat gets lowered to **-3** to raise
+  Pyre anyway, but eke out a fail forward? Maybe. I leave it to the DM's
+  discretion and player munchkin instincts.
+</aside>
+
+A downed Hunter goes back up when his companions help him or the smoke clears
+and the scene ends.
+
+**Turn to Ash** and **Pyre** is how we go down, but we could use a little bit of
+going up as a palate cleanser. We also need an XP sink. I love XP-on-Miss: it
+incentivizes the players to play courageously and embrace setbacks.
+
+<Move illuminated isBaseMove>
+
 ### Level Up
 
 When you _have **4 XP** or more, and a moment of rest_, spend **4 XP** to raise
 one of your stats by **+1** (up to **+3**) or clear **1 Pyre**.
 
 </Move>
+
+The Hunters can use XP to get stronger or postpone their doom. They can also
+hoard it until the end of the game, until the **Aftermath**, to affect the world
+and have more to say in the epilogue.
+
+<HerosJourney
+  role="img"
+  aria-label="The Hero's Journey"
+  className="mx-auto w-140 max-w-full"
+/>
+
+The Hero's Journey doesn't end when the Dragon is defeated. There's still
+Transformation, Atonement and Return. Our session time is limited, so instead of
+playing it out, please forgive me and brace for the longest procedure you've
+ever read in a game.
 
 <Move illuminated isBaseMove>
 
@@ -282,7 +356,7 @@ Tis but a write-up for people who already played a lot of games. I'm playing
 this with a list yoinked from Stonetop, because I have it engraved in my brain.
 _"Reveal an unwelcome truth"_ creates a new situational armor or tells us
 something about existing legendary armor. "Hurt someone" allows me to hurt them
-narratively and also mark _**Pyre**_.
+narratively and burn their stats.
 
 <aside>
   If you've read this far without reading [1 HP Dragon], "Armor" is an obstacle,
@@ -308,6 +382,13 @@ _Escape_.
   </q>
 </aside>
 
+### Marking Pyre
+
+I feel like it'd be rude for me, a mere Dragon Minder, to force them to mark
+Pyre directly. I'd rather attack their stats. Instead of falling down the
+Hunters may say "Hell no, I'm not going down like that!" and trigger **Stoke the
+Fire** or **Relinquish their Goal**.
+
 ## Narrative Structure
 
 Running this at [Bazyliszek](https://bazyliszek.ava.waw.pl/), I'm basically
@@ -327,13 +408,20 @@ planning to do a few rounds around the table.
    who gave up on his quest for forbidden Knowledge now teaching kids at a
    school?
 
-Thanks to my dear friend
-[Zack Thomson](https://bsky.app/profile/zackthomson.bsky.social) for talking it
-out with me on Discord and helping me come up with something semi-decent.
+## The End
+
+That's basically the game. Well, at least a part of it. Go grab a PDF [on
+itch.io]. \
+You've run stuff, you'll be fine. Play it, make your Class a "High-school
+Teacher" and fight the Dragon of "Late-stage Capitalism". Or don't play it, just
+yoink what you like and make your own game.
+
+Ideas, complaints, insults or accolades?
+[Mail me](mailto:piotr@monwid-olechnowicz.com) all about it. If you get a chance
+to play, [BlueSky me](https://bsky.app/profile/haspar.us) why you fought it and
+if it was worth it.
 
 ---
-
-<footer>
 
 ## Prior Art & Attributions
 
@@ -343,11 +431,13 @@ game with the DM moves from his [Stonetop] **or** [Monster of the Week] Keeper
 moves by Mike Sands. The ruleset in this post is shared under [CC BY-SA 4.0].
 All the images in this article are public domain.
 
+Thanks to my dear friend
+[Zack Thomson](https://bsky.app/profile/zackthomson.bsky.social) for talking it
+out with me on Discord and helping me come up with something semi-decent.
+
 [Stonetop]: https://www.lampblackandbrimstone.com/
 [Monster of the Week]: https://evilhat.com/product/monster-of-the-week/
 [CC BY-SA 4.0]: https://creativecommons.org/licenses/by-sa/4.0/
-
-</footer>
 
 <figure className='*:first:dark:opacity-80 mt-10'>
 
@@ -359,3 +449,9 @@ All the images in this article are public domain.
 </figcaption>
 
 </figure>
+
+## Addendum
+
+- If you'd like to get some more flavor and immersion for the price of lowered
+  accessibility, you can say _Raise Pyre_ instead of _Mark 1 Pyre_ and _Burn 1
+  Body_ instead of _Take -1 Body_.
