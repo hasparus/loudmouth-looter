@@ -43,6 +43,7 @@ const postSchema = blogPostingSchema({
   title={frontmatter.title}
   ogImage={ogImage}
   description={description}
+  ogType="article"
 >
   <JsonLd data={postSchema} slot="head" />
   <div class="zaduma-prose zaduma-prose-grid py-4">

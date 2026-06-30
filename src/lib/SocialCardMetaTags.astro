@@ -1,15 +1,28 @@
 ---
+import { SITE_NAME } from "./siteMeta";
+
 interface Props {
+  title: string;
+  description: string;
   ogImage: string | undefined;
+  /** "article" for posts; default "website". */
+  ogType?: "website" | "article";
 }
 
-let { ogImage } = Astro.props;
+let { title, description, ogImage, ogType = "website" } = Astro.props;
 
 if (ogImage) {
   ogImage = new URL(ogImage, import.meta.env.PUBLIC_URL).href;
 }
 ---
 
+<meta property="og:type" content={ogType} />
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+{
+  /* twitter:title/description fall back to og:* — no need to repeat them. */
+}
 {
   ogImage && (
     <>
