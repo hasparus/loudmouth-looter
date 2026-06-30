@@ -2,8 +2,8 @@
   <circle cx="50" cy="50" r="50" fill="rgb(23 23 23)" />
   <text x="50" y="55" font-size="86" dominant-baseline="central" text-anchor="middle">☞</text>
   <style>
-    text{fill:#B91C1B;}
+    text{fill:#B91C1B;stroke:#B91C1B;stroke-width:2;paint-order:stroke;}
     circle{fill:#FBF8F4;}
-    @media (prefers-color-scheme:dark){text{fill:#F87171;}circle{fill:#1F1D1C;}}
+    @media (prefers-color-scheme:dark){text{fill:#F87171;stroke:#F87171;}circle{fill:#1F1D1C;}}
   </style>
 </svg>
