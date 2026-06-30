@@ -18,7 +18,8 @@ export interface PostFrontmatter {
   img?:
     | string
     | {
-        /** Image for the Open Graph social card. */
+        /** A ready-made Open Graph image, served directly instead of the
+         *  generated /api/og card. Relative (`./og-image.webp`) or absolute. */
         og?: string;
         /** Image for the post header.` */
         src?: string;
