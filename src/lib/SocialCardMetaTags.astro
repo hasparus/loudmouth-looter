@@ -5,26 +5,29 @@ interface Props {
   title: string;
   description: string;
   ogImage: string | undefined;
+  /** "article" for posts; default "website". */
+  ogType?: "website" | "article";
 }
 
-let { title, description, ogImage } = Astro.props;
+let { title, description, ogImage, ogType = "website" } = Astro.props;
 
 if (ogImage) {
   ogImage = new URL(ogImage, import.meta.env.PUBLIC_URL).href;
 }
 ---
 
-<meta property="og:type" content="website" />
+<meta property="og:type" content={ogType} />
 <meta property="og:site_name" content={SITE_NAME} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
+{
+  /* twitter:title/description fall back to og:* — no need to repeat them. */
+}
 {
   ogImage && (
     <>
       <meta property="og:image" content={ogImage} />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
     </>
   )

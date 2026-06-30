@@ -12,7 +12,7 @@ import Marginalia from "../lib/Marginalia.astro";
 import ScrollbarStyles from "../lib/ScrollbarStyles.astro";
 import { websiteSchema } from "../lib/seo/jsonLd";
 import JsonLd from "../lib/seo/JsonLd.astro";
-import { SITE_NAME } from "../lib/siteMeta";
+import { SITE_BLURB, SITE_NAME } from "../lib/siteMeta";
 import SocialCardMetaTags from "../lib/SocialCardMetaTags.astro";
 import type { PostFrontmatter } from "../types";
 
@@ -27,11 +27,16 @@ interface Props {
   description: string;
   children: astroHTML.JSX.Element;
   ogImage?: string;
+  /** "article" for posts; default "website". */
+  ogType?: "website" | "article";
   /** Live multiplayer cursors. On by default; opt out per page (e.g. admin). */
   cursors?: boolean;
 }
 
-const { title, description, ogImage, cursors = true } = Astro.props;
+const { title, ogImage, ogType, cursors = true } = Astro.props;
+// Fall back to the site blurb so description-less pages still get a non-empty
+// meta/og description instead of empty tags that SEO validators flag.
+const description = Astro.props.description || SITE_BLURB;
 
 const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
   "../../posts/**/*.mdx",
@@ -119,6 +124,7 @@ const hasHeaderContent = Astro.slots.has("header-content");
       title={title}
       description={description}
       ogImage={ogImage}
+      ogType={ogType}
     />
 
     <link rel="canonical" href={canonical} />
