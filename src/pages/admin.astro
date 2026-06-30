@@ -1,17 +1,18 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { createOgImageLink } from "../lib/createOgImageLink";
 import { Link } from "../lib/Link";
+import { resolvePostOgImage } from "../lib/ogImage";
 import type { PostFrontmatter } from "../types";
 
 const postModules = import.meta.glob<{ frontmatter: PostFrontmatter }>(
   "../../posts/**/*.mdx",
   { eager: true },
 );
-const posts = Object.values(postModules);
 
-const linksToOGImages = posts.map((post) =>
-  createOgImageLink(post.frontmatter),
+const linksToOGImages = await Promise.all(
+  Object.entries(postModules).map(([file, post]) =>
+    resolvePostOgImage(post.frontmatter, file),
+  ),
 );
 ---
 
