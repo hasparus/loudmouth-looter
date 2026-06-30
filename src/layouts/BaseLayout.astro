@@ -1,6 +1,7 @@
 ---
 import crimsonItalicPath from "@fontsource/crimson-text/files/crimson-text-latin-400-italic.woff2";
 import crimsonPath from "@fontsource/crimson-text/files/crimson-text-latin-400-normal.woff2";
+import Analytics from "@vercel/analytics/astro";
 
 import InitColorScheme from "../lib/color-scheme/InitColorScheme.astro";
 import { Commands } from "../lib/Commands";
@@ -114,7 +115,11 @@ const hasHeaderContent = Astro.slots.has("header-content");
       ))
     }
 
-    <SocialCardMetaTags ogImage={ogImage} />
+    <SocialCardMetaTags
+      title={title}
+      description={description}
+      ogImage={ogImage}
+    />
 
     <link rel="canonical" href={canonical} />
     {
@@ -157,6 +162,8 @@ const hasHeaderContent = Astro.slots.has("header-content");
       {cursors && <CursorParty />}
       <Marginalia />
     </main>
+
+    <Analytics />
 
     <script>
       // Show the pointer-active (pinched) cursor the instant a clickable is
