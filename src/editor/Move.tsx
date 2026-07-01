@@ -123,7 +123,7 @@ function MoveWithTitle(props: MoveWithTitleProps) {
   );
 }
 
-function BaseMove(props: MoveProps) {
+function EditorMove(props: MoveProps) {
   const [, rest] = splitProps(props, [
     "checkboxes",
     "children",
@@ -152,7 +152,7 @@ function BaseMove(props: MoveProps) {
 
 export function Move(props: MoveProps) {
   return (
-    <Show when={props.title} fallback={<BaseMove {...props} />}>
+    <Show when={props.title} fallback={<EditorMove {...props} />}>
       {(title) => <MoveWithTitle {...props} title={title()} />}
     </Show>
   );
