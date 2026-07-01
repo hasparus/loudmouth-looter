@@ -1,4 +1,4 @@
-import { Index, type JSX, Show } from "solid-js";
+import { Index, type JSX, Show, splitProps } from "solid-js";
 
 import { Heading } from "../lib/prose/Heading";
 
@@ -9,7 +9,6 @@ import { slugFromTitle } from "./move-props";
 export interface MoveProps extends JSX.HTMLAttributes<HTMLElement> {
   checkboxes?: number;
   children: JSX.Element;
-  className?: string;
   id?: string;
   illuminated?: boolean;
   isBaseMove?: boolean;
@@ -33,7 +32,7 @@ function MoveWithTitle(props: MoveWithTitleProps) {
       class={cn(
         MOVE_ARTICLE_CLASS,
         props.illuminated ? "te-move-illuminated" : undefined,
-        props.className,
+        props.class,
         isSmall() ? "space-y-2" : undefined,
       )}
     >
@@ -125,17 +124,32 @@ function MoveWithTitle(props: MoveWithTitleProps) {
 }
 
 export function Move(props: MoveProps) {
+  const [, rest] = splitProps(props, [
+    "checkboxes",
+    "children",
+    "class",
+    "illuminated",
+    "isBaseMove",
+    "requirement",
+    "resourceName",
+    "resources",
+    "size",
+    "title",
+  ]);
   return (
     <Show
       when={props.title}
       fallback={
         <article
-          {...props}
+          {...rest}
           class={cn(
             "te-move",
             props.illuminated ? "te-move-illuminated" : undefined,
+            props.class,
           )}
-        />
+        >
+          {props.children}
+        </article>
       }
     >
       {(title) => <MoveWithTitle {...props} title={title()} />}
