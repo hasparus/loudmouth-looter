@@ -187,7 +187,7 @@ const baseRules = {
   "no-useless-constructor": "off",
   "prefer-rest-params": "error",
   "prefer-spread": "error",
-  "prefer-const": "warn",
+  "prefer-const": ["warn", { destructuring: "all" }],
   "no-var": "off",
   "@typescript-eslint/array-type": "off",
   "@typescript-eslint/ban-tslint-comment": "off",

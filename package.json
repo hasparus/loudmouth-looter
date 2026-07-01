@@ -66,6 +66,7 @@
     "@edgeandnode/eslint-config": "^2.0.3",
     "@eslint/compat": "^2.1.0",
     "@happy-dom/global-registrator": "20.10.1",
+    "@hasparus/eslint-config": "2.1.1",
     "@playwright/test": "1.60.0",
     "@types/bun": "1.3.14",
     "@types/hast": "3.0.4",
