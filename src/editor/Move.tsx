@@ -123,7 +123,7 @@ function MoveWithTitle(props: MoveWithTitleProps) {
   );
 }
 
-export function Move(props: MoveProps) {
+function BaseMove(props: MoveProps) {
   const [, rest] = splitProps(props, [
     "checkboxes",
     "children",
@@ -137,21 +137,22 @@ export function Move(props: MoveProps) {
     "title",
   ]);
   return (
-    <Show
-      when={props.title}
-      fallback={
-        <article
-          {...rest}
-          class={cn(
-            "te-move",
-            props.illuminated ? "te-move-illuminated" : undefined,
-            props.class,
-          )}
-        >
-          {props.children}
-        </article>
-      }
+    <article
+      {...rest}
+      class={cn(
+        "te-move",
+        props.illuminated ? "te-move-illuminated" : undefined,
+        props.class,
+      )}
     >
+      {props.children}
+    </article>
+  );
+}
+
+export function Move(props: MoveProps) {
+  return (
+    <Show when={props.title} fallback={<BaseMove {...props} />}>
       {(title) => <MoveWithTitle {...props} title={title()} />}
     </Show>
   );
