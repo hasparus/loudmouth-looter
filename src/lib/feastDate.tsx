@@ -71,27 +71,30 @@ export const feastDate = (date: string | number | Date) => {
     for (const yr of [y - 1, y, y + 1]) {
       const d = Math.round(
         (t.getTime() -
-          new Date(Date.UTC(yr, Math.trunc(md / 100) - 1, md % 100)).getTime()) /
-        864e5,
+          new Date(
+            Date.UTC(yr, Math.trunc(md / 100) - 1, md % 100),
+          ).getTime()) /
+          864e5,
       );
       if (Math.abs(d) < Math.abs(n) || (Math.abs(d) === Math.abs(n) && d > n))
         ((n = d), (best = la));
     }
   let feast: string;
   switch (n) {
-  case 0: {
-  feast = `in festo ${best}`;
-  break;
-  }
-  case 1: {
-  feast = `crastino ${best}`;
-  break;
-  }
-  case -1: {
-  feast = `vigilia ${best}`;
-  break;
-  }
-  default: feast = `${W[t.getUTCDay()]} ${n > 0 ? "post" : "ante"} f. ${best}`;
+    case 0: {
+      feast = `in festo ${best}`;
+      break;
+    }
+    case 1: {
+      feast = `crastino ${best}`;
+      break;
+    }
+    case -1: {
+      feast = `vigilia ${best}`;
+      break;
+    }
+    default:
+      feast = `${W[t.getUTCDay()]} ${n > 0 ? "post" : "ante"} f. ${best}`;
   }
   return `${feast} ${romanYear(y)}`;
 };

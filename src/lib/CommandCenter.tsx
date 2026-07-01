@@ -28,7 +28,7 @@ type CommandCenterCtx = {
   onSelectedUnmount: () => void;
   getInputValue: () => string;
 };
-// eslint-disable-next-line @typescript-eslint/no-empty-function
+// eslint-disable-next-line @typescript-eslint/no-empty-function -- default context handlers are intentional no-ops
 const noop = () => {};
 const CommandCenterCtx = createContext<CommandCenterCtx>({
   inputId: "",
