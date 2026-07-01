@@ -42,7 +42,7 @@ export function Commands(props: {
     <CommandCenter inputId={INPUT_ID}>
       <CommandCenterTrigger
         classList={{
-          "zaduma-hover-before h-12 w-12 before:rounded-none! dark:text-neu-400 dark:hover:text-neu-300 hover:duration-0 trim-cap-alphabetic [&>span]:block [&>span]:translate-y-px": true,
+          "zaduma-hover-before size-12 before:rounded-none! dark:text-neu-400 dark:hover:text-neu-300 hover:duration-0 trim-cap-alphabetic [&>span]:block [&>span]:translate-y-px": true,
           [props.class ?? ""]: true,
         }}
       />
@@ -160,9 +160,7 @@ export function CommandsPalette(props: {
     <CommandCenterDialog
       onClose={() => setPage(undefined)}
       ref={(ref) => (dialog = ref)}
-      class={
-        "border-neu-300 bg-neu-50 font-text shadow-neu-950/40 backdrop:bg-neu-950/20 dark:border-neu-700 dark:bg-neu-900 max-w-container relative w-full transform flex-col overflow-hidden p-0 transition-all [&[open]]:flex"
-      }
+      class="border-neu-300 bg-neu-50 font-text shadow-neu-950/40 backdrop:bg-neu-950/20 dark:border-neu-700 dark:bg-neu-900 max-w-container relative w-full transform flex-col overflow-hidden p-0 transition-all [[open]]:flex"
     >
       <div class="flex items-center gap-2 px-3 pt-3">
         <span
@@ -278,9 +276,7 @@ function CommandItem(props: CommandItemProps) {
 
   return (
     <CommandCenterItem
-      class={
-        "zaduma-hover-before selected:text-neu-900 hover:text-neu-900 dark:selected:text-neu-100 dark:hover:text-neu-100 text-neu-700 dark:text-neu-300 relative flex w-full cursor-pointer items-center justify-between p-2 no-underline transition-colors before:rounded-none! hover:bg-none"
-      }
+      class="zaduma-hover-before selected:text-neu-900 hover:text-neu-900 dark:selected:text-neu-100 dark:hover:text-neu-100 text-neu-700 dark:text-neu-300 relative flex w-full cursor-pointer items-center justify-between p-2 no-underline transition-colors before:rounded-none! hover:bg-none"
       tabIndex={-1}
       onClick={() => {
         if (own.shortcut) own.onClick!(own.shortcut);

@@ -19,6 +19,22 @@ export default [
   },
 
   {
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: [
+            "*.config.*",
+            "*.mjs",
+            "*.js",
+            ".github/scripts/*.mjs",
+            ".github/scripts/*.ts",
+          ],
+        },
+      },
+    },
+  },
+
+  {
     files: ["src/**/*.ts"],
     ignores: ["**/*.d.ts", "**/*.xml.ts", "**/*.txt.ts", "**/*.md.ts"],
     plugins: { "check-file": checkFile },

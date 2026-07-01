@@ -34,7 +34,8 @@ export async function resolvePostOgImage(
     );
   }
 
-  return (await image()).default.src;
+  const { default: resolved } = await image();
+  return resolved.src;
 }
 
 function createOgImageLink(frontmatter: PostFrontmatter) {

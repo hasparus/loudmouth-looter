@@ -132,7 +132,7 @@ function buildExcerptReturn(
   if (childrenProp?.type !== "ArrayExpression") return null;
 
   const picked = pickLede(childrenProp.elements, blocks);
-  if (!picked.length) return null;
+  if (picked.length === 0) return null;
 
   const cloned = clone(root);
   const clonedChildren = findChildren(cloned.arguments[1]);
@@ -154,7 +154,7 @@ function pickLede(children: ChildNode[], blocks: number): CallExpression[] {
     if (LEDE_SKIPS.has(name)) continue;
 
     if (LEDE_ENDERS.has(name)) {
-      if (picked.length) break;
+      if (picked.length > 0) break;
       continue;
     }
 

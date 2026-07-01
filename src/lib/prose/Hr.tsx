@@ -3,7 +3,7 @@
  * No interaction, so Astro renders it statically (no island). The gap between
  * the flex segments makes the break, so no background masking is needed.
  */
-export default function Hr() {
+export function Hr() {
   return (
     <div
       role="separator"
