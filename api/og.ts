@@ -74,17 +74,17 @@ export default async function og(req: Request) {
         ],
       },
     );
-  } catch (error_: unknown) {
+  } catch (err: unknown) {
     // eslint-disable-next-line no-console -- surface edge-function failures in server logs
-    console.error(error_);
+    console.error(err);
 
-    if (error_ instanceof HttpError) {
-      return Response.json({ message: error_.message }, {
-        status: error_.status,
+    if (err instanceof HttpError) {
+      return Response.json({ message: err.message }, {
+        status: err.status,
       });
     }
 
-    const error = error_ instanceof Error ? error_ : new Error(String(error_));
+    const error = err instanceof Error ? err : new Error(String(err));
 
     return Response.json({ message: error.message }, {
       status: 500,
