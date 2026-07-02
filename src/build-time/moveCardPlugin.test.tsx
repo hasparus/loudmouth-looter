@@ -18,7 +18,7 @@ function makeMove(
 function runPlugin(node: MdxJsxFlowElement) {
   const tree = { type: "root" as const, children: [node] };
   // @ts-expect-error — simplified tree, no position info needed
-  void moveCardPlugin()(tree, {}, () => {});
+  void moveCardPlugin()(tree, {}, () => null);
   return tree.children[0]!;
 }
 
@@ -96,7 +96,7 @@ describe("moveCardPlugin", () => {
     };
     const tree = { type: "root" as const, children: [nonMove] };
     // @ts-expect-error — simplified tree
-    void moveCardPlugin()(tree, {}, () => {});
+    void moveCardPlugin()(tree, {}, () => null);
     expect(tree.children[0]!.attributes).toHaveLength(0);
   });
 });

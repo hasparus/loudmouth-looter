@@ -8,5 +8,5 @@
     "types": ["node", "bun"],
     "allowJs": true
   },
-  "include": ["src", "api", "e2e", "*.ts"]
+  "include": ["src", "api", "e2e"]
 }

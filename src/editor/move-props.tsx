@@ -5,8 +5,8 @@ export function slugFromTitle(value: string): string {
   return value
     .toLowerCase()
     .trim()
-    .replace(/[^\w]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replaceAll(/[^\w]+/g, "-")
+    .replaceAll(/^-+|-+$/g, "");
 }
 
 function headingText(node: RootContent): string {
