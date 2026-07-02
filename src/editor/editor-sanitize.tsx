@@ -98,7 +98,7 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
       if (atomClass === "te-track") {
         el.setAttribute("contenteditable", "false");
         if (child.dataset.interactive === "1")
-          el.setAttribute("data-interactive", "1");
+          el.dataset.interactive = "1";
       }
       if (atomClass === "te-toggle") {
         const rawShape = child.dataset.shape ?? "";
