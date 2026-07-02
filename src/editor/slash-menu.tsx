@@ -47,6 +47,7 @@ export function SlashMenu(props: SlashMenuProps) {
                 props.onPick(command);
               }}
               role="option"
+              tabIndex={-1}
             >
               <span class="text-neu-400 dark:text-neu-500 w-28 shrink-0 font-mono text-xs">
                 /{command.name}

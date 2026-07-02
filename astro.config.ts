@@ -60,7 +60,7 @@ export default defineConfig({
     },
     processor: unified({
       remarkPlugins: remarkPlugins(__dirname),
-      rehypePlugins: rehypePlugins,
+      rehypePlugins,
       gfm: true,
     }),
   },

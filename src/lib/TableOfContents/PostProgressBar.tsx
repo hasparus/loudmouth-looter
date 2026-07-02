@@ -33,8 +33,8 @@ export function PostProgressBar(props: { children: JSX.Element }) {
       <div class="bg-neu-400/30 dark:bg-neu-800 absolute -left-4 h-full w-[2px] overflow-hidden">
         <div
           class={
-            "bg-neu-400 dark:bg-neu-700 absolute h-full w-full " +
-            "-translate-y-[var(--y,100%)] transition-transform duration-300 ease-linear"
+            "bg-neu-400 dark:bg-neu-700 absolute size-full " +
+            "-translate-y-(--y,100%) transition-transform duration-300 ease-linear"
           }
           ref={progressThumb}
         />
@@ -56,13 +56,13 @@ function createScrollListener(callback: (scrollY: number) => void) {
     if (animatedKilled) return;
 
     const newPos = window.scrollY;
-    if (scrollY !== newPos) {
+    if (scrollY === newPos) {
+      window.addEventListener("scroll", animate);
+    } else {
       window.removeEventListener("scroll", animate);
       scrollY = window.scrollY;
       callback(scrollY);
       animate();
-    } else {
-      window.addEventListener("scroll", animate);
     }
   }
 

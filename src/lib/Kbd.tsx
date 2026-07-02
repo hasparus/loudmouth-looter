@@ -18,7 +18,7 @@ export function Kbd(props: KbdProps) {
       ref={ref}
       {...props}
       class={
-        "border-neu-300 bg-neu-50 dark:border-neu-700 dark:bg-neu-800 all-small-caps font-text text-neu-500 dark:text-neu-400 trim-start-alphabetic inline-block aspect-[2] min-w-4 shrink-0 rounded border border-b-2 p-1 text-base leading-none font-medium tracking-wide tabular-nums [corner-shape:superellipse(-.33)] group-hover:border-b group-hover:shadow-[inset_0_1px_1px_0_rgba(0,0,0,0.025)] group-focus:outline-solid data-pressed:border-b" +
+        "border-neu-300 bg-neu-50 dark:border-neu-700 dark:bg-neu-800 all-small-caps font-text text-neu-500 dark:text-neu-400 trim-start-alphabetic inline-block aspect-[2] min-w-4 shrink-0 rounded-sm border border-b-2 p-1 text-base leading-none font-medium tracking-wide tabular-nums [corner-shape:superellipse(-.33)] group-hover:border-b group-hover:shadow-[inset_0_1px_1px_0_rgba(0,0,0,0.025)] group-focus:outline-solid data-pressed:border-b" +
         (props.class ? ` ${props.class}` : "")
       }
     />
@@ -27,11 +27,11 @@ export function Kbd(props: KbdProps) {
 
 function setDataPressedOnKeyDown(props: KbdProps, ref: HTMLElement) {
   const onKeyDown = (event: KeyboardEvent) => {
-    if (currentKeyPressed(props, event)) ref.setAttribute("data-pressed", "");
+    if (currentKeyPressed(props, event)) ref.dataset.pressed = "";
   };
 
   const onKeyUp = (event: KeyboardEvent) => {
-    if (currentKeyPressed(props, event)) ref.removeAttribute("data-pressed");
+    if (currentKeyPressed(props, event)) delete ref.dataset.pressed;
   };
 
   window.addEventListener("keydown", onKeyDown);
@@ -44,7 +44,7 @@ function setDataPressedOnKeyDown(props: KbdProps, ref: HTMLElement) {
 
 function currentKeyPressed(props: KbdProps, event: KeyboardEvent) {
   const { code, key } = parseKeys(event);
-  const children = props.children;
+  const { children } = props;
 
   return (
     props.code === code ||
