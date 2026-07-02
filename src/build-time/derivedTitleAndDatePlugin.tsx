@@ -10,9 +10,7 @@ export const derivedTitleAndDatePlugin: Plugin<
     const data = file.data as { astro: PostProps };
     const frontmatter = data.astro.frontmatter as Partial<PostFrontmatter>;
 
-    if (!frontmatter.title) {
-      frontmatter.title = title(file.stem || "");
-    }
+    frontmatter.title ||= title(file.stem || "");
 
     if (!frontmatter.date) {
       let createdAt = execFileSync(
@@ -26,15 +24,12 @@ export const derivedTitleAndDatePlugin: Plugin<
           "--",
           file.path,
         ],
-        { encoding: "utf-8" },
+        { encoding: "utf8" },
       )
         .trim()
         .split("\n")[0];
 
-      if (!createdAt) {
-        // if the file wasn't committed yet, we use the current date
-        createdAt = new Date().toISOString();
-      }
+      createdAt ||= new Date().toISOString();
 
       frontmatter.date = createdAt;
     }

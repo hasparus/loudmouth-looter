@@ -154,7 +154,7 @@ test.describe("e2e fixture post", () => {
 
         return {
           asideHeight: asideBox.height,
-          markerHeight: parseFloat(marker.height),
+          markerHeight: Number.parseFloat(marker.height),
           topDelta: previousBox
             ? Math.abs(asideBox.top - previousBox.top)
             : null,

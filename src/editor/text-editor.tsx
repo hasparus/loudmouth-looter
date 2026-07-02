@@ -397,7 +397,7 @@ export function TextEditor() {
 
   return (
     <main class="min-h-screen">
-      <div class="mx-auto max-w-3xl px-4 py-24 md:px-6 print:max-w-none print:px-0 print:py-0">
+      <div class="mx-auto max-w-3xl px-4 py-24 md:px-6 print:max-w-none print:p-0">
         <div
           aria-activedescendant={slash() ? slashActiveId() : undefined}
           aria-controls={slash() ? SLASH_MENU_ID : undefined}

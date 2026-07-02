@@ -143,8 +143,8 @@ export function FlowText(props: {
 
   onMount(() => {
     const cs = getComputedStyle(root);
-    const base: Base = { family: cs.fontFamily, size: parseFloat(cs.fontSize) };
-    const lhRaw = parseFloat(cs.lineHeight);
+    const base: Base = { family: cs.fontFamily, size: Number.parseFloat(cs.fontSize) };
+    const lhRaw = Number.parseFloat(cs.lineHeight);
     lh = Number.isFinite(lhRaw) ? lhRaw : base.size * 1.6;
 
     const build = () => {
