@@ -64,7 +64,14 @@ const postSchema = blogPostingSchema({
     </header>
     {
       imgSrc && (
-        <Image alt="" src={imgSrc} format="webp" width={774} height={387} />
+        <Image
+          alt=""
+          src={imgSrc}
+          format="webp"
+          width={774}
+          height={387}
+          relativeTo={Astro.props.file}
+        />
       )
     }
     <slot />

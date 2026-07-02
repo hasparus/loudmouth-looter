@@ -1,14 +1,10 @@
-import type { ImageMetadata } from "astro";
 import { OG_IMAGE_SECRET } from "astro:env/server";
 import { createHmac } from "node:crypto";
-import { dirname, join } from "node:path";
 
 import type { StringifiedPost } from "../../api/og";
 import type { PostFrontmatter } from "../types/PostFrontmatter";
 
-const ogImages = import.meta.glob<{ default: ImageMetadata }>(
-  "/posts/**/og-image.{webp,avif,gif,png,jpg,jpeg}",
-);
+import { resolvePostImage } from "./postImages";
 
 export async function resolvePostOgImage(
   frontmatter: PostFrontmatter,
@@ -16,31 +12,23 @@ export async function resolvePostOgImage(
 ): Promise<string> {
   const og =
     typeof frontmatter.img === "object" ? frontmatter.img.og : undefined;
-  if (!og) return createOgImageLink(frontmatter);
-  if (!og.startsWith(".")) return og;
-
-  const postsAt = file.indexOf("/posts/");
-  if (postsAt === -1) {
-    throw new Error(
-      `resolvePostOgImage: expected a post under /posts/: ${file}`,
-    );
+  if (og) {
+    return og.startsWith(".") ? (await resolvePostImage(file, og)).src : og;
   }
 
-  const key = join(dirname(file.slice(postsAt)), og);
-  const image = ogImages[key];
-  if (!image) {
-    throw new Error(
-      `resolvePostOgImage: no og image at ${key} (img.og: ${og})`,
-    );
+  let img =
+    typeof frontmatter.img === "object" ? frontmatter.img.src : frontmatter.img;
+  if (img?.startsWith(".")) {
+    img = (await resolvePostImage(file, img)).src;
   }
 
-  return (await image()).default.src;
+  return createOgImageLink(frontmatter, img);
 }
 
-function createOgImageLink(frontmatter: PostFrontmatter) {
-  let img = frontmatter.img;
-  if (typeof img === "object") img = img.src;
-
+function createOgImageLink(
+  frontmatter: PostFrontmatter,
+  img: string | undefined,
+) {
   const timestamp = new Date(frontmatter.date).getTime();
   const minutes = frontmatter.readingTime.minutes;
   const title = frontmatter.title;

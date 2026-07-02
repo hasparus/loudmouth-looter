@@ -9,7 +9,8 @@ interface Props {
   ogType?: "website" | "article";
 }
 
-let { title, description, ogImage, ogType = "website" } = Astro.props;
+const { title, description, ogType = "website" } = Astro.props;
+let { ogImage } = Astro.props;
 
 if (ogImage) {
   ogImage = new URL(ogImage, import.meta.env.PUBLIC_URL).href;
