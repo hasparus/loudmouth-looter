@@ -86,19 +86,19 @@ applyIntrinsicSizeFromQuery(imageSource.src);
 
 if (imageSource.kind === "public") {
   // Raw public images may contain text or details, so preserve their full ratio.
-  const derivedAspectRatio = parseFloat(props.aspectRatio as string);
-  const parsedWidth = parseFloat(props.width as string);
+  const derivedAspectRatio = Number.parseFloat(props.aspectRatio as string);
+  const parsedWidth = Number.parseFloat(props.width as string);
   height =
-    !isNaN(derivedAspectRatio) && !isNaN(parsedWidth)
+    !Number.isNaN(derivedAspectRatio) && !Number.isNaN(parsedWidth)
       ? parsedWidth / derivedAspectRatio
       : props.height
-        ? parseFloat(props.height as string)
+        ? Number.parseFloat(props.height as string)
         : undefined;
   props.aspectRatio = imageSource.image.width / imageSource.image.height;
   width =
-    height != null
-      ? height * (imageSource.image.width / imageSource.image.height)
-      : undefined;
+    height == null
+      ? undefined
+      : height * (imageSource.image.width / imageSource.image.height);
 }
 
 if (imageSource.kind === "src-image") {
@@ -120,13 +120,13 @@ if (imageForPlaceholder) {
     width ??= metadata.width;
     props.aspectRatio ??= metadata.width / metadata.height;
     width = Math.min(width, WIDE_CONTAINER_WIDTH);
-    height = Math.round(width / parseFloat(props.aspectRatio as string));
+    height = Math.round(width / Number.parseFloat(props.aspectRatio as string));
   }
 }
 
 height ??=
   typeof props.aspectRatio === "number"
-    ? parseFloat(width as unknown as string) / props.aspectRatio
+    ? Number.parseFloat(width as unknown as string) / props.aspectRatio
     : undefined;
 
 props.alt ||= "";
@@ -170,7 +170,8 @@ async function resolveImageSource(source: string): Promise<ImageSource> {
     if (!loadImage) {
       throw new Error(`Image not found in public/content: ${source}`);
     }
-    return { kind: "public", src: source, image: (await loadImage()).default };
+    const { default: image } = await loadImage();
+    return { kind: "public", src: source, image };
   }
 
   if (source.startsWith(ASTRO_ASSET_PREFIX)) {
@@ -196,10 +197,11 @@ async function resolveImageSource(source: string): Promise<ImageSource> {
     if (!loadImage) {
       throw new Error(`Image not found in src/images: ${source}`);
     }
+    const { default: image } = await loadImage();
     return {
       kind: "src-image",
       src: source,
-      image: (await loadImage()).default,
+      image,
     };
   }
 

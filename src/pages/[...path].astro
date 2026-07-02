@@ -1,5 +1,5 @@
 ---
-import type { MarkdownInstance } from "astro";
+import type { MDXInstance } from "astro";
 
 import PostLayout from "../layouts/PostLayout.astro";
 import { isPostRoutable } from "../lib/isPostVisible";
@@ -7,11 +7,10 @@ import { mdxComponents } from "../lib/mdxComponents";
 import type { PostFrontmatter } from "../types";
 
 export const getStaticPaths = async () => {
-  const postModules = import.meta.glob<{
-    frontmatter: PostFrontmatter;
-    Content: any;
-    getHeadings: any;
-  }>("../../posts/**/*.mdx", { eager: true });
+  const postModules = import.meta.glob<MDXInstance<PostFrontmatter>>(
+    "../../posts/**/*.mdx",
+    { eager: true },
+  );
   const posts = Object.values(postModules).filter((post) =>
     isPostRoutable(post.frontmatter, { isProd: import.meta.env.PROD }),
   );
@@ -26,7 +25,7 @@ export const getStaticPaths = async () => {
   });
 };
 
-interface Props extends Omit<MarkdownInstance<{}>, "frontmatter"> {
+interface Props extends Omit<MDXInstance<{}>, "frontmatter"> {
   frontmatter: PostFrontmatter;
 }
 const { Content } = Astro.props;

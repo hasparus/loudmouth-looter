@@ -15,8 +15,7 @@ import parseArgs from "yargs-parser";
 const { token, prod } = parseArgs(process.argv.slice(2));
 
 if (!token) {
-  console.error("deploy.mjs: missing --token");
-  process.exit(2);
+  throw new Error("deploy.mjs: missing --token");
 }
 
 const environment = prod ? "production" : "preview";
@@ -31,6 +30,7 @@ const environment = prod ? "production" : "preview";
  */
 function bunxRun(label, args, opts = {}) {
   const redacted = args.map((a) => a.replace(token, "***"));
+  // eslint-disable-next-line no-console -- progress output for the GitHub Actions log
   console.log(`\n▶ ${label}: bunx ${redacted.join(" ")}`);
 
   const result = spawnSync("bunx", args, {
@@ -39,15 +39,14 @@ function bunxRun(label, args, opts = {}) {
   });
 
   if (result.error) {
-    console.error(`✗ ${label} failed to spawn: ${result.error.message}`);
-    process.exit(1);
+    throw new Error(`✗ ${label} failed to spawn: ${result.error.message}`);
   }
   if (result.status !== 0) {
-    console.error(`✗ ${label} exited with code ${result.status}`);
-    if (opts.captureStdout && result.stdout) {
-      console.error("--- stdout ---\n" + result.stdout);
-    }
-    process.exit(result.status ?? 1);
+    const stdoutTail =
+      opts.captureStdout && result.stdout
+        ? `\n--- stdout ---\n${result.stdout}`
+        : "";
+    throw new Error(`✗ ${label} exited with code ${result.status}${stdoutTail}`);
   }
 
   return opts.captureStdout ? (result.stdout ?? "") : "";
@@ -86,19 +85,21 @@ const deployStdout = bunxRun(
 const deploymentUrl = deployStdout
   .split(/\r?\n/)
   .map((l) => l.trim())
-  .reverse()
+  .toReversed()
   .find((l) => /^https:\/\/\S+$/.test(l));
 
 if (!deploymentUrl) {
-  console.error("✗ could not find a deployment URL in `vercel deploy` output");
-  console.error("--- stdout ---\n" + deployStdout);
-  process.exit(1);
+  throw new Error(
+    `✗ could not find a deployment URL in \`vercel deploy\` output\n--- stdout ---\n${deployStdout}`,
+  );
 }
+// eslint-disable-next-line no-console -- progress output for the GitHub Actions log
 console.log(`deployment URL: ${deploymentUrl}`);
 
 // 4. Alias the deployment to `${branch}--loudmouth-looter.vercel.app` and write the
 //    alias to $GITHUB_ENV so later steps can reference it.
 const deploymentAlias = createDeploymentAlias();
+// eslint-disable-next-line no-console -- progress output for the GitHub Actions log
 console.log(`deployment alias: ${deploymentAlias}`);
 
 if (process.env.GITHUB_ENV) {
@@ -123,8 +124,8 @@ function createDeploymentAlias() {
     "dependabot/npm_and_yarn/",
     "deps-",
   )
-    .replace(/[^a-z0-9]/gi, "-")
-    .replace(/-+/g, "-")
+    .replaceAll(/[^a-z0-9]/gi, "-")
+    .replaceAll(/-+/g, "-")
     .toLowerCase();
 
   return `${refSlug}--loudmouth-looter.vercel.app`;

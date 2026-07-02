@@ -23,7 +23,7 @@ const SPEED = 0.18;
 const PUSH = 6;
 const SPRING = 0.015;
 const DAMPING = 0.93;
-const GLYPHS = "◆◆◇▼█▓▓▒╬╬╫╪╧╤╥║│┃╎::··..".split("");
+const GLYPHS = [..."◆◆◇▼█▓▓▒╬╬╫╪╧╤╥║│┃╎::··.."];
 
 const segRadius = (i: number) => {
   if (i < 3) return 2.5 - i * 0.15;
