@@ -231,7 +231,7 @@ function MarkView(props: { mark: Mark }) {
   const m = props.mark;
   // eslint-disable-next-line solid/components-return-once -- narrowing requires the ternary
   return typeof m === "string" ? (
-    <>{m}</>
+    m
   ) : "em" in m ? (
     <em>{m.em}</em>
   ) : "strong" in m ? (
@@ -257,7 +257,7 @@ function MemeLink(props: { alt: string; src: string }) {
   const track = (event: MouseEvent) => {
     if (!hoverable()) return;
     if (img.classList.contains("animate-bounce-out")) {
-      img.getAnimations().forEach((a) => a.cancel());
+      for (const a of img.getAnimations()) a.cancel();
       img.classList.remove("animate-bounce-out");
       if (onExitEnd) {
         img.removeEventListener("animationend", onExitEnd);

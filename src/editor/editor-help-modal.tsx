@@ -7,7 +7,7 @@ import "./editor-help-modal.css";
 function Row(props: { children: JSX.Element; code: string }) {
   return (
     <div class="flex items-baseline gap-3 py-1">
-      <code class="bg-neu-100 text-neu-600 dark:bg-neu-800 dark:text-neu-300 shrink-0 rounded px-1.5 py-0.5 font-mono text-xs">
+      <code class="bg-neu-100 text-neu-600 dark:bg-neu-800 dark:text-neu-300 shrink-0 rounded-sm px-1.5 py-0.5 font-mono text-xs">
         {props.code}
       </code>
       <span class="text-neu-800 dark:text-neu-300 flex-1 text-sm">
@@ -67,6 +67,7 @@ export function EditorHelpModal() {
         </span>
       </button>
 
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- native <dialog> already closes on Esc; onClick only adds backdrop-click dismissal */}
       <dialog
         aria-label="Editor guide"
         class="te-help-dialog border-neu-200 text-neu-900 dark:border-neu-700 dark:bg-neu-900 dark:text-neu-100 w-[calc(100vw-2rem)] max-w-lg rounded-xl border bg-white shadow-2xl print:hidden"
@@ -91,7 +92,7 @@ export function EditorHelpModal() {
             >
               <span
                 aria-hidden="true"
-                class="trim-end-alphabetic -translate-y-[.5px] leading-none"
+                class="trim-end-alphabetic translate-y-[-0.5px] leading-none"
               >
                 ✕
               </span>

@@ -44,6 +44,7 @@ export function Dialog(props: DialogProps) {
   };
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- native <dialog> already closes on Esc; onClick only adds backdrop-click dismissal
     <dialog
       onClick={dismissOnBackdropClick}
       ref={(dialog) => {
