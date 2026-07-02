@@ -1,5 +1,5 @@
 ---
-import type { MarkdownLayoutProps } from "astro";
+import type { MarkdownHeading, MDXInstance } from "astro";
 
 import { resolvePostOgImage } from "../lib/ogImage";
 import PostTime from "../lib/PostTime.astro";
@@ -13,8 +13,9 @@ import BaseLayout from "./BaseLayout.astro";
 
 import "../global-styles/shiki.css";
 
-interface Props extends Omit<MarkdownLayoutProps<{}>, "frontmatter"> {
+interface Props extends Omit<MDXInstance<{}>, "frontmatter"> {
   frontmatter: PostFrontmatter;
+  headings: MarkdownHeading[];
 }
 
 const { frontmatter, headings } = Astro.props;

@@ -50,12 +50,12 @@ async function ensurePageStable(page: Page) {
   await page.evaluate(async () => {
     await document.fonts.ready;
     await Promise.all(
-      Array.from(document.images).map((img) => {
+      [...document.images].map((img) => {
         if (img.complete && img.naturalWidth > 0) return Promise.resolve();
         if (img.loading === "lazy") return Promise.resolve();
         return Promise.race([
-          img.decode().catch(() => undefined),
-          new Promise((resolve) => setTimeout(resolve, 3_000)),
+          img.decode().catch(() => null),
+          new Promise((resolve) => setTimeout(resolve, 3000)),
         ]);
       }),
     );

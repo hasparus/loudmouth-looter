@@ -68,6 +68,7 @@ export async function writeDocument(
       try {
         await writable.abort();
       } catch (error) {
+        // eslint-disable-next-line no-console -- diagnostic for a caught File System Access failure
         console.warn("text-editor: could not abort failed file write", error);
       }
     }

@@ -38,7 +38,7 @@ const F: [number, string][] = `0101 Circumcisionis Domini
 1225 Nativitatis Domini
 1228 SS. Innocentium`
   .split("\n")
-  .map((s) => [+s.slice(0, 4), s.slice(5)]);
+  .map((s) => [Number(s.slice(0, 4)), s.slice(5)]);
 
 const W = [
   "Dominica",
@@ -70,15 +70,31 @@ export const feastDate = (date: string | number | Date) => {
   for (const [md, la] of F)
     for (const yr of [y - 1, y, y + 1]) {
       const d = Math.round(
-        (+t - +new Date(Date.UTC(yr, ((md / 100) | 0) - 1, md % 100))) / 864e5,
+        (t.getTime() -
+          new Date(
+            Date.UTC(yr, Math.trunc(md / 100) - 1, md % 100),
+          ).getTime()) /
+          864e5,
       );
       if (Math.abs(d) < Math.abs(n) || (Math.abs(d) === Math.abs(n) && d > n))
         ((n = d), (best = la));
     }
   let feast: string;
-  if (n === 0) feast = `in festo ${best}`;
-  else if (n === 1) feast = `crastino ${best}`;
-  else if (n === -1) feast = `vigilia ${best}`;
-  else feast = `${W[t.getUTCDay()]} ${n > 0 ? "post" : "ante"} f. ${best}`;
+  switch (n) {
+    case 0: {
+      feast = `in festo ${best}`;
+      break;
+    }
+    case 1: {
+      feast = `crastino ${best}`;
+      break;
+    }
+    case -1: {
+      feast = `vigilia ${best}`;
+      break;
+    }
+    default:
+      feast = `${W[t.getUTCDay()]} ${n > 0 ? "post" : "ante"} f. ${best}`;
+  }
   return `${feast} ${romanYear(y)}`;
 };
