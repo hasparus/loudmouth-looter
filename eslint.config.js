@@ -15,7 +15,10 @@ export default [
   },
 
   {
-    rules: { "unicorn/consistent-function-scoping": "off" },
+    rules: {
+      "unicorn/consistent-function-scoping": "off",
+      "unicorn/no-useless-spread": "off",
+    },
   },
 
   {
