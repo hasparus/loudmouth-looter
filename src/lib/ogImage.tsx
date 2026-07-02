@@ -4,25 +4,23 @@ import { createHmac } from "node:crypto";
 import type { StringifiedPost } from "../../api/og";
 import type { PostFrontmatter } from "../types/PostFrontmatter";
 
-import { resolvePostImage } from "./postImages";
+import { normalizeImg, resolvePostImage } from "./postImages";
 
 export async function resolvePostOgImage(
   frontmatter: PostFrontmatter,
   file: string,
 ): Promise<string> {
-  const og =
-    typeof frontmatter.img === "object" ? frontmatter.img.og : undefined;
-  if (og) {
-    return og.startsWith(".") ? (await resolvePostImage(file, og)).src : og;
-  }
+  const { og, src } = normalizeImg(frontmatter.img);
+  if (og) return resolveIfRelative(file, og);
+  return createOgImageLink(frontmatter, await resolveIfRelative(file, src));
+}
 
-  let img =
-    typeof frontmatter.img === "object" ? frontmatter.img.src : frontmatter.img;
-  if (img?.startsWith(".")) {
-    img = (await resolvePostImage(file, img)).src;
-  }
-
-  return createOgImageLink(frontmatter, img);
+async function resolveIfRelative<T extends string | undefined>(
+  file: string,
+  path: T,
+): Promise<string | T> {
+  if (!path?.startsWith(".")) return path;
+  return (await resolvePostImage(file, path)).image.src;
 }
 
 function createOgImageLink(

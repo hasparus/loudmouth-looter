@@ -6,7 +6,7 @@ interface Props {
   description: string;
   ogImage: string | undefined;
   /** "article" for posts; default "website". */
-  ogType?: "website" | "article";
+  ogType?: "website" | "article" | undefined;
 }
 
 const { title, description, ogType = "website" } = Astro.props;
