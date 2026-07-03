@@ -7,6 +7,24 @@ const postImages = import.meta.glob<{ default: ImageMetadata }>(
   "/posts/**/*.{png,jpg,jpeg,webp,avif,gif}",
 );
 
+/**
+ * Looks up a root-absolute key in an `import.meta.glob` record and loads the
+ * image, deriving its filesystem path from the key.
+ */
+export async function loadGlobImage(
+  images: Record<string, () => Promise<{ default: ImageMetadata }>>,
+  key: string,
+  globName: string,
+): Promise<{ image: ImageMetadata; fsPath: string }> {
+  const load = images[key];
+  if (!load) {
+    throw new Error(`Image not found in ${globName}: ${key}`);
+  }
+
+  const { default: image } = await load();
+  return { image, fsPath: join(process.cwd(), key) };
+}
+
 /** Resolves a post-relative image path (`./stonetop.png`). */
 export async function resolvePostImage(
   file: string,
@@ -17,14 +35,11 @@ export async function resolvePostImage(
     throw new Error(`resolvePostImage: expected a post under /posts/: ${file}`);
   }
 
-  const key = join(dirname(file.slice(postsAt)), src);
-  const image = postImages[key];
-  if (!image) {
-    throw new Error(`resolvePostImage: no image at ${key} (src: ${src})`);
-  }
-
-  const { default: metadata } = await image();
-  return { image: metadata, fsPath: join(process.cwd(), key) };
+  return loadGlobImage(
+    postImages,
+    join(dirname(file.slice(postsAt)), src),
+    "posts",
+  );
 }
 
 export function normalizeImg(img: PostFrontmatter["img"]): {

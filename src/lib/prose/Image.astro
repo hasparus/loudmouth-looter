@@ -20,10 +20,9 @@ import {
   type RemoteImageProps,
 } from "astro:assets";
 import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { getPlaiceholder } from "plaiceholder";
 
-import { resolvePostImage } from "../postImages";
+import { loadGlobImage, resolvePostImage } from "../postImages";
 
 import "./Image.css";
 
@@ -51,8 +50,8 @@ type RemoteProps = RemoteImageProps & {
 };
 export type Props = (LocalProps | RemoteProps) & {
   /**
-   * Filesystem path of the file the `src` is relative to, e.g. the post's
-   * `.mdx` file. Enables `src="./image.png"` colocated with the post.
+   * Absolute path of the post's `.mdx` file — must live under `posts/`.
+   * Enables `src="./image.png"` colocated with the post.
    */
   relativeTo?: string;
 };
@@ -114,14 +113,6 @@ if (imageSource.kind === "public") {
       : height * (imageSource.image.width / imageSource.image.height);
 }
 
-if (imageSource.kind === "asset") {
-  props.width ??= imageSource.image.width;
-  props.height ??= imageSource.image.height;
-  if (imageSource.image.format === "jpg") {
-    imageSource.image.format = "webp";
-  }
-}
-
 const imageForPlaceholder = await readImageForPlaceholder(imageSource);
 if (imageForPlaceholder) {
   const { metadata, css } = await getPlaiceholder(imageForPlaceholder, {
@@ -153,7 +144,6 @@ let attrs = {
 
 if (imageSource.kind === "asset" || imageSource.kind === "optimized-string") {
   let attributes;
-  props.src = imageSource.src;
   ({ src, attributes } = await getImage({
     ...props,
     src:
@@ -191,12 +181,11 @@ async function resolveImageSource(source: string): Promise<ImageSource> {
       string,
       { default: ImageMetadata }
     >("/public/content/**/*");
-    const path = "/public" + source;
-    const loadImage = publicImages[path];
-    if (!loadImage) {
-      throw new Error(`Image not found in public/content: ${source}`);
-    }
-    const { default: image } = await loadImage();
+    const { image } = await loadGlobImage(
+      publicImages,
+      "/public" + source,
+      "public/content",
+    );
     return { kind: "public", src: source, image };
   }
 
@@ -218,17 +207,14 @@ async function resolveImageSource(source: string): Promise<ImageSource> {
       string,
       { default: ImageMetadata }
     >("/src/images/**/*");
-    const path = decodeURIComponent(`/src/images${source}`);
-    const loadImage = srcImages[path];
-    if (!loadImage) {
-      throw new Error(`Image not found in src/images: ${source}`);
-    }
-    const { default: image } = await loadImage();
     return {
       kind: "asset",
       src: source,
-      image,
-      fsPath: join(process.cwd(), path),
+      ...(await loadGlobImage(
+        srcImages,
+        decodeURIComponent(`/src/images${source}`),
+        "src/images",
+      )),
     };
   }
 
