@@ -60,6 +60,7 @@ export function useLinkedFile(): LinkedFile {
       } catch (error) {
         if (activeHtml !== null && pending.current === null)
           pending.current = activeHtml;
+        // eslint-disable-next-line no-console -- diagnostic for a caught file-save failure
         console.warn("text-editor: file save failed", error);
         setState("status", "error");
         return false;
@@ -107,6 +108,7 @@ export function useLinkedFile(): LinkedFile {
       setState("status", "saved");
       return html;
     } catch (error) {
+      // eslint-disable-next-line no-console -- diagnostic for a caught file-open failure
       console.warn("text-editor: could not open file", error);
       setState("status", "error");
       return null;

@@ -26,6 +26,9 @@ const avaraBlack = fetchFont(
 const width = 1200;
 const height = 630;
 
+const env = (process as { env: Record<string, string | undefined> }).env;
+
+// eslint-disable-next-line import-x/no-default-export -- Vercel edge functions must default-export the handler
 export default async function og(req: Request) {
   try {
     const url = new URL(req.url);
@@ -34,8 +37,6 @@ export default async function og(req: Request) {
     );
 
     await assertTokenIsValid(stringifiedPost, token);
-
-    console.log("returning ImageResponse for", stringifiedPost);
 
     return new ImageResponse(
       h(
@@ -73,18 +74,20 @@ export default async function og(req: Request) {
         ],
       },
     );
-  } catch (err: unknown) {
-    console.error(err);
+  } catch (error: unknown) {
+    // eslint-disable-next-line no-console -- surface edge-function failures in server logs
+    console.error(error);
 
-    if (err instanceof HttpError) {
-      return new Response(JSON.stringify({ message: err.message }), {
-        status: err.status,
+    if (error instanceof HttpError) {
+      return Response.json({ message: error.message }, {
+        status: error.status,
       });
     }
 
-    const error = err instanceof Error ? err : new Error(String(err));
+    const normalizedError =
+      error instanceof Error ? error : new Error(String(error));
 
-    return new Response(JSON.stringify({ message: error.message }), {
+    return Response.json({ message: normalizedError.message }, {
       status: 500,
     });
   }
@@ -97,7 +100,7 @@ function Illustration({
   children?: React.ReactNode[];
   imageHref: string | null | undefined;
 }) {
-  imageHref = imageHref ? `https://${process.env.VERCEL_URL}${imageHref}` : "";
+  imageHref = imageHref ? `https://${env.VERCEL_URL}${imageHref}` : "";
 
   return h(
     "div",
@@ -170,10 +173,11 @@ function h<T extends React.ElementType>(
 ) {
   return {
     type,
-    key: "key" in props ? props.key : null,
+    key: "key" in props ? (props.key as string | null) : null,
     props: {
       ...props,
-      children: children.length ? children : props.children,
+      children:
+        children.length > 0 ? children : (props.children as React.ReactNode),
     },
   };
 }
@@ -249,7 +253,7 @@ async function assertTokenIsValid(
   post: StringifiedPost,
   receivedToken: string,
 ): Promise<void> {
-  const secret = process.env.OG_IMAGE_SECRET;
+  const secret = env.OG_IMAGE_SECRET;
 
   if (!secret) {
     throw new Error("process.env.OG_IMAGE_SECRET is missing");
@@ -284,7 +288,7 @@ function timingSafeEqualHex(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;
   for (let i = 0; i < a.length; i++) {
-    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    diff |= (a.codePointAt(i) ?? 0) ^ (b.codePointAt(i) ?? 0);
   }
   return diff === 0;
 }

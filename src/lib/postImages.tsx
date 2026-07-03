@@ -23,7 +23,8 @@ export async function resolvePostImage(
     throw new Error(`resolvePostImage: no image at ${key} (src: ${src})`);
   }
 
-  return { image: (await image()).default, fsPath: join(process.cwd(), key) };
+  const { default: metadata } = await image();
+  return { image: metadata, fsPath: join(process.cwd(), key) };
 }
 
 export function normalizeImg(img: PostFrontmatter["img"]): {

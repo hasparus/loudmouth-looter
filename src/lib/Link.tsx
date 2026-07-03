@@ -5,9 +5,13 @@ export interface LinkProps extends JSX.AnchorHTMLAttributes<HTMLAnchorElement> {
 }
 
 export function Link(props: LinkProps) {
-  const [own, rest] = splitProps(props, ["classList", "noUnderline"]);
+  const [own, rest] = splitProps(props, [
+    "classList",
+    "noUnderline",
+    "children",
+  ]);
 
-  const childIsImg = () => isChildAnImage(rest.children);
+  const childIsImg = () => isChildAnImage(own.children);
 
   return (
     <a
@@ -20,7 +24,9 @@ export function Link(props: LinkProps) {
         "zaduma-image-box": childIsImg(),
       }}
       {...rest}
-    />
+    >
+      {own.children}
+    </a>
   );
 }
 

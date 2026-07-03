@@ -20,7 +20,8 @@ async function resolveIfRelative<T extends string | undefined>(
   path: T,
 ): Promise<string | T> {
   if (!path?.startsWith(".")) return path;
-  return (await resolvePostImage(file, path)).image.src;
+  const { image } = await resolvePostImage(file, path);
+  return image.src;
 }
 
 function createOgImageLink(

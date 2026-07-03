@@ -28,17 +28,11 @@ export const GET: APIRoute = ({ site }) => {
     throw new Error("`site` must be set in astro.config for robots.txt");
   }
 
-  const lines: string[] = [];
+  const lines: string[] = [ "User-agent: *", `Content-Signal: ${CONTENT_SIGNAL}`, "Allow: /", ""];
 
-  lines.push("User-agent: *");
-  lines.push(`Content-Signal: ${CONTENT_SIGNAL}`);
-  lines.push("Allow: /");
-  lines.push("");
 
   for (const bot of AI_BOTS) {
-    lines.push(`User-agent: ${bot}`);
-    lines.push("Allow: /");
-    lines.push("");
+    lines.push(`User-agent: ${bot}`, "Allow: /", "");
   }
 
   lines.push(`Sitemap: ${new URL("sitemap-index.xml", site).href}`);
