@@ -20,8 +20,9 @@ import {
   type RemoteImageProps,
 } from "astro:assets";
 import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { getPlaiceholder } from "plaiceholder";
+
+import { loadGlobImage, resolvePostImage } from "../postImages";
 
 import "./Image.css";
 
@@ -47,7 +48,13 @@ type RemoteProps = RemoteImageProps & {
   aspectRatio?: number | string;
   height?: number | string;
 };
-export type Props = LocalProps | RemoteProps;
+export type Props = (LocalProps | RemoteProps) & {
+  /**
+   * Absolute path of the post's `.mdx` file — must live under `posts/`.
+   * Enables `src="./image.png"` colocated with the post.
+   */
+  relativeTo?: string;
+};
 
 type ImageSource =
   | {
@@ -55,10 +62,15 @@ type ImageSource =
       src: string;
     }
   | { kind: "public"; src: string; image: ImageMetadata }
-  | { kind: "src-image"; src: string; image: ImageMetadata }
+  | { kind: "asset"; src: string; image: ImageMetadata; fsPath: string }
   | { kind: "optimized-string"; src: string };
 
-const { loading = "lazy", decoding = "async", ...props } = Astro.props as Props;
+const {
+  loading = "lazy",
+  decoding = "async",
+  relativeTo,
+  ...props
+} = Astro.props as Props;
 
 let width = props.width;
 let height = props.height;
@@ -101,14 +113,6 @@ if (imageSource.kind === "public") {
       : height * (imageSource.image.width / imageSource.image.height);
 }
 
-if (imageSource.kind === "src-image") {
-  props.width ??= imageSource.image.width;
-  props.height ??= imageSource.image.height;
-  if (imageSource.image.format === "jpg") {
-    imageSource.image.format = "webp";
-  }
-}
-
 const imageForPlaceholder = await readImageForPlaceholder(imageSource);
 if (imageForPlaceholder) {
   const { metadata, css } = await getPlaiceholder(imageForPlaceholder, {
@@ -138,15 +142,14 @@ let attrs = {
   aspectRatio: props.aspectRatio,
 };
 
-if (
-  imageSource.kind === "src-image" ||
-  imageSource.kind === "optimized-string"
-) {
+if (imageSource.kind === "asset" || imageSource.kind === "optimized-string") {
   let attributes;
-  props.src = imageSource.src;
   ({ src, attributes } = await getImage({
     ...props,
-    src: imageSource.kind === "src-image" ? imageSource.image : imageSource.src,
+    src:
+      imageSource.kind === "optimized-string"
+        ? imageSource.src
+        : imageSource.image,
     format: "webp",
     width,
     height,
@@ -159,18 +162,30 @@ async function resolveImageSource(source: string): Promise<ImageSource> {
     return { kind: "raw", src: source.slice(4) };
   }
 
+  if (source.startsWith(".")) {
+    if (!relativeTo) {
+      throw new Error(
+        `Relative image src "${source}" requires the relativeTo prop`,
+      );
+    }
+    return {
+      kind: "asset",
+      src: source,
+      ...(await resolvePostImage(relativeTo, source)),
+    };
+  }
+
   if (source.startsWith(PUBLIC_IMAGES_PREFIX)) {
     const publicImages = import.meta.glob<
       false,
       string,
       { default: ImageMetadata }
-    >("../../../public/content/**/*");
-    const path = "../../../public" + source;
-    const loadImage = publicImages[path];
-    if (!loadImage) {
-      throw new Error(`Image not found in public/content: ${source}`);
-    }
-    const { default: image } = await loadImage();
+    >("/public/content/**/*");
+    const { image } = await loadGlobImage(
+      publicImages,
+      "/public" + source,
+      "public/content",
+    );
     return { kind: "public", src: source, image };
   }
 
@@ -191,17 +206,15 @@ async function resolveImageSource(source: string): Promise<ImageSource> {
       false,
       string,
       { default: ImageMetadata }
-    >("../../../src/images/**/*");
-    const path = decodeURIComponent(`../../../src/images${source}`);
-    const loadImage = srcImages[path];
-    if (!loadImage) {
-      throw new Error(`Image not found in src/images: ${source}`);
-    }
-    const { default: image } = await loadImage();
+    >("/src/images/**/*");
     return {
-      kind: "src-image",
+      kind: "asset",
       src: source,
-      image,
+      ...(await loadGlobImage(
+        srcImages,
+        decodeURIComponent(`/src/images${source}`),
+        "src/images",
+      )),
     };
   }
 
@@ -223,15 +236,8 @@ function applyIntrinsicSizeFromQuery(source: string) {
 }
 
 async function readImageForPlaceholder(source: ImageSource) {
-  if (source.kind === "src-image") {
-    return readFile(
-      join(
-        process.cwd(),
-        "src",
-        "images",
-        decodeURIComponent(source.src.slice(SRC_IMAGES_PREFIX.length)),
-      ),
-    );
+  if (source.kind === "asset") {
+    return readFile(source.fsPath);
   }
 
   if (source.kind !== "optimized-string") return null;

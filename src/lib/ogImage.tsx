@@ -1,47 +1,33 @@
-import type { ImageMetadata } from "astro";
 import { OG_IMAGE_SECRET } from "astro:env/server";
 import { createHmac } from "node:crypto";
-import { dirname, join } from "node:path";
 
 import type { StringifiedPost } from "../../api/og";
 import type { PostFrontmatter } from "../types/PostFrontmatter";
 
-const ogImages = import.meta.glob<{ default: ImageMetadata }>(
-  "/posts/**/og-image.{webp,avif,gif,png,jpg,jpeg}",
-);
+import { normalizeImg, resolvePostImage } from "./postImages";
 
 export async function resolvePostOgImage(
   frontmatter: PostFrontmatter,
   file: string,
 ): Promise<string> {
-  const og =
-    typeof frontmatter.img === "object" ? frontmatter.img.og : undefined;
-  if (!og) return createOgImageLink(frontmatter);
-  if (!og.startsWith(".")) return og;
-
-  const postsAt = file.indexOf("/posts/");
-  if (postsAt === -1) {
-    throw new Error(
-      `resolvePostOgImage: expected a post under /posts/: ${file}`,
-    );
-  }
-
-  const key = join(dirname(file.slice(postsAt)), og);
-  const image = ogImages[key];
-  if (!image) {
-    throw new Error(
-      `resolvePostOgImage: no og image at ${key} (img.og: ${og})`,
-    );
-  }
-
-  const { default: resolved } = await image();
-  return resolved.src;
+  const { og, src } = normalizeImg(frontmatter.img);
+  if (og) return resolveIfRelative(file, og);
+  return createOgImageLink(frontmatter, await resolveIfRelative(file, src));
 }
 
-function createOgImageLink(frontmatter: PostFrontmatter) {
-  let img = frontmatter.img;
-  if (typeof img === "object") img = img.src;
+async function resolveIfRelative<T extends string | undefined>(
+  file: string,
+  path: T,
+): Promise<string | T> {
+  if (!path?.startsWith(".")) return path;
+  const { image } = await resolvePostImage(file, path);
+  return image.src;
+}
 
+function createOgImageLink(
+  frontmatter: PostFrontmatter,
+  img: string | undefined,
+) {
   const timestamp = new Date(frontmatter.date).getTime();
   const minutes = frontmatter.readingTime.minutes;
   const title = frontmatter.title;
