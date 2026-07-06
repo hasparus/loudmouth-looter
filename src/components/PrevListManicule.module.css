@@ -1,0 +1,10 @@
+.PrevListManicule {
+  display: none;
+}
+
+:global(.zaduma-prose) ul:has(+ .PrevListManicule)>li::before {
+  content: "☞";
+  color: light-dark(var(--color-accent-600), var(--color-accent-400)) !important;
+  display: inline-block;
+  transform: translate3d(1px, 1px, 0);
+}

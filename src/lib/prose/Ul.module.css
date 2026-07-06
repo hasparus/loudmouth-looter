@@ -1,15 +1,11 @@
 @reference "../../global-styles/base.css";
 
-/* Structure only. The diamond bullet, task-list handling, and checkbox style
-   are global (src/global-styles/skin.css) so they can't break on a CSS-module
-   hash failing to land beside remark-gfm's .contains-task-list class. */
 .Ul {
   list-style: none;
-  padding-left: 0;
   margin-top: -0.5em;
-
-  /* nested lists are the worse */
   text-indent: 0;
+
+  padding-left: 0;
 
   ul &,
   ol & {

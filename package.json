@@ -6,6 +6,9 @@
   "engines": {
     "node": ">=22"
   },
+  "imports": {
+    "#components/*": "./src/components/*"
+  },
   "scripts": {
     "dev": "astro dev",
     "vercel:dev": "vercel dev",

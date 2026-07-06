@@ -3,7 +3,7 @@
 .Paragraph {
   @apply max-w-prose;
 
-  line-height: 1.6;
+  line-height: 1.52;
   text-overflow: ellipsis;
 
   overflow: clip;
