@@ -127,6 +127,7 @@ const hasHeaderContent = Astro.slots.has("header-content");
       ogType={ogType}
     />
 
+    <meta property="og:url" content={canonical} />
     <link rel="canonical" href={canonical} />
     {
       isPostRoute && (
