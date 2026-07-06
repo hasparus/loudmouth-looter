@@ -1,0 +1,61 @@
+---
+/* eslint-disable better-tailwindcss/no-unknown-classes */
+interface Props {
+  name: string;
+  span?: "3" | "4" | "full";
+  class?: string;
+}
+
+const initialSrcBySlug: Record<string, string> = {
+  aftermath: "/books/why-dragon/initials/aftermath.png",
+  "face-fury": "/books/why-dragon/initials/face-fury.png",
+  bellow: "/books/why-dragon/initials/bellow.png",
+  "stoke-the-fire": "/books/why-dragon/initials/stoke-the-fire.png",
+  "relinquish-your-goal": "/books/why-dragon/initials/relinquish-your-goal.png",
+  "jump-into-flames": "/books/why-dragon/initials/jump-into-flames.png",
+  "throw-sand": "/books/why-dragon/initials/throw-sand.png",
+  "turn-to-ash": "/books/why-dragon/initials/turn-to-ash.png",
+  "level-up": "/books/why-dragon/initials/level-up.png",
+};
+
+const { name, span = "3", class: className } = Astro.props;
+const spanClass =
+  span === "full" ? "wd-full" : span === "4" ? "wd-span-4" : "wd-span-3";
+const trimmed = name.trim();
+const initial = trimmed.charAt(0);
+const rest = trimmed.slice(1);
+const initialSlug = trimmed
+  .toLowerCase()
+  .replace(/[^\w]+/g, "-")
+  .replace(/^-+|-+$/g, "");
+const initialSrc = initialSrcBySlug[initialSlug];
+---
+
+<div class:list={["wd-move", spanClass, className]}>
+  <span
+    class:list={[
+      "wd-initial",
+      initialSrc ? "wd-initial-image" : "wd-initial-fallback",
+    ]}
+    aria-hidden="true"
+  >
+    {
+      initialSrc ? (
+        <img
+          src={initialSrc}
+          width="768"
+          height="768"
+          alt=""
+          loading="eager"
+          decoding="async"
+        />
+      ) : (
+        <span class="wd-initial-letter">{initial}</span>
+      )
+    }
+  </span>
+  <div class="wd-move-copy">
+    <h3 class="wd-move-name" aria-label={name}>{rest}</h3>
+    <slot />
+  </div>
+</div>
