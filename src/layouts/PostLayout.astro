@@ -1,7 +1,8 @@
 ---
-import type { MarkdownLayoutProps } from "astro";
+import type { MarkdownHeading, MDXInstance } from "astro";
 
 import { resolvePostOgImage } from "../lib/ogImage";
+import { normalizeImg } from "../lib/postImages";
 import PostTime from "../lib/PostTime.astro";
 import Image from "../lib/prose/Image.astro";
 import { blogPostingSchema } from "../lib/seo/jsonLd";
@@ -13,8 +14,9 @@ import BaseLayout from "./BaseLayout.astro";
 
 import "../global-styles/shiki.css";
 
-interface Props extends Omit<MarkdownLayoutProps<{}>, "frontmatter"> {
+interface Props extends Omit<MDXInstance<{}>, "frontmatter"> {
   frontmatter: PostFrontmatter;
+  headings: MarkdownHeading[];
 }
 
 const { frontmatter, headings } = Astro.props;
@@ -22,8 +24,7 @@ const { frontmatter, headings } = Astro.props;
 const ogImage = await resolvePostOgImage(frontmatter, Astro.props.file);
 const readingTime = frontmatter.readingTime;
 const date = new Date(frontmatter.date);
-const imgSrc =
-  typeof frontmatter.img === "object" ? frontmatter.img.src : frontmatter.img;
+const imgSrc = normalizeImg(frontmatter.img).src;
 const description = frontmatter.description || "";
 
 const canonical = Astro.site
@@ -64,7 +65,14 @@ const postSchema = blogPostingSchema({
     </header>
     {
       imgSrc && (
-        <Image alt="" src={imgSrc} format="webp" width={774} height={387} />
+        <Image
+          alt=""
+          src={imgSrc}
+          format="webp"
+          width={774}
+          height={387}
+          relativeTo={Astro.props.file}
+        />
       )
     }
     <slot />

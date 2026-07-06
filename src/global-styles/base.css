@@ -1,3 +1,4 @@
+/* impeccable-disable bounce-easing -- bounce-in/out is a keyframe name; the easing is cubic-bezier(0.23, 1, 0.32, 1), ease-out-quint */
 @import "tailwindcss";
 
 @source "../../posts/**/*.mdx";

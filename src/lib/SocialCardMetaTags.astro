@@ -6,14 +6,13 @@ interface Props {
   description: string;
   ogImage: string | undefined;
   /** "article" for posts; default "website". */
-  ogType?: "website" | "article";
+  ogType?: "website" | "article" | undefined;
 }
 
-let { title, description, ogImage, ogType = "website" } = Astro.props;
+const { title, description, ogType = "website" } = Astro.props;
+let { ogImage } = Astro.props;
 
-if (ogImage) {
-  ogImage = new URL(ogImage, import.meta.env.PUBLIC_URL).href;
-}
+ogImage &&= new URL(ogImage, import.meta.env.PUBLIC_URL).href;
 ---
 
 <meta property="og:type" content={ogType} />

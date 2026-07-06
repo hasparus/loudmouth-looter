@@ -10,7 +10,11 @@ type Point = { x: number; y: number };
 type Interval = { left: number; right: number };
 type Rect = { x: number; y: number; width: number; height: number };
 
-function transformWrapPoints(points: Point[], rect: Rect, angle: number): Point[] {
+function transformWrapPoints(
+  points: Point[],
+  rect: Rect,
+  angle: number,
+): Point[] {
   const cx = rect.x + rect.width / 2;
   const cy = rect.y + rect.height / 2;
   const cos = Math.cos(angle);
@@ -28,7 +32,7 @@ function isPointInPolygon(points: Point[], x: number, y: number): boolean {
     const a = points[i]!;
     const b = points[j]!;
     if (
-      (a.y > y) !== (b.y > y) &&
+      a.y > y !== b.y > y &&
       x < ((b.x - a.x) * (y - a.y)) / (b.y - a.y) + a.x
     )
       inside = !inside;
@@ -38,7 +42,7 @@ function isPointInPolygon(points: Point[], x: number, y: number): boolean {
 
 function polygonXsAtY(points: Point[], y: number): number[] {
   const xs: number[] = [];
-  let a = points[points.length - 1]!;
+  let a = points.at(-1)!;
   for (const b of points) {
     if ((a.y <= y && y < b.y) || (b.y <= y && y < a.y))
       xs.push(a.x + ((y - a.y) * (b.x - a.x)) / (b.y - a.y));
@@ -76,7 +80,8 @@ function carveSlots(base: Interval, blocked: Interval[]): Interval[] {
         continue;
       }
       if (iv.left > slot.left) next.push({ left: slot.left, right: iv.left });
-      if (iv.right < slot.right) next.push({ left: iv.right, right: slot.right });
+      if (iv.right < slot.right)
+        next.push({ left: iv.right, right: slot.right });
     }
     slots = next;
   }
@@ -111,7 +116,13 @@ const TRIANGLE: Point[] = [
   { x: 0.03, y: 0.95 },
 ];
 
-type ShapeDef = { base: Point[]; fx: number; fy: number; fw: number; fh: number };
+type ShapeDef = {
+  base: Point[];
+  fx: number;
+  fy: number;
+  fw: number;
+  fh: number;
+};
 const SHAPES: ShapeDef[] = [
   { base: TRIANGLE, fx: 0.07, fy: 0.34, fw: 0.26, fh: 0.4 },
   { base: HEX, fx: 0.62, fy: 0.08, fw: 0.28, fh: 0.42 },
@@ -128,7 +139,9 @@ const HPAD = 12;
  * a shape to spin it — the text reflows live around the new geometry.
  */
 export function Spread() {
-  const [lines, setLines] = createSignal<{ text: string; x: number; y: number }[]>([]);
+  const [lines, setLines] = createSignal<
+    { text: string; x: number; y: number }[]
+  >([]);
   const [polys, setPolys] = createSignal<Point[][]>([]);
 
   let root!: HTMLDivElement;
@@ -141,9 +154,9 @@ export function Spread() {
     const H = root.clientHeight;
     if (!W || !H) return;
     const cs = getComputedStyle(root);
-    const size = parseFloat(cs.fontSize);
+    const size = Number.parseFloat(cs.fontSize);
     const font = `${cs.fontWeight} ${size}px ${cs.fontFamily}`;
-    const lh = parseFloat(cs.lineHeight) || size * 1.5;
+    const lh = Number.parseFloat(cs.lineHeight) || size * 1.5;
 
     const shapePolys = SHAPES.map((s, i) =>
       transformWrapPoints(
@@ -171,12 +184,20 @@ export function Spread() {
           .filter((iv): iv is Interval => iv !== null);
         const slots = carveSlots(col, blocked);
         for (const slot of slots) {
-          const range = layoutNextLineRange(prepared, cursor, slot.right - slot.left);
+          const range = layoutNextLineRange(
+            prepared,
+            cursor,
+            slot.right - slot.left,
+          );
           if (range === null) {
             done = true;
             break;
           }
-          out.push({ text: materializeLineRange(prepared, range).text, x: slot.left, y });
+          out.push({
+            text: materializeLineRange(prepared, range).text,
+            x: slot.left,
+            y,
+          });
           cursor = range.end;
         }
       }
@@ -208,6 +229,13 @@ export function Spread() {
     if (hit !== -1) spin(hit);
   };
 
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    const count = polys().length;
+    if (count > 0) spin(Math.floor(Math.random() * count));
+  };
+
   onMount(() => {
     if (document.fonts.status === "loaded") layout();
     else void document.fonts.ready.then(layout);
@@ -222,41 +250,50 @@ export function Spread() {
   const toPath = (p: Point[]) => p.map((q) => `${q.x},${q.y}`).join(" ");
 
   return (
-    <div
-      ref={root}
-      onClick={onClick}
-      class="font-text text-neu-800 dark:text-neu-300 relative h-[460px] text-base leading-relaxed"
-    >
-      <svg class="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
-        <For each={polys()}>
-          {(p) => (
-            <polygon
-              points={toPath(p)}
-              class="text-accent-500/15 stroke-accent-500/70 cursor-pointer [stroke-width:1.5]"
-              fill="currentColor"
-              stroke="currentColor"
-            />
-          )}
-        </For>
-      </svg>
-
+    <>
       <p class="sr-only">{TEXT}</p>
-      <div aria-hidden="true">
-        <For each={lines()}>
-          {(l) => (
-            <span
-              style={{
-                position: "absolute",
-                left: `${l.x}px`,
-                top: `${l.y}px`,
-                "white-space": "pre",
-              }}
-            >
-              {l.text}
-            </span>
-          )}
-        </For>
+      <div
+        ref={root}
+        role="button"
+        tabIndex={0}
+        aria-label="Rearrange the words"
+        onClick={onClick}
+        onKeyDown={onKeyDown}
+        class="font-text text-neu-800 dark:text-neu-300 relative h-[460px] text-base/relaxed"
+      >
+        <svg
+          class="absolute inset-0 size-full overflow-visible"
+          aria-hidden="true"
+        >
+          <For each={polys()}>
+            {(p) => (
+              <polygon
+                points={toPath(p)}
+                class="text-accent-500/15 stroke-accent-500/70 cursor-pointer stroke-[1.5]"
+                fill="currentColor"
+                stroke="currentColor"
+              />
+            )}
+          </For>
+        </svg>
+
+        <div aria-hidden="true">
+          <For each={lines()}>
+            {(l) => (
+              <span
+                style={{
+                  position: "absolute",
+                  left: `${l.x}px`,
+                  top: `${l.y}px`,
+                  "white-space": "pre",
+                }}
+              >
+                {l.text}
+              </span>
+            )}
+          </For>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

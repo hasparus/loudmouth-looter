@@ -141,4 +141,26 @@ test.describe("editor", () => {
       page.getByRole("button", { name: "Turn spellcheck on" }),
     ).toBeVisible();
   });
+
+  test("pastes every block of multi-block content", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+
+    const words = ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot"];
+    await editor.evaluate((el, blocks) => {
+      const data = new DataTransfer();
+      data.setData("text/html", blocks.map((w) => `<p>${w}</p>`).join(""));
+      el.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    }, words);
+
+    for (const word of words) {
+      await expect(editor).toContainText(word);
+    }
+  });
 });
