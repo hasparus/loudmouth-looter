@@ -142,19 +142,45 @@ import fire from "../../src/fire.svg?url";
   defaultValue={2}
   max={4}
   style={`--fire: url("${fire}")`}
-  class="[&:has(.te-toggle:last-child[aria-checked=true])_.te-toggle]:text-accent-700! dark:[&:has(.te-toggle:last-child[aria-checked=true])_.te-toggle]:text-accent-400! [&_.te-toggle:last-child]:before:bg-neu-400! [&_.te-toggle:last-child:hover]:before:bg-neu-800! [&:has(.te-toggle:last-child[aria-checked=true])_.te-toggle:last-child]:before:bg-accent-700! dark:[&:has(.te-toggle:last-child[aria-checked=true])_.te-toggle:last-child]:before:bg-accent-400! [&_.te-toggle:last-child]:cursor-match [&:has(.te-toggle:last-child:hover)_.te-toggle]:animate-jitter [&_.te-toggle:last-child]:before:size-[0.82em]! [&_.te-toggle:last-child]:before:transform-none! [&_.te-toggle:last-child]:before:shadow-none! [&_.te-toggle:last-child]:before:[clip-path:none]! [&_.te-toggle:last-child]:before:[mask:var(--fire)_center/contain_no-repeat]! dark:[&_.te-toggle:last-child:hover]:before:bg-white!"
+  class="fire"
 />
 
 <style>
   {
     /* css */ `
-    .te-track:has(.te-toggle:last-child:hover) .te-toggle:nth-last-child(2) {
+    .fire .te-toggle:last-child {
+      cursor: -webkit-image-set(var(--cur-match)) 15 14, pointer !important;
+      cursor: image-set(var(--cur-match)) 15 14, pointer !important;
+    }
+    .fire .te-toggle:last-child::before {
+      width: 0.82em !important;
+      height: 0.82em !important;
+      background-color: var(--color-neu-400) !important;
+      transform: none !important;
+      box-shadow: none !important;
+      clip-path: none !important;
+      -webkit-mask: var(--fire) center / contain no-repeat !important;
+      mask: var(--fire) center / contain no-repeat !important;
+    }
+    .fire .te-toggle:last-child:hover::before {
+      background-color: light-dark(var(--color-neu-800), #fff) !important;
+    }
+    .fire:has(.te-toggle:last-child[aria-checked=true]) .te-toggle {
+      color: light-dark(var(--color-accent-700), var(--color-accent-400)) !important;
+    }
+    .fire:has(.te-toggle:last-child[aria-checked=true]) .te-toggle:last-child::before {
+      background-color: light-dark(var(--color-accent-700), var(--color-accent-400)) !important;
+    }
+    .fire:has(.te-toggle:last-child:hover) .te-toggle {
+      animation: var(--animate-jitter);
+    }
+    .fire:has(.te-toggle:last-child:hover) .te-toggle:nth-last-child(2) {
       animation-delay: 33ms;
     }
-    .te-track:has(.te-toggle:last-child:hover) .te-toggle:nth-last-child(3) {
+    .fire:has(.te-toggle:last-child:hover) .te-toggle:nth-last-child(3) {
       animation-delay: 66ms;
     }
-    .te-track:has(.te-toggle:last-child:hover) .te-toggle:nth-last-child(4) {
+    .fire:has(.te-toggle:last-child:hover) .te-toggle:nth-last-child(4) {
       animation-delay: 99ms;
     }`
   }
