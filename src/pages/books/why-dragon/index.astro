@@ -81,7 +81,7 @@ const pyreLevels = [
               <span class="wd-field-name">Class</span>
               <span class="wd-line"></span>
               <label class="wd-bellow">
-                <input type="checkbox" />
+                <input type="checkbox" data-checkbox-marker="x" />
                 <span>Bellow</span>
               </label>
               <span class="wd-examples wd-stat-desc italic">
@@ -133,11 +133,14 @@ const pyreLevels = [
                   "Vengeance",
                 ].map((goal) => (
                   <li>
-                    <input type="checkbox" /> {goal}
+                    <input type="checkbox" data-checkbox-marker="x" /> {goal}
                   </li>
                 ))
               }
-              <li><input type="checkbox" /> <span class="wd-line"></span></li>
+              <li>
+                <input type="checkbox" data-checkbox-marker="x" />
+                <span class="wd-line"></span>
+              </li>
             </ul>
           </section>
           <section class="wd-span-2 wd-notes">
@@ -147,7 +150,11 @@ const pyreLevels = [
           <section class="wd-span-4">
             <div class="wd-xp-head">
               <h3 class="wd-rubric">XP</h3>
-              {[1, 2, 3, 4].map(() => <input type="checkbox" />)}
+              {
+                [1, 2, 3, 4].map(() => (
+                  <input type="checkbox" data-checkbox-marker="x" />
+                ))
+              }
             </div>
             <p class="wd-hint">
               Mark 1 XP when you roll a 6−, or your Goal leads you into danger. <br

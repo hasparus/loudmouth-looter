@@ -1,4 +1,3 @@
-
 export type Shape = "circle" | "rhomb" | "square";
 
 export const TRACK_SHAPES: ReadonlySet<string> = new Set([
