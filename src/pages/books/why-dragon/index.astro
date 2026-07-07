@@ -133,7 +133,8 @@ const pyreLevels = [
                   "Vengeance",
                 ].map((goal) => (
                   <li>
-                    <input type="checkbox" data-checkbox-marker="x" /> {goal}
+                    <input type="checkbox" data-checkbox-marker="x" />
+                    <span>{goal}</span>
                   </li>
                 ))
               }
@@ -221,7 +222,7 @@ const pyreLevels = [
             Proofread by Zack Thomson, Wafergix, Łukasz Bartoszewicz.
           </p>
           <p class="wd-colophon wd-full">
-            Made for use with <em>1 HP Dragon</em> by Clayton Notestine. <em
+            Based on <em>1 HP Dragon</em> by Clayton Notestine. <em
               >Face Fury</em
             > adapts Jeremy Strandberg's <em>Defy Danger, Restated</em>, used
             under CC BY-SA 4.0. The ruleset is shared under CC BY-SA 4.0.
@@ -303,6 +304,52 @@ const pyreLevels = [
             </ul>
             <p>You may turn one of your rolls into a success now or later.</p>
           </Move>
+
+          <Move name="Burn">
+            <p>
+              When you <em>wield power torn from the Dragon</em>, roll
+              <strong>+Pyre</strong>.
+            </p>
+            <p>
+              <strong>On 10+</strong>, the power obeys.<br />
+              <strong>On 7–9</strong>, it works, but <strong>raise Pyre</strong
+              >{" "}
+              and say what else catches fire.<br />
+              <strong>On 6−</strong>, you lose control. <strong
+                >Raise Pyre</strong
+              >, mark <strong>1 XP</strong>, and the DM makes a move.
+            </p>
+          </Move>
+
+          <section class="wd-full wd-dm mt-4">
+            <div>
+              <h3 class="wd-rubric">DM's Agenda</h3>
+              <ul>
+                <li><span>Make the Dragon vast and terrible.</span></li>
+                <li><span>Learn what they're willing to burn.</span></li>
+                <li><span>See what's left when the smoke clears.</span></li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="wd-rubric">DM Moves</h3>
+              <p>
+                Hurt, Raze, Capture, Separate,<br />Reveal, Bargain, Soar,
+                Threaten.
+              </p>
+            </div>
+          </section>
+
+          <section class="wd-full wd-dragon-box mt-4">
+            <h3 class="wd-rubric">The Dragon</h3>
+            <p>
+              The Dragon is made of <em>Scales</em> to protect, <em>Fangs</em> to
+              deter attackers, and <em>Curses</em> that spell doom if it ever dies.
+              Each is <em>Known</em> or <em>Secret</em> until a Hunter unveils it.
+              Put them in the center of the table. For short games, use 3–5 and start
+              <em>in medias res</em>; for four-hour games, add a <em>Curse</em> on
+              top.
+            </p>
+          </section>
         </article>
 
         <article class="wd-page wd-recto">
