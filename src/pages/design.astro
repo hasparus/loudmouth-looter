@@ -100,7 +100,9 @@ const fonts = [
             <li
               class={`${cls} border-neu-300 dark:border-neu-700 bg-neu-50 dark:bg-neu-800 flex flex-col items-center gap-2 rounded border p-4`}
               style={
-                cls ? undefined : `cursor: url("/cursors/${png}"), ${native}`
+                cls
+                  ? undefined
+                  : `cursor: image-set(url("/cursors/${png}") 1x, url("/cursors/${png.replace(".png", "@2x.png")}") 2x), ${native}`
               }
             >
               <img
