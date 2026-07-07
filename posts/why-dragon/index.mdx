@@ -182,6 +182,11 @@ import fire from "../../src/fire.svg?url";
     }
     .fire:has(.te-toggle:last-child:hover) .te-toggle:nth-last-child(4) {
       animation-delay: 99ms;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .fire:has(.te-toggle:last-child:hover) .te-toggle {
+        animation-duration: 0.01ms;
+      }
     }`
   }
 </style>
