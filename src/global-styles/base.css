@@ -12,6 +12,20 @@
 
 @custom-variant group-link-hocus (&:is(:where(.group):has(>a:is(:hover, :focus)) *));
 
+@utility cursor-default {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/default.png") 1x,
+        url("/cursors/default@2x.png") 2x
+      )
+      5 5,
+    auto !important;
+  cursor:
+    image-set(url("/cursors/default.png") 1x, url("/cursors/default@2x.png") 2x)
+      5 5,
+    auto !important;
+}
+
 @utility cursor-pointer {
   cursor:
     -webkit-image-set(
@@ -42,20 +56,6 @@
         13 3,
       pointer !important;
   }
-}
-
-@utility cursor-match {
-  cursor:
-    -webkit-image-set(
-        url("/cursors/match.png") 1x,
-        url("/cursors/match@2x.png") 2x
-      )
-      15 14,
-    pointer !important;
-  cursor:
-    image-set(url("/cursors/match.png") 1x, url("/cursors/match@2x.png") 2x) 15
-      14,
-    pointer !important;
 }
 
 @utility cursor-text {

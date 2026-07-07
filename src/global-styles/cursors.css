@@ -1,24 +1,7 @@
-html {
-  --cur-default:
-    url("/cursors/default.png") 1x, url("/cursors/default@2x.png") 2x;
-  --cur-pointer:
-    url("/cursors/pointer.png") 1x, url("/cursors/pointer@2x.png") 2x;
-  --cur-pointer-active:
-    url("/cursors/pointer-active.png") 1x,
-    url("/cursors/pointer-active@2x.png") 2x;
-  --cur-match: url("/cursors/match.png") 1x, url("/cursors/match@2x.png") 2x;
-  --cur-text:
-    url("/cursors/text-select.png") 1x, url("/cursors/text-select@2x.png") 2x;
-  --cur-not-allowed:
-    url("/cursors/not-allowed.png") 1x, url("/cursors/not-allowed@2x.png") 2x;
-  --cur-wait: url("/cursors/wait.png") 1x, url("/cursors/wait@2x.png") 2x;
+@reference "./base.css";
 
-  cursor:
-    -webkit-image-set(var(--cur-default)) 5 5,
-    auto;
-  cursor:
-    image-set(var(--cur-default)) 5 5,
-    auto;
+html {
+  @apply cursor-default;
 }
 
 a[href],
@@ -46,22 +29,7 @@ input:is(
 [role="switch"],
 [role="tab"],
 [onclick] {
-  cursor:
-    -webkit-image-set(var(--cur-pointer)) 13 3,
-    pointer;
-  cursor:
-    image-set(var(--cur-pointer)) 13 3,
-    pointer;
-
-  &:active,
-  &[data-cursor-pressed] {
-    cursor:
-      -webkit-image-set(var(--cur-pointer-active)) 13 3,
-      pointer;
-    cursor:
-      image-set(var(--cur-pointer-active)) 13 3,
-      pointer;
-  }
+  @apply cursor-pointer;
 }
 
 input:is(
@@ -82,29 +50,14 @@ input:is(
 textarea,
 [contenteditable="true"],
 .zaduma-prose :where(p, li) {
-  cursor:
-    -webkit-image-set(var(--cur-text)) 16 16,
-    text;
-  cursor:
-    image-set(var(--cur-text)) 16 16,
-    text;
+  @apply cursor-text;
 }
 
 :disabled,
 [aria-disabled="true"] {
-  cursor:
-    -webkit-image-set(var(--cur-not-allowed)) 16 16,
-    not-allowed;
-  cursor:
-    image-set(var(--cur-not-allowed)) 16 16,
-    not-allowed;
+  @apply cursor-not-allowed;
 }
 
 [aria-busy="true"] {
-  cursor:
-    -webkit-image-set(var(--cur-wait)) 16 16,
-    wait;
-  cursor:
-    image-set(var(--cur-wait)) 16 16,
-    wait;
+  @apply cursor-wait;
 }
