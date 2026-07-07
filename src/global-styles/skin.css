@@ -257,7 +257,7 @@
   }
 
   :where(input[type="checkbox"][data-checkbox-marker="x"]:checked,
-    .te-toggle[data-shape="circle"][aria-checked="true"])::before {
+    .te-toggle:is([data-shape="circle"], [data-checkbox-marker="x"])[aria-checked="true"])::before {
     content: "✗";
     font-size: 1.05em;
     font-weight: bold;

@@ -20,6 +20,7 @@ interface Props {
   name?: string;
   class?: string;
   style?: string | Record<string, string>;
+  marker?: "x";
 }
 
 const {
@@ -31,6 +32,7 @@ const {
 } = resolveTrackProps(Astro.props);
 const className = Astro.props.class;
 const style = Astro.props.style;
+const marker = Astro.props.marker;
 ---
 
 {
@@ -59,6 +61,7 @@ const style = Astro.props.style;
           data-shape={shape}
           aria-hidden="true"
           aria-checked={i < fill ? "true" : "false"}
+          data-checkbox-marker={marker}
         />
       ))}
     </span>
