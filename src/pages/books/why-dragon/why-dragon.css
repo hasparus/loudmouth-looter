@@ -773,4 +773,7 @@ html.dark .wd-pyre-num {
     filter: none;
   }
 
+  .wd-goal-list li span:not(.wd-line) {
+    top: 2px;
+  }
 }
