@@ -774,6 +774,6 @@ html.dark .wd-pyre-num {
   }
 
   .wd-goal-list li span:not(.wd-line) {
-    top: 2px;
+    top: 1.5px;
   }
 }
