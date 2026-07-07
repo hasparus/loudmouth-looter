@@ -12,154 +12,255 @@
 
 @custom-variant group-link-hocus (&:is(:where(.group):has(>a:is(:hover, :focus)) *));
 
-/* Custom pixel cursors share names with Tailwind core cursor-* utils.
-   A cascade layer after `utilities` makes them win deterministically with no
-   !important and no rename. */
-@layer cursors {
-  .cursor-pointer {
-    cursor:
-      -webkit-image-set(var(--cur-pointer)) 13 3,
-      pointer;
-    cursor:
-      image-set(var(--cur-pointer)) 13 3,
-      pointer;
+@utility cursor-pointer {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/pointer.png") 1x,
+        url("/cursors/pointer@2x.png") 2x
+      )
+      13 3,
+    pointer !important;
+  cursor:
+    image-set(url("/cursors/pointer.png") 1x, url("/cursors/pointer@2x.png") 2x)
+      13 3,
+    pointer !important;
 
-    &:active,
-    &[data-cursor-pressed] {
-      cursor:
-        -webkit-image-set(var(--cur-pointer-active)) 13 3,
-        pointer;
-      cursor:
-        image-set(var(--cur-pointer-active)) 13 3,
-        pointer;
-    }
+  &:active,
+  &[data-cursor-pressed] {
+    cursor:
+      -webkit-image-set(
+          url("/cursors/pointer-active.png") 1x,
+          url("/cursors/pointer-active@2x.png") 2x
+        )
+        13 3,
+      pointer !important;
+    cursor:
+      image-set(
+          url("/cursors/pointer-active.png") 1x,
+          url("/cursors/pointer-active@2x.png") 2x
+        )
+        13 3,
+      pointer !important;
   }
+}
 
-  .cursor-match {
-    cursor:
-      -webkit-image-set(var(--cur-match)) 15 14,
-      pointer;
-    cursor:
-      image-set(var(--cur-match)) 15 14,
-      pointer;
-  }
+@utility cursor-match {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/match.png") 1x,
+        url("/cursors/match@2x.png") 2x
+      )
+      15 14,
+    pointer !important;
+  cursor:
+    image-set(url("/cursors/match.png") 1x, url("/cursors/match@2x.png") 2x) 15
+      14,
+    pointer !important;
+}
 
-  .cursor-text {
-    cursor:
-      -webkit-image-set(var(--cur-text)) 16 16,
-      text;
-    cursor:
-      image-set(var(--cur-text)) 16 16,
-      text;
-  }
+@utility cursor-text {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/text-select.png") 1x,
+        url("/cursors/text-select@2x.png") 2x
+      )
+      16 16,
+    text !important;
+  cursor:
+    image-set(
+        url("/cursors/text-select.png") 1x,
+        url("/cursors/text-select@2x.png") 2x
+      )
+      16 16,
+    text !important;
+}
 
-  .cursor-not-allowed {
-    cursor:
-      -webkit-image-set(var(--cur-not-allowed)) 16 16,
-      not-allowed;
-    cursor:
-      image-set(var(--cur-not-allowed)) 16 16,
-      not-allowed;
-  }
+@utility cursor-not-allowed {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/not-allowed.png") 1x,
+        url("/cursors/not-allowed@2x.png") 2x
+      )
+      16 16,
+    not-allowed !important;
+  cursor:
+    image-set(
+        url("/cursors/not-allowed.png") 1x,
+        url("/cursors/not-allowed@2x.png") 2x
+      )
+      16 16,
+    not-allowed !important;
+}
 
-  .cursor-wait {
-    cursor:
-      -webkit-image-set(var(--cur-wait)) 16 16,
-      wait;
-    cursor:
-      image-set(var(--cur-wait)) 16 16,
-      wait;
-  }
+@utility cursor-wait {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/wait.png") 1x,
+        url("/cursors/wait@2x.png") 2x
+      )
+      16 16,
+    wait !important;
+  cursor:
+    image-set(url("/cursors/wait.png") 1x, url("/cursors/wait@2x.png") 2x) 16 16,
+    wait !important;
+}
 
-  .cursor-progress {
-    cursor:
-      -webkit-image-set(var(--cur-wait)) 16 16,
-      progress;
-    cursor:
-      image-set(var(--cur-wait)) 16 16,
-      progress;
-  }
+@utility cursor-progress {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/wait.png") 1x,
+        url("/cursors/wait@2x.png") 2x
+      )
+      16 16,
+    progress !important;
+  cursor:
+    image-set(url("/cursors/wait.png") 1x, url("/cursors/wait@2x.png") 2x) 16 16,
+    progress !important;
+}
 
-  .cursor-help {
-    cursor:
-      -webkit-image-set(var(--cur-help)) 16 16,
-      help;
-    cursor:
-      image-set(var(--cur-help)) 16 16,
-      help;
-  }
+@utility cursor-help {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/help.png") 1x,
+        url("/cursors/help@2x.png") 2x
+      )
+      16 16,
+    help !important;
+  cursor:
+    image-set(url("/cursors/help.png") 1x, url("/cursors/help@2x.png") 2x) 16 16,
+    help !important;
+}
 
-  .cursor-crosshair {
-    cursor:
-      -webkit-image-set(var(--cur-crosshair)) 16 16,
-      crosshair;
-    cursor:
-      image-set(var(--cur-crosshair)) 16 16,
-      crosshair;
-  }
+@utility cursor-crosshair {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/precision-select.png") 1x,
+        url("/cursors/precision-select@2x.png") 2x
+      )
+      16 16,
+    crosshair !important;
+  cursor:
+    image-set(
+        url("/cursors/precision-select.png") 1x,
+        url("/cursors/precision-select@2x.png") 2x
+      )
+      16 16,
+    crosshair !important;
+}
 
-  .cursor-move {
-    cursor:
-      -webkit-image-set(var(--cur-move)) 16 16,
-      move;
-    cursor:
-      image-set(var(--cur-move)) 16 16,
-      move;
-  }
+@utility cursor-move {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/move.png") 1x,
+        url("/cursors/move@2x.png") 2x
+      )
+      16 16,
+    move !important;
+  cursor:
+    image-set(url("/cursors/move.png") 1x, url("/cursors/move@2x.png") 2x) 16 16,
+    move !important;
+}
 
-  .cursor-ew-resize {
-    cursor:
-      -webkit-image-set(var(--cur-ew-resize)) 16 16,
-      ew-resize;
-    cursor:
-      image-set(var(--cur-ew-resize)) 16 16,
-      ew-resize;
-  }
+@utility cursor-ew-resize {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/horizontal-resize.png") 1x,
+        url("/cursors/horizontal-resize@2x.png") 2x
+      )
+      16 16,
+    ew-resize !important;
+  cursor:
+    image-set(
+        url("/cursors/horizontal-resize.png") 1x,
+        url("/cursors/horizontal-resize@2x.png") 2x
+      )
+      16 16,
+    ew-resize !important;
+}
 
-  .cursor-ns-resize {
-    cursor:
-      -webkit-image-set(var(--cur-ns-resize)) 16 16,
-      ns-resize;
-    cursor:
-      image-set(var(--cur-ns-resize)) 16 16,
-      ns-resize;
-  }
+@utility cursor-ns-resize {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/vertical-resize.png") 1x,
+        url("/cursors/vertical-resize@2x.png") 2x
+      )
+      16 16,
+    ns-resize !important;
+  cursor:
+    image-set(
+        url("/cursors/vertical-resize.png") 1x,
+        url("/cursors/vertical-resize@2x.png") 2x
+      )
+      16 16,
+    ns-resize !important;
+}
 
-  .cursor-col-resize {
-    cursor:
-      -webkit-image-set(var(--cur-col-resize)) 16 16,
-      col-resize;
-    cursor:
-      image-set(var(--cur-col-resize)) 16 16,
-      col-resize;
-  }
+@utility cursor-col-resize {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/column-resize.png") 1x,
+        url("/cursors/column-resize@2x.png") 2x
+      )
+      16 16,
+    col-resize !important;
+  cursor:
+    image-set(
+        url("/cursors/column-resize.png") 1x,
+        url("/cursors/column-resize@2x.png") 2x
+      )
+      16 16,
+    col-resize !important;
+}
 
-  .cursor-row-resize {
-    cursor:
-      -webkit-image-set(var(--cur-row-resize)) 16 16,
-      row-resize;
-    cursor:
-      image-set(var(--cur-row-resize)) 16 16,
-      row-resize;
-  }
+@utility cursor-row-resize {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/row-resize.png") 1x,
+        url("/cursors/row-resize@2x.png") 2x
+      )
+      16 16,
+    row-resize !important;
+  cursor:
+    image-set(
+        url("/cursors/row-resize.png") 1x,
+        url("/cursors/row-resize@2x.png") 2x
+      )
+      16 16,
+    row-resize !important;
+}
 
-  .cursor-nwse-resize {
-    cursor:
-      -webkit-image-set(var(--cur-nwse-resize)) 16 16,
-      nwse-resize;
-    cursor:
-      image-set(var(--cur-nwse-resize)) 16 16,
-      nwse-resize;
-  }
+@utility cursor-nwse-resize {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/diagonal-resize-1.png") 1x,
+        url("/cursors/diagonal-resize-1@2x.png") 2x
+      )
+      16 16,
+    nwse-resize !important;
+  cursor:
+    image-set(
+        url("/cursors/diagonal-resize-1.png") 1x,
+        url("/cursors/diagonal-resize-1@2x.png") 2x
+      )
+      16 16,
+    nwse-resize !important;
+}
 
-  .cursor-nesw-resize {
-    cursor:
-      -webkit-image-set(var(--cur-nesw-resize)) 16 16,
-      nesw-resize;
-    cursor:
-      image-set(var(--cur-nesw-resize)) 16 16,
-      nesw-resize;
-  }
+@utility cursor-nesw-resize {
+  cursor:
+    -webkit-image-set(
+        url("/cursors/diagonal-resize-2.png") 1x,
+        url("/cursors/diagonal-resize-2@2x.png") 2x
+      )
+      16 16,
+    nesw-resize !important;
+  cursor:
+    image-set(
+        url("/cursors/diagonal-resize-2.png") 1x,
+        url("/cursors/diagonal-resize-2@2x.png") 2x
+      )
+      16 16,
+    nesw-resize !important;
 }
 
 @theme {

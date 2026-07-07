@@ -61,27 +61,30 @@ export function Dialogue(props: { tree: Tree }) {
     const rm = reduceMotion();
     const from = box.offsetHeight;
     setShown(false);
-    window.setTimeout(() => {
-      setAnimate(true);
-      mutate();
-      requestAnimationFrame(() => {
-        if (!rm) {
-          const to = box.offsetHeight;
-          if (from !== to) {
-            box.style.overflow = "hidden";
-            const anim = box.animate(
-              [{ height: `${from}px` }, { height: `${to}px` }],
-              { duration: 240, easing: EASE_OUT },
-            );
-            anim.onfinish = () => (box.style.overflow = "");
-          }
-        }
+    window.setTimeout(
+      () => {
+        setAnimate(true);
+        mutate();
         requestAnimationFrame(() => {
-          setShown(true);
-          busy = false;
+          if (!rm) {
+            const to = box.offsetHeight;
+            if (from !== to) {
+              box.style.overflow = "hidden";
+              const anim = box.animate(
+                [{ height: `${from}px` }, { height: `${to}px` }],
+                { duration: 240, easing: EASE_OUT },
+              );
+              anim.onfinish = () => (box.style.overflow = "");
+            }
+          }
+          requestAnimationFrame(() => {
+            setShown(true);
+            busy = false;
+          });
         });
-      });
-    }, rm ? 120 : 110);
+      },
+      rm ? 120 : 110,
+    );
   };
 
   const select = (to: string) => {
@@ -146,10 +149,7 @@ export function Dialogue(props: { tree: Tree }) {
 
   return (
     <div ref={box}>
-      <div
-        class={styles.content}
-        data-shown={shown() ? "true" : "false"}
-      >
+      <div class={styles.content} data-shown={shown() ? "true" : "false"}>
         <p class="text-neu-800 dark:text-neu-300 leading-relaxed">
           <Prose say={node().say} onNav={select} /> {nav()}
         </p>
@@ -289,8 +289,7 @@ function MemeLink(props: { alt: string; src: string }) {
         href={props.src}
         target="_blank"
         rel="noopener noreferrer"
-        class="decoration-neu-400 dark:decoration-neu-500 text-inherit underline decoration-dotted decoration-[1.5px] underline-offset-[0.2em]"
-        style={{ cursor: "image-set(var(--cur-help)) 16 16, help" }}
+        class="decoration-neu-400 dark:decoration-neu-500 cursor-help text-inherit underline decoration-dotted decoration-[1.5px] underline-offset-[0.2em]"
         onMouseEnter={track}
         onMouseMove={track}
         onMouseLeave={leave}

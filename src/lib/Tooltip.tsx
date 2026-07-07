@@ -18,8 +18,7 @@ export function Tooltip(props: { text: string; children: JSX.Element }) {
       <button
         type="button"
         aria-describedby={id}
-        class="decoration-accent-500 dark:decoration-accent-400 border-0 bg-transparent p-0 text-inherit underline decoration-wavy underline-offset-[0.2em]"
-        style={{ cursor: "image-set(var(--cur-help)) 16 16, help" }}
+        class="decoration-accent-500 dark:decoration-accent-400 cursor-help border-0 bg-transparent p-0 text-inherit underline decoration-wavy underline-offset-[0.2em]"
       >
         {props.children}
       </button>

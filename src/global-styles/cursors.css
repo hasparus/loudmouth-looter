@@ -12,28 +12,6 @@ html {
   --cur-not-allowed:
     url("/cursors/not-allowed.png") 1x, url("/cursors/not-allowed@2x.png") 2x;
   --cur-wait: url("/cursors/wait.png") 1x, url("/cursors/wait@2x.png") 2x;
-  --cur-help: url("/cursors/help.png") 1x, url("/cursors/help@2x.png") 2x;
-  --cur-crosshair:
-    url("/cursors/precision-select.png") 1x,
-    url("/cursors/precision-select@2x.png") 2x;
-  --cur-move: url("/cursors/move.png") 1x, url("/cursors/move@2x.png") 2x;
-  --cur-ew-resize:
-    url("/cursors/horizontal-resize.png") 1x,
-    url("/cursors/horizontal-resize@2x.png") 2x;
-  --cur-ns-resize:
-    url("/cursors/vertical-resize.png") 1x,
-    url("/cursors/vertical-resize@2x.png") 2x;
-  --cur-col-resize:
-    url("/cursors/column-resize.png") 1x,
-    url("/cursors/column-resize@2x.png") 2x;
-  --cur-row-resize:
-    url("/cursors/row-resize.png") 1x, url("/cursors/row-resize@2x.png") 2x;
-  --cur-nwse-resize:
-    url("/cursors/diagonal-resize-1.png") 1x,
-    url("/cursors/diagonal-resize-1@2x.png") 2x;
-  --cur-nesw-resize:
-    url("/cursors/diagonal-resize-2.png") 1x,
-    url("/cursors/diagonal-resize-2@2x.png") 2x;
 
   cursor:
     -webkit-image-set(var(--cur-default)) 5 5,
@@ -102,7 +80,8 @@ input:is(
   [type="week"]
 ),
 textarea,
-[contenteditable="true"] {
+[contenteditable="true"],
+.zaduma-prose :where(p, li) {
   cursor:
     -webkit-image-set(var(--cur-text)) 16 16,
     text;
