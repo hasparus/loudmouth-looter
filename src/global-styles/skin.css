@@ -191,23 +191,6 @@
     font-size: 0.755em;
   }
 
-  ul.diamond {
-    list-style: none;
-    padding-left: 0;
-  }
-
-  ul.diamond>li::before {
-    content: "◈";
-    color: var(--color-neu-400);
-    margin-right: 0.5rem;
-    position: relative;
-    top: -0.03em;
-  }
-
-  html.dark ul.diamond>li::before {
-    color: var(--color-neu-500);
-  }
-
   /* Prose bullet lists carry the diamond sigil; task lists (remark-gfm adds
      .contains-task-list) show only the checkbox. Global + content-based so it
      never depends on a CSS-module hash landing on the same element. */

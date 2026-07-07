@@ -292,7 +292,7 @@ html.dark .wd-marker {
 }
 
 .wd-premise {
-  margin-block: var(--wd-baseline) 0;
+  margin-block: auto;
   font-size: 12pt;
 }
 
@@ -313,16 +313,16 @@ html.dark .wd-myth {
   color: var(--color-accent-400);
 }
 
+.wd-cover {
+  grid-template-rows: min-content min-content 1fr min-content min-content;
+}
+
 .wd-premise-zoom {
   margin-top: calc(var(--wd-baseline) * 0.75);
   font-variant: all-small-caps;
   letter-spacing: 0.08em;
   font-size: 9.5pt;
   color: var(--wd-ink);
-}
-
-.wd-cover {
-  grid-template-rows: min-content 1fr;
 }
 
 .wd-dragon-overlay {
