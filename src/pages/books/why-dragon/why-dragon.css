@@ -621,6 +621,13 @@ html.dark .wd-hint {
   font-weight: 600;
 }
 
+.wd-dragon-box p {
+  margin: 0;
+  font-size: 8.5pt;
+  line-height: 1.3;
+  text-wrap: pretty;
+}
+
 .wd-pyre {
   --wd-pyre-ink: var(--color-accent-800);
   display: flex;
