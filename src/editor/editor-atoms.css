@@ -51,7 +51,50 @@
   list-style: none;
 }
 
-.te-task>.te-toggle {
+.te-task > .te-toggle {
   margin-right: 0.5em;
   vertical-align: -0.08em;
+}
+
+/* Opaque MDX atoms: JSX, imports, and frontmatter the editor preserves but
+   cannot edit. The original source rides in data-mdx. */
+.te-jsx {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  margin-block: 0.35em;
+  padding: 0.3em 0.6em;
+  border: 1px dashed var(--color-neu-300, #d6d3d1);
+  border-radius: 4px;
+  font-size: 0.82em;
+  user-select: none;
+}
+
+.dark .te-jsx {
+  border-color: var(--color-neu-600, #57534e);
+}
+
+.te-jsx-tag {
+  flex-shrink: 0;
+  font-family: ui-monospace, monospace;
+  font-size: 0.9em;
+  color: var(--color-accent-700, #9f1239);
+}
+
+.dark .te-jsx-tag {
+  color: var(--color-accent-400, #fb7185);
+}
+
+.te-jsx-preview {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: ui-monospace, monospace;
+  font-size: 0.9em;
+  color: var(--color-neu-500, #78716c);
+}
+
+.te-jsx-inline {
+  border-bottom: 1px dotted var(--color-neu-400, #a8a29e);
+  user-select: none;
 }

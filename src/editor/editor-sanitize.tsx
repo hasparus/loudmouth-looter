@@ -1,5 +1,8 @@
-
-import { populateToggleElement, type Shape } from "./editor-atoms";
+import {
+  populateJsxElement,
+  populateToggleElement,
+  type Shape,
+} from "./editor-atoms";
 
 export function escapeHtml(text: string) {
   return text
@@ -88,6 +91,21 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
     if (DROPPED_TAGS.has(tag)) continue;
 
     const atomClass = child.getAttribute("class");
+
+    // Opaque MDX atoms (preserved JSX, imports, frontmatter): rebuild the
+    // whole chip from data-mdx instead of trusting its inner HTML. The
+    // payload is inert — it only ever reaches the remark serializer.
+    if (
+      (atomClass === "te-jsx" && tag === "DIV") ||
+      (atomClass === "te-jsx-inline" && tag === "SPAN")
+    ) {
+      const mdx = child instanceof HTMLElement ? (child.dataset.mdx ?? "") : "";
+      if (!mdx.trim()) continue;
+      const el = document.createElement(tag.toLowerCase());
+      populateJsxElement(el, mdx, atomClass === "te-jsx-inline");
+      target.append(el);
+      continue;
+    }
     if (
       atomClass &&
       ATOM_TAGS[atomClass] === tag &&
@@ -97,8 +115,7 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
       el.className = atomClass;
       if (atomClass === "te-track") {
         el.setAttribute("contenteditable", "false");
-        if (child.dataset.interactive === "1")
-          el.dataset.interactive = "1";
+        if (child.dataset.interactive === "1") el.dataset.interactive = "1";
       }
       if (atomClass === "te-toggle") {
         const rawShape = child.dataset.shape ?? "";
@@ -108,6 +125,11 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
           shape,
           child.getAttribute("aria-checked") === "true",
         );
+      }
+      if (atomClass === "te-move" && child.dataset.moveAttrs) {
+        // Preserved Move attributes; inert text, only read by the remark
+        // serializer on save.
+        el.dataset.moveAttrs = child.dataset.moveAttrs;
       }
       target.append(el);
       sanitizeInto(child, el);
