@@ -193,8 +193,9 @@ interface Sheet {
 **When to roll:**
 
 - Only when the outcome is in doubt and failure has teeth.
-- Difficulty is framing. Zoom in, split the task, or change the fiction. Leave
-  the number alone.
+- Difficulty is framing. Zoom in, change the stakes or the fiction. Leave the
+  number alone. _(audited per §9: "split the task" was task-resolution
+  language)_
 - Impossible stays impossible until the plan changes.
 
 **Combat** — _Monsters don't roll. One 2d10 + mod settles the exchange._
