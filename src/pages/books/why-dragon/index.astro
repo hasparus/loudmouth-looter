@@ -345,8 +345,9 @@ const pyreLevels = [
               The Dragon is made of Barriers: <em>Scales</em> to shield it, <em
                 >Fangs</em
               > to deter attackers, and <em>Curses</em> to spell doom if it ever dies.
-              Each is <em>Known</em> or <em>Secret</em> until a Hunter unveils it.
-              Put them in the center of the table. For short games, use 3–5 and start
+              Each is <em>Known</em> or <em>Secret</em> until a Hunter unveils it,
+              and each can be destroyed — or taken. Put them in the center of the
+              table. For short games, use 3–5 and start
               <em> in medias res</em>; for four-hour games, add 1–2 more and a
               Curse on top.
             </p>
@@ -512,6 +513,25 @@ const pyreLevels = [
       else void document.fonts.ready.then(relayoutMoves);
 
       new ResizeObserver(relayoutMoves).observe(document.body);
+
+      // The visible move headings start at their second letter — the
+      // illuminated initial images stand in for the first — which breaks
+      // search and copy in exported PDFs ("ace Fury"). Collect the full names
+      // into a near-invisible line in each page's bottom margin (.wd-page-alt)
+      // so they survive in the text layer. See why-dragon.css for why neither
+      // sr-only nor `transparent` text works in print.
+      for (const page of document.querySelectorAll<HTMLElement>(".wd-page")) {
+        const names = [...page.querySelectorAll(".wd-move-name")]
+          .map((heading) => heading.getAttribute("aria-label"))
+          .filter(Boolean)
+          .join(" · ");
+        if (!names) continue;
+        const alt = document.createElement("span");
+        alt.className = "wd-page-alt";
+        alt.setAttribute("aria-hidden", "true");
+        alt.textContent = names;
+        page.append(alt);
+      }
     </script>
   </body>
 </html>
