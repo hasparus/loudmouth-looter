@@ -146,10 +146,9 @@
   }
 
   @media (min-width: 1100px) {
-    grid-template-columns: [bleed-start] var(--aside-w) [main-start] minmax(
-        0,
-        1fr
-      ) [main-end aside-start] var(--aside-w) [bleed-end];
+    grid-template-columns:
+      [bleed-start] var(--aside-w) [main-start] minmax(0, 1fr)
+      [main-end aside-start] var(--aside-w) [bleed-end];
     width: calc(100% + 2 * (var(--aside-w) + var(--col-gap)));
     margin-left: calc(-1 * (var(--aside-w) + var(--col-gap)));
 

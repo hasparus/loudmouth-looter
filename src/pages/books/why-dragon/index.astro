@@ -318,12 +318,15 @@ const pyreLevels = [
             <LevelUp.Content />
           </PrintMove>
 
-          <PrintMove name={Aftermath.frontmatter.title as string} class="wd-break">
-            <Aftermath.Content />
-          </PrintMove>
-
           <PrintMove name={RaiseAToast.frontmatter.title as string}>
             <RaiseAToast.Content />
+          </PrintMove>
+
+          <PrintMove
+            name={Aftermath.frontmatter.title as string}
+            class="wd-break"
+          >
+            <Aftermath.Content />
           </PrintMove>
         </article>
       </div>
@@ -349,7 +352,11 @@ const pyreLevels = [
       } from "@chenglou/pretext";
 
       const relayoutMoves = () => {
-        for (const move of document.querySelectorAll<HTMLElement>(".wd-move")) {
+        // Skip the column-flow page: min-height only aligned grid rows, and
+        // estimator overshoot shows up as blank space inside the column.
+        for (const move of document.querySelectorAll<HTMLElement>(
+          ".wd-move:not(.wd-flow .wd-move)",
+        )) {
           const copy = move.querySelector<HTMLElement>(".wd-move-copy");
           const initial = move.querySelector<HTMLElement>(".wd-initial");
           if (!copy || !initial) continue;
