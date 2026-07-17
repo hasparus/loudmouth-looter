@@ -299,38 +299,30 @@ const pyreLevels = [
           </section>
         </article>
 
-        <article class="wd-page wd-recto">
+        <article class="wd-page wd-recto wd-flow">
           <span class="wd-pageno">3 · moves II</span>
 
           <PrintMove name={JumpIntoFlames.frontmatter.title as string}>
             <JumpIntoFlames.Content />
           </PrintMove>
 
-          <PrintMove name={ThrowSand.frontmatter.title as string}>
-            <ThrowSand.Content />
-          </PrintMove>
-
           <PrintMove name={TurnToAsh.frontmatter.title as string}>
             <TurnToAsh.Content />
+          </PrintMove>
+
+          <PrintMove name={ThrowSand.frontmatter.title as string}>
+            <ThrowSand.Content />
           </PrintMove>
 
           <PrintMove name={LevelUp.frontmatter.title as string}>
             <LevelUp.Content />
           </PrintMove>
 
-          <PrintMove
-            name={Aftermath.frontmatter.title as string}
-            span="full"
-            class="wd-aftermath"
-          >
+          <PrintMove name={Aftermath.frontmatter.title as string} class="wd-break">
             <Aftermath.Content />
           </PrintMove>
 
-          <PrintMove
-            name={RaiseAToast.frontmatter.title as string}
-            span="full"
-            class="wd-aftermath"
-          >
+          <PrintMove name={RaiseAToast.frontmatter.title as string}>
             <RaiseAToast.Content />
           </PrintMove>
         </article>

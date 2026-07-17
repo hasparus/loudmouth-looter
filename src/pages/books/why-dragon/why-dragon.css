@@ -282,18 +282,28 @@ html.dark .wd-move-name {
   color: light-dark(var(--color-neu-600), var(--color-neu-400));
 }
 
-.wd-aftermath {
-  column-count: 2;
+.wd-page.wd-flow {
+  display: block;
+  columns: 2;
   column-gap: var(--wd-alley);
+  column-fill: auto;
 }
 
-.wd-aftermath p {
-  margin-bottom: 0.25em;
-}
-
-.wd-aftermath p,
-.wd-aftermath ul {
+.wd-flow .wd-move {
   break-inside: avoid;
+  margin-block-end: 4mm;
+}
+
+.wd-flow .wd-move.wd-break {
+  break-inside: auto;
+}
+
+.wd-flow .wd-move.wd-break :is(p, li) {
+  break-inside: avoid;
+}
+
+.wd-flow .wd-move p {
+  margin-bottom: 0.25em;
 }
 
 .wd-marker {
