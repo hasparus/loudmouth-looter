@@ -3,6 +3,7 @@
 import InitColorScheme from "../../../lib/color-scheme/InitColorScheme.astro";
 
 import * as Aftermath from "../../../rules/why-dragon/aftermath.mdx";
+import * as RaiseAToast from "../../../rules/why-dragon/raise-a-toast.mdx";
 import * as Bellow from "../../../rules/why-dragon/bellow.mdx";
 import * as Burn from "../../../rules/why-dragon/burn.mdx";
 import * as FaceFury from "../../../rules/why-dragon/face-fury.mdx";
@@ -323,6 +324,14 @@ const pyreLevels = [
             class="wd-aftermath"
           >
             <Aftermath.Content />
+          </PrintMove>
+
+          <PrintMove
+            name={RaiseAToast.frontmatter.title as string}
+            span="full"
+            class="wd-aftermath"
+          >
+            <RaiseAToast.Content />
           </PrintMove>
         </article>
       </div>
