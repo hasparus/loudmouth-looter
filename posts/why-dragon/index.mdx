@@ -494,6 +494,13 @@ out with me on Discord and helping me come up with something semi-decent.
 
 import { PrevListManicule } from "#components/PrevListManicule";
 
+<style>{`
+  #changelog + ol > li:not(:first-child),
+  #changelog + ol > li > ul > li {
+    margin-top: 0.5rem; /* mt-2 */
+  }
+`}</style>
+
 1. **Saturday, July 4, 2026** — After proofreading from Wafergix and Łukasz
    Bartoszewicz
 
@@ -518,3 +525,45 @@ import { PrevListManicule } from "#components/PrevListManicule";
      statistically better than rerolling two, but it doesn't _feel_ impactful.
 
    <PrevListManicule />
+
+3. **Friday, July 17, 2026** — I ran the game thrice on Bazyliszek and twice after it.
+
+    - Changed Jump into Flames to reroll both dice instead of just one. Everybody helping in one roll always led to a success, so I had to either limit the number of people that can help or nerf the reroll. I also ran the games for parties of 5 and 6, what _happens_ on conventions, and the game needs to handle that.
+
+    - If you only help with misses and stop at the first 7+, the Hunters still erase almost every miss either way, but they can't consistently upgrade to a full success.
+
+    <PrevListManicule />
+
+    <figure className="mx-auto w-fit [&>table]:w-full">
+
+    | Helpers         | Reroll one     | Reroll both      |
+    | --------------: | :------------: | :--------------: |
+    |               0 |          41.7% |            41.7% |
+    |               1 |          19.4% |            17.4% |
+    |               2 |           9.1% |             7.3% |
+    |               3 |           4.2% |             3.0% |
+    |               4 |           2.0% |             1.3% |
+    |               5 |           1.0% |             0.5% |
+
+    <figcaption>Miss rate (the roll stays a 6−) by party size helping one Jump Into Flames</figcaption>
+
+    </figure>
+
+    - The old reroll let you keep your best die, so shoving a 7–9 up to a 10+ cost nothing. You'd never drop below it, and a full table would just grind any roll into a crit. Rerolling both dice kills that. A fresh 2d6 can crash back to a miss, so there's a risk in rerolling a partial.
+
+    <PrevListManicule />
+
+    <figure className="mx-auto w-fit [&>table]:w-full">
+
+    | Helpers         | Reroll one     | Reroll both      |
+    | --------------: | :------------: | :--------------: |
+    |               0 |          16.7% |            16.7% |
+    |               1 |          35.7% |            30.6% |
+    |               2 |          52.3% |            42.1% |
+    |               3 |          65.2% |            51.9% |
+    |               4 |          74.9% |            59.8% |
+    |               5 |          82.1% |            66.5% |
+
+    <figcaption>Full-success (10+) rate when the Hunters keep pushing for the full hit</figcaption>
+
+    </figure>
