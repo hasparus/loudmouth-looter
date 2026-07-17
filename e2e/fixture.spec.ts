@@ -113,18 +113,24 @@ test.describe("e2e fixture post", () => {
     await expect(
       prose.getByRole("link", { name: "fixture link" }),
     ).toBeVisible();
-    await expect(prose.getByRole("img", { name: "Fixture image" })).toBeVisible();
+    await expect(
+      prose.getByRole("img", { name: "Fixture image" }),
+    ).toBeVisible();
     await expect(prose.locator("aside")).toContainText(
       "Fixture side note for prose-grid layout",
     );
     await expect(prose.locator("sub")).toHaveText("2");
-    await expect(prose.locator("p", { hasText: "X" }).locator("sup")).toHaveText(
-      "2",
-    );
-    await expect(prose.getByRole("link", { name: "1", exact: true })).toBeVisible();
+    await expect(
+      prose.locator("p", { hasText: "X" }).locator("sup"),
+    ).toHaveText("2");
+    await expect(
+      prose.getByRole("link", { name: "1", exact: true }),
+    ).toBeVisible();
   });
 
-  test("aside positioned to the right on desktop", async ({ page }, testInfo) => {
+  test("aside positioned to the right on desktop", async ({
+    page,
+  }, testInfo) => {
     const aside = page.locator("aside", {
       hasText: "Fixture side note for prose-grid layout",
     });

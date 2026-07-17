@@ -20,7 +20,7 @@ const tocShown = headings.length > 2;
       <PostProgressBar client:media="(min-width: 1100px)">
         <ul
           id="table-of-contents"
-          class="text-sm leading-6 text-neu-700 dark:text-neu-400"
+          class="text-neu-700 dark:text-neu-400 text-sm leading-6"
         >
           {headings.map(({ text, depth, slug }) => {
             if (depth < 2 || depth > 3) return null;

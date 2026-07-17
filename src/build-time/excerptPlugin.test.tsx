@@ -94,7 +94,9 @@ describe("recmaMdxExcerpt", () => {
   });
 
   test("a code fence ends the lede", async () => {
-    const code = await excerptOf(`Before.\n\n\`\`\`js\nvar x = 1;\n\`\`\`\n\nAfter.`);
+    const code = await excerptOf(
+      `Before.\n\n\`\`\`js\nvar x = 1;\n\`\`\`\n\nAfter.`,
+    );
     expect(code).toContain("Before.");
     expect(code).not.toContain("After.");
   });
@@ -118,7 +120,9 @@ describe("recmaMdxExcerpt", () => {
  */
 describe("MDX codegen contract", () => {
   test("still emits the internals the plugin depends on", async () => {
-    const out = await compile(`First.\n\nSecond.`, { jsxImportSource: "astro" });
+    const out = await compile(`First.\n\nSecond.`, {
+      jsxImportSource: "astro",
+    });
     const code = String(out.value);
     expect(code).toContain("function _createMdxContent");
     expect(code).toContain("_Fragment");

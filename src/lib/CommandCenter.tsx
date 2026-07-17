@@ -230,28 +230,29 @@ export function CommandItem(props: CommandItemProps) {
   const { isSelected, matchesFilter, onSelectedUnmount } =
     useCommandCenterCtx();
 
-  const res = (
+  const res =
     // eslint-disable-next-line solid/reactivity -- static href, element built once
-    own.href ? (
-      <a
-        href={own.href}
-        role="option"
-        aria-selected="false"
-        {...(rest as JSX.HTMLAttributes<HTMLAnchorElement>)}
-      >
-        {props.children}
-      </a>
-    ) : (
-      <button
-        type="button"
-        role="option"
-        aria-selected="false"
-        {...(rest as JSX.HTMLAttributes<HTMLButtonElement>)}
-      >
-        {props.children}
-      </button>
-    )
-  ) as HTMLElement;
+    (
+      own.href ? (
+        <a
+          href={own.href}
+          role="option"
+          aria-selected="false"
+          {...(rest as JSX.HTMLAttributes<HTMLAnchorElement>)}
+        >
+          {props.children}
+        </a>
+      ) : (
+        <button
+          type="button"
+          role="option"
+          aria-selected="false"
+          {...(rest as JSX.HTMLAttributes<HTMLButtonElement>)}
+        >
+          {props.children}
+        </button>
+      )
+    ) as HTMLElement;
 
   createEffect(() => {
     const text = getCommandText(res);

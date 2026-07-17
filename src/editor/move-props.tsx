@@ -16,7 +16,10 @@ function headingText(node: RootContent): string {
     .join("");
 }
 
-function mdxAttribute(node: MdxJsxFlowElement, name: string): string | undefined {
+function mdxAttribute(
+  node: MdxJsxFlowElement,
+  name: string,
+): string | undefined {
   for (const attr of node.attributes) {
     if (attr.type === "mdxJsxAttribute" && attr.name === name) {
       return typeof attr.value === "string" ? attr.value : undefined;

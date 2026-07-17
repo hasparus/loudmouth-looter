@@ -5,7 +5,7 @@
   list-style-type: none;
   padding: 0;
 
-  &>li {
+  & > li {
     text-indent: -1.5em;
     padding-left: 1.5em;
 
@@ -33,7 +33,7 @@
     line-height: 1.52;
   }
 
-  & li>p {
+  & li > p {
     display: contents;
   }
 

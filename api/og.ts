@@ -79,17 +79,23 @@ export default async function og(req: Request) {
     console.error(error);
 
     if (error instanceof HttpError) {
-      return Response.json({ message: error.message }, {
-        status: error.status,
-      });
+      return Response.json(
+        { message: error.message },
+        {
+          status: error.status,
+        },
+      );
     }
 
     const normalizedError =
       error instanceof Error ? error : new Error(String(error));
 
-    return Response.json({ message: normalizedError.message }, {
-      status: 500,
-    });
+    return Response.json(
+      { message: normalizedError.message },
+      {
+        status: 500,
+      },
+    );
   }
 }
 
