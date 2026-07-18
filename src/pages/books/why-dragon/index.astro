@@ -26,6 +26,13 @@ import pyre4 from "./pyre-4.webp?url";
 import "../../../global-styles/base.css";
 import "./why-dragon.css";
 
+const title = (rule: { frontmatter: Record<string, unknown> }): string => {
+  const value = rule.frontmatter.title;
+  if (typeof value !== "string")
+    throw new Error(`rule MDX is missing a title: ${JSON.stringify(rule)}`);
+  return value;
+};
+
 const pyreLevels = [
   { src: pyre1, top: 94.5, h: 48 },
   { src: pyre2, top: 81.5, h: 48 },
@@ -236,7 +243,8 @@ const pyreLevels = [
 
           <p class="wd-colophon wd-full">
             Written by Piotr Monwid-Olechnowicz. Illustrated by Rouzeris.
-            Proofread by Zack Thomson, Wafergix, Łukasz Bartoszewicz.
+            Proofread by Zack Thomson, Wafergix, Łukasz Bartoszewicz, Radosław
+            Ganczarek.
           </p>
           <p class="wd-colophon wd-full">
             Based on <em>1 HP Dragon</em> by Clayton Notestine. <em
@@ -259,23 +267,23 @@ const pyreLevels = [
         <article class="wd-page wd-verso">
           <span class="wd-pageno">2 · moves I</span>
 
-          <PrintMove name={FaceFury.frontmatter.title as string} span="full">
+          <PrintMove name={title(FaceFury)} span="full">
             <FaceFury.Content />
           </PrintMove>
 
-          <PrintMove name={Bellow.frontmatter.title as string}>
+          <PrintMove name={title(Bellow)}>
             <Bellow.Content />
           </PrintMove>
 
-          <PrintMove name={StokeTheFire.frontmatter.title as string}>
+          <PrintMove name={title(StokeTheFire)}>
             <StokeTheFire.Content />
           </PrintMove>
 
-          <PrintMove name={RelinquishYourGoal.frontmatter.title as string}>
+          <PrintMove name={title(RelinquishYourGoal)}>
             <RelinquishYourGoal.Content />
           </PrintMove>
 
-          <PrintMove name={Burn.frontmatter.title as string}>
+          <PrintMove name={title(Burn)}>
             <Burn.Content />
           </PrintMove>
 
@@ -306,28 +314,28 @@ const pyreLevels = [
         <article class="wd-page wd-recto wd-flow">
           <span class="wd-pageno">3 · moves II</span>
 
-          <PrintMove name={JumpIntoFlames.frontmatter.title as string}>
+          <PrintMove name={title(JumpIntoFlames)}>
             <JumpIntoFlames.Content />
           </PrintMove>
 
-          <PrintMove name={TurnToAsh.frontmatter.title as string}>
+          <PrintMove name={title(TurnToAsh)}>
             <TurnToAsh.Content />
           </PrintMove>
 
-          <PrintMove name={ThrowSand.frontmatter.title as string}>
+          <PrintMove name={title(ThrowSand)}>
             <ThrowSand.Content />
           </PrintMove>
 
-          <PrintMove name={LevelUp.frontmatter.title as string}>
+          <PrintMove name={title(LevelUp)}>
             <LevelUp.Content />
           </PrintMove>
 
-          <PrintMove name={RaiseAToast.frontmatter.title as string}>
+          <PrintMove name={title(RaiseAToast)}>
             <RaiseAToast.Content />
           </PrintMove>
 
           <PrintMove
-            name={Aftermath.frontmatter.title as string}
+            name={title(Aftermath)}
             class="wd-break break-before-column"
           >
             <Aftermath.Content />
