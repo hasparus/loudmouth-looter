@@ -41,7 +41,3 @@ temp/
 
 # impeccable local tooling state
 .impeccable/
-
-# decrypted design docs — committed age-encrypted only
-/design-notes.md
-/why-dragon-critique.md
