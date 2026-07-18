@@ -13,21 +13,25 @@ export const derivedTitleAndDatePlugin: Plugin<
     frontmatter.title ||= title(file.stem || "");
 
     if (!frontmatter.date) {
-      let createdAt = execFileSync(
-        "git",
-        [
-          "log",
-          "--follow",
-          "--diff-filter=A",
-          "--find-renames=40%",
-          "--format=%ai",
-          "--",
-          file.path,
-        ],
-        { encoding: "utf8" },
-      )
-        .trim()
-        .split("\n")[0];
+      let createdAt = "";
+      try {
+        createdAt = execFileSync(
+          "git",
+          [
+            "log",
+            "--follow",
+            "--diff-filter=A",
+            "--find-renames=40%",
+            "--format=%ai",
+            "--",
+            file.path,
+          ],
+          { encoding: "utf8" },
+        )
+          .trim()
+          .split("\n")[0]!;
+      } catch {
+      }
 
       createdAt ||= new Date().toISOString();
 
