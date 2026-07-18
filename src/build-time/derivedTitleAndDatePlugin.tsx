@@ -3,6 +3,27 @@ import type { Plugin } from "unified";
 
 import type { PostFrontmatter, PostProps } from "../types";
 
+function gitCreationDate(path: string): string | null {
+  try {
+    const log = execFileSync(
+      "git",
+      [
+        "log",
+        "--follow",
+        "--diff-filter=A",
+        "--find-renames=40%",
+        "--format=%ai",
+        "--",
+        path,
+      ],
+      { encoding: "utf8" },
+    );
+    return log.trim().split("\n")[0] || null;
+  } catch {
+    return null;
+  }
+}
+
 export const derivedTitleAndDatePlugin: Plugin<
   [{ title: (fileStem: string) => string }]
 > = ({ title }) => {
@@ -12,30 +33,6 @@ export const derivedTitleAndDatePlugin: Plugin<
 
     frontmatter.title ||= title(file.stem || "");
 
-    if (!frontmatter.date) {
-      let createdAt = "";
-      try {
-        createdAt = execFileSync(
-          "git",
-          [
-            "log",
-            "--follow",
-            "--diff-filter=A",
-            "--find-renames=40%",
-            "--format=%ai",
-            "--",
-            file.path,
-          ],
-          { encoding: "utf8" },
-        )
-          .trim()
-          .split("\n")[0]!;
-      } catch {
-      }
-
-      createdAt ||= new Date().toISOString();
-
-      frontmatter.date = createdAt;
-    }
+    frontmatter.date ||= gitCreationDate(file.path) ?? new Date().toISOString();
   };
 };
