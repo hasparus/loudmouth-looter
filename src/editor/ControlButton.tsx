@@ -11,7 +11,11 @@ export function ControlButton(
     <button
       {...rest}
       type={local.type ?? "button"}
-      class={local.class ? `${controlButtonClass} ${local.class}` : controlButtonClass}
+      class={
+        local.class
+          ? `${controlButtonClass} ${local.class}`
+          : controlButtonClass
+      }
     />
   );
 }

@@ -18,15 +18,51 @@
   --guide-edge: color-mix(in oklab, var(--color-accent-700) 45%, transparent);
 
   --wd-tint: 6%;
-  --color-neu-100: color-mix(in oklab, #fdf9f6 calc(100% - var(--wd-tint)), var(--color-accent-700) var(--wd-tint));
-  --color-neu-200: color-mix(in oklab, #f0e6e1 calc(100% - var(--wd-tint)), var(--color-accent-700) var(--wd-tint));
-  --color-neu-300: color-mix(in oklab, #dfcdc5 calc(100% - var(--wd-tint)), var(--color-accent-700) var(--wd-tint));
-  --color-neu-400: color-mix(in oklab, #c2a499 calc(100% - var(--wd-tint)), var(--color-accent-700) var(--wd-tint));
-  --color-neu-500: color-mix(in oklab, #8a6a5d calc(100% - var(--wd-tint)), var(--color-accent-700) var(--wd-tint));
-  --color-neu-600: color-mix(in oklab, #5a4c47 calc(100% - var(--wd-tint)), var(--color-accent-700) var(--wd-tint));
-  --color-neu-700: color-mix(in oklab, #493e3a calc(100% - var(--wd-tint)), var(--color-accent-700) var(--wd-tint));
-  --color-neu-800: color-mix(in oklab, #302a27 calc(100% - var(--wd-tint)), var(--color-accent-800) var(--wd-tint));
-  --color-neu-900: color-mix(in oklab, #1c1917 calc(100% - var(--wd-tint)), var(--color-accent-900) var(--wd-tint));
+  --color-neu-100: color-mix(
+    in oklab,
+    #fdf9f6 calc(100% - var(--wd-tint)),
+    var(--color-accent-700) var(--wd-tint)
+  );
+  --color-neu-200: color-mix(
+    in oklab,
+    #f0e6e1 calc(100% - var(--wd-tint)),
+    var(--color-accent-700) var(--wd-tint)
+  );
+  --color-neu-300: color-mix(
+    in oklab,
+    #dfcdc5 calc(100% - var(--wd-tint)),
+    var(--color-accent-700) var(--wd-tint)
+  );
+  --color-neu-400: color-mix(
+    in oklab,
+    #c2a499 calc(100% - var(--wd-tint)),
+    var(--color-accent-700) var(--wd-tint)
+  );
+  --color-neu-500: color-mix(
+    in oklab,
+    #8a6a5d calc(100% - var(--wd-tint)),
+    var(--color-accent-700) var(--wd-tint)
+  );
+  --color-neu-600: color-mix(
+    in oklab,
+    #5a4c47 calc(100% - var(--wd-tint)),
+    var(--color-accent-700) var(--wd-tint)
+  );
+  --color-neu-700: color-mix(
+    in oklab,
+    #493e3a calc(100% - var(--wd-tint)),
+    var(--color-accent-700) var(--wd-tint)
+  );
+  --color-neu-800: color-mix(
+    in oklab,
+    #302a27 calc(100% - var(--wd-tint)),
+    var(--color-accent-800) var(--wd-tint)
+  );
+  --color-neu-900: color-mix(
+    in oklab,
+    #1c1917 calc(100% - var(--wd-tint)),
+    var(--color-accent-900) var(--wd-tint)
+  );
 
   --wd-paper: var(--color-white);
   --wd-ink: var(--color-neu-900);
@@ -44,7 +80,8 @@
   position: relative;
   inline-size: var(--format-w);
   block-size: var(--format-h);
-  padding: var(--margin-top) var(--margin-outer) var(--margin-bottom) var(--margin-inner);
+  padding: var(--margin-top) var(--margin-outer) var(--margin-bottom)
+    var(--margin-inner);
   display: grid;
   grid-template-columns: repeat(var(--wd-cols), 1fr);
   column-gap: var(--wd-alley);
@@ -92,7 +129,9 @@ html.dark .wd-book {
 
 .wd-page::before,
 .wd-page::after {
-  --wd-col: calc((100% - (var(--wd-cols) - 1) * var(--wd-alley)) / var(--wd-cols));
+  --wd-col: calc(
+    (100% - (var(--wd-cols) - 1) * var(--wd-alley)) / var(--wd-cols)
+  );
   content: "";
   position: absolute;
   top: var(--margin-top);
@@ -111,16 +150,20 @@ html.dark .wd-book {
 }
 
 .wd-page::before {
-  background-image: repeating-linear-gradient(to right,
-      var(--guide-col) 0 var(--wd-col),
-      transparent var(--wd-col) calc(var(--wd-col) + var(--wd-alley)));
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--guide-col) 0 var(--wd-col),
+    transparent var(--wd-col) calc(var(--wd-col) + var(--wd-alley))
+  );
   outline: 1px solid var(--guide-edge);
 }
 
 .wd-page::after {
-  background-image: repeating-linear-gradient(to bottom,
-      var(--guide-flow) 0 1px,
-      transparent 1px var(--wd-baseline));
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--guide-flow) 0 1px,
+    transparent 1px var(--wd-baseline)
+  );
 }
 
 .wd-book:has(#wd-grid:checked) .wd-page::before,
@@ -176,6 +219,26 @@ html.dark .wd-move-name {
   color: var(--color-accent-400);
 }
 
+/* Full move names, kept in the text layer in each page's bottom margin so
+   they survive copy, search, and print-to-PDF extraction (the visible
+   headings start at their second letter — the illuminated initial images
+   stand in for the first). Tiny and near-invisible rather than sr-only or
+   `transparent`: Chrome strips clipped and fully transparent text from PDF
+   output, and overlaying hidden runs on the cards garbles extraction. */
+.wd-page-alt {
+  position: absolute;
+  inset-block-end: 1mm;
+  inset-inline-start: var(--margin-inner);
+  /* Small enough to sit inside the bottom margin, big enough that glyph
+     gaps stay below PDF extractors' word-break threshold (at 4px, kerning
+     alone splits words: "R elinquish"). */
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  color: rgb(0 0 0 / 0.4%);
+}
+
 .wd-initial {
   float: left;
   display: grid;
@@ -186,7 +249,7 @@ html.dark .wd-move-name {
   shape-outside: margin-box;
 }
 
-.wd-initial>img {
+.wd-initial > img {
   display: block;
   width: 100%;
   height: 100%;
@@ -219,18 +282,28 @@ html.dark .wd-move-name {
   color: light-dark(var(--color-neu-600), var(--color-neu-400));
 }
 
-.wd-aftermath {
-  column-count: 2;
+.wd-page.wd-flow {
+  display: block;
+  columns: 2;
   column-gap: var(--wd-alley);
+  column-fill: auto;
 }
 
-.wd-aftermath p {
-  margin-bottom: 0.25em;
-}
-
-.wd-aftermath p,
-.wd-aftermath ul {
+.wd-flow .wd-move {
   break-inside: avoid;
+  margin-block-end: 1.5mm;
+}
+
+.wd-flow .wd-move.wd-break {
+  break-inside: auto;
+}
+
+.wd-flow .wd-move.wd-break :is(p, li) {
+  break-inside: avoid;
+}
+
+.wd-flow .wd-move p {
+  margin-bottom: 0.25em;
 }
 
 .wd-marker {
@@ -283,11 +356,11 @@ html.dark .wd-marker {
   display: none;
 }
 
-#wd-grid:checked~.wd-grid-off {
+#wd-grid:checked ~ .wd-grid-off {
   display: none;
 }
 
-#wd-grid:checked~.wd-grid-on {
+#wd-grid:checked ~ .wd-grid-on {
   display: inline;
 }
 
@@ -511,8 +584,8 @@ html.dark .wd-hint {
   position: relative;
   margin-inline-start: calc(var(--wd-alley) / -2);
   padding-inline-start: calc(var(--wd-alley) / 2);
-  background:
-    linear-gradient(var(--wd-divider), var(--wd-divider)) no-repeat left 0 top 9px / 1px calc(100% - 18px);
+  background: linear-gradient(var(--wd-divider), var(--wd-divider)) no-repeat
+    left 0 top 9px / 1px calc(100% - 18px);
 }
 
 .wd-rose {

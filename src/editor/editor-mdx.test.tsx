@@ -71,9 +71,9 @@ describe("htmlToMdx", () => {
   });
 
   test("link round-trip", () => {
-    expect(
-      htmlToMdx('<p><a href="https://example.com">label</a></p>'),
-    ).toBe("[label](https://example.com)\n");
+    expect(htmlToMdx('<p><a href="https://example.com">label</a></p>')).toBe(
+      "[label](https://example.com)\n",
+    );
     expect(mdxToHtml("[label](https://example.com)\n")).toBe(
       '<p><a href="https://example.com">label</a></p>',
     );
@@ -153,5 +153,78 @@ describe("formatInline", () => {
     expect(formatInline("[x](javascript:alert(1))")).toBe(
       "[x](javascript:alert(1))",
     );
+  });
+});
+
+describe("MDX preservation (unknown JSX, imports, frontmatter)", () => {
+  test("unknown flow JSX becomes a non-editable te-jsx atom", () => {
+    const html = mdxToHtml("<BellowRules components={props.components} />\n");
+    expect(html).toContain('class="te-jsx"');
+    expect(html).toContain('contenteditable="false"');
+    expect(html).toContain("BellowRules");
+  });
+
+  test("unknown flow JSX round-trips verbatim", () => {
+    const mdx = "<BellowRules components={props.components} />\n";
+    expect(htmlToMdx(mdxToHtml(mdx))).toContain(
+      "<BellowRules components={props.components} />",
+    );
+  });
+
+  test("imports round-trip verbatim", () => {
+    const mdx =
+      'import A from "./a.mdx";\nimport B from "./b.mdx";\n\nHello.\n';
+    const back = htmlToMdx(mdxToHtml(mdx));
+    expect(back).toContain(
+      'import A from "./a.mdx";\nimport B from "./b.mdx";',
+    );
+    expect(back).toContain("Hello.");
+  });
+
+  test("JSX with markdown children keeps its inner source", () => {
+    const mdx =
+      "<aside>\n  Clayton is turning **1 HP Dragon** into a full game.\n</aside>\n";
+    const back = htmlToMdx(mdxToHtml(mdx));
+    expect(back).toContain("<aside>");
+    expect(back).toContain("**1 HP Dragon**");
+    expect(back).toContain("</aside>");
+  });
+
+  test("frontmatter survives instead of parsing as thematic breaks", () => {
+    const mdx = '---\ndate: "2026-06-06"\ntitle: T\n---\n\nBody.\n';
+    const html = mdxToHtml(mdx);
+    expect(html).toContain("frontmatter");
+    const back = htmlToMdx(html);
+    expect(back).toContain('---\ndate: "2026-06-06"\ntitle: T\n---');
+    expect(back).toContain("Body.");
+  });
+
+  test("flow expressions like prettier-ignore comments survive", () => {
+    const mdx = "{/* prettier-ignore */}\n\nA paragraph.\n";
+    const back = htmlToMdx(mdxToHtml(mdx));
+    expect(back).toContain("{/* prettier-ignore */}");
+  });
+
+  test("inline unknown JSX shows its text and round-trips", () => {
+    const mdx = 'more than <Tooltip text="hi">twice</Tooltip> as fast\n';
+    const html = mdxToHtml(mdx);
+    expect(html).toContain('class="te-jsx-inline"');
+    expect(html).toContain("twice");
+    expect(htmlToMdx(html)).toContain('<Tooltip text="hi">twice</Tooltip>');
+  });
+
+  test("unknown JSX inside a Move body survives the round-trip", () => {
+    const mdx =
+      "<Move illuminated isBaseMove>\n\n### Bellow\n\n<BellowRules components={props.components} />\n\n</Move>\n";
+    const back = htmlToMdx(mdxToHtml(mdx));
+    expect(back).toContain("## Bellow");
+    expect(back).toContain("<BellowRules components={props.components} />");
+  });
+
+  test("Move attributes like illuminated/isBaseMove round-trip", () => {
+    const mdx =
+      "<Move illuminated isBaseMove>\n\n### Bellow\n\nBody text.\n\n</Move>\n";
+    const back = htmlToMdx(mdxToHtml(mdx));
+    expect(back).toContain("<Move illuminated isBaseMove>");
   });
 });

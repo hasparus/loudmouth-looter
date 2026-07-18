@@ -5,8 +5,12 @@ import { parseInline } from "./tree";
 
 describe("tokenize", () => {
   test("punctuation after an expandable hugs it (no leading gap)", () => {
-    const toks = tokenize(parseInline("of [[the Looter | who | the Looter, my ego]], a collection"));
-    const kinds = toks.map((t) => `${t.kind}:${t.text}:${t.spaceBefore ? "_" : ""}`);
+    const toks = tokenize(
+      parseInline("of [[the Looter | who | the Looter, my ego]], a collection"),
+    );
+    const kinds = toks.map(
+      (t) => `${t.kind}:${t.text}:${t.spaceBefore ? "_" : ""}`,
+    );
     expect(kinds).toEqual([
       "text:of:",
       "expand:the Looter:_",

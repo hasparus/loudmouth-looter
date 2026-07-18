@@ -46,7 +46,9 @@ function bunxRun(label, args, opts = {}) {
       opts.captureStdout && result.stdout
         ? `\n--- stdout ---\n${result.stdout}`
         : "";
-    throw new Error(`✗ ${label} exited with code ${result.status}${stdoutTail}`);
+    throw new Error(
+      `✗ ${label} exited with code ${result.status}${stdoutTail}`,
+    );
   }
 
   return opts.captureStdout ? (result.stdout ?? "") : "";

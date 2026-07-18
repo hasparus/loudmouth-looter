@@ -102,6 +102,57 @@ export function buildToggleElement(
   return toggle;
 }
 
+// Opaque MDX atoms: JSX elements, imports/exports, expressions, and
+// frontmatter the editor doesn't understand are kept as non-editable chips
+// carrying their original MDX source in data-mdx, so opening and saving a
+// post never destroys them. data-mdx is inert text — it is only ever fed
+// back to the remark serializer, never into innerHTML.
+export function jsxAtomLabel(mdx: string): string {
+  const trimmed = mdx.trimStart();
+  if (trimmed.startsWith("---")) return "frontmatter";
+  if (/^(?:import|export)\b/.test(trimmed)) return "import";
+  if (trimmed.startsWith("{")) return "expression";
+  const name = /^<\s*([A-Za-z][\w.]*)/.exec(trimmed)?.[1];
+  return name ? `<${name}>` : "jsx";
+}
+
+// Single source of truth for a JSX atom's attributes — used both by the
+// builder below and by the sanitizer when it rebuilds one from saved HTML.
+export function populateJsxElement(
+  el: HTMLElement,
+  mdx: string,
+  inline: boolean,
+): void {
+  el.className = inline ? "te-jsx-inline" : "te-jsx";
+  el.setAttribute("contenteditable", "false");
+  el.dataset.mdx = mdx;
+  el.title = mdx;
+  el.textContent = "";
+  if (inline) {
+    // Show the element's text so the surrounding prose still reads naturally
+    // (e.g. a <Tooltip>twice</Tooltip> renders as "twice").
+    const text = mdx.replaceAll(/<[^>]*>/g, "").trim();
+    el.textContent = text || jsxAtomLabel(mdx);
+    return;
+  }
+  const tag = document.createElement("span");
+  tag.className = "te-jsx-tag";
+  tag.textContent = jsxAtomLabel(mdx);
+  el.append(tag);
+  const collapsed = mdx.replaceAll(/\s+/g, " ").trim();
+  const preview = document.createElement("span");
+  preview.className = "te-jsx-preview";
+  preview.textContent =
+    collapsed.length > 96 ? `${collapsed.slice(0, 96)}…` : collapsed;
+  el.append(preview);
+}
+
+export function buildJsxElement(mdx: string, inline = false): HTMLElement {
+  const el = document.createElement(inline ? "span" : "div");
+  populateJsxElement(el, mdx, inline);
+  return el;
+}
+
 export function buildTrackElement(
   shape: Shape,
   count: number,

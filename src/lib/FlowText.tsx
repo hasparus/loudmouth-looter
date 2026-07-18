@@ -36,7 +36,12 @@ export function tokenize(say: Inline[]): Token[] {
     for (const m of s.matchAll(/(\s+)|(\S+)/g)) {
       if (m[1]) prevSpace = true;
       else {
-        toks.push({ kind, text: m[2]!, spaceBefore: prevSpace && toks.length > 0, ...extra });
+        toks.push({
+          kind,
+          text: m[2]!,
+          spaceBefore: prevSpace && toks.length > 0,
+          ...extra,
+        });
         prevSpace = false;
       }
     }
@@ -57,7 +62,14 @@ export function tokenize(say: Inline[]): Token[] {
           q: part.q,
           spaceBefore,
         });
-      else toks.push({ kind: "node", text: part.base, node: part.into.node, q: part.q, spaceBefore });
+      else
+        toks.push({
+          kind: "node",
+          text: part.base,
+          node: part.into.node,
+          q: part.q,
+          spaceBefore,
+        });
       prevSpace = false;
     }
   }
@@ -74,7 +86,9 @@ const fontFor = (kind: Kind, b: Base) =>
  *  upgrade path is per-word expandable tokens + a non-slot-text reveal. */
 function items(toks: Token[], expanded: boolean, b: Base): RichInlineItem[] {
   return toks.map((t) => ({
-    text: (t.spaceBefore ? " " : "") + (expanded && t.kind === "expand" ? t.expanded! : t.text),
+    text:
+      (t.spaceBefore ? " " : "") +
+      (expanded && t.kind === "expand" ? t.expanded! : t.text),
     font: fontFor(t.kind, b),
     break: t.kind === "expand" || t.kind === "node" ? "never" : "normal",
   }));
@@ -127,7 +141,9 @@ export function FlowText(props: {
 
   const dur = () =>
     (SLOT_TEXT_OPTIONS.duration ?? 0) +
-    (SLOT_TEXT_OPTIONS.stagger ?? 0) * (toks[expandIdx]?.expanded?.length ?? 0) * 0.5;
+    (SLOT_TEXT_OPTIONS.stagger ?? 0) *
+      (toks[expandIdx]?.expanded?.length ?? 0) *
+      0.5;
 
   const relayout = (animated: boolean) => {
     const w = root.clientWidth;
@@ -143,7 +159,10 @@ export function FlowText(props: {
 
   onMount(() => {
     const cs = getComputedStyle(root);
-    const base: Base = { family: cs.fontFamily, size: Number.parseFloat(cs.fontSize) };
+    const base: Base = {
+      family: cs.fontFamily,
+      size: Number.parseFloat(cs.fontSize),
+    };
     const lhRaw = Number.parseFloat(cs.lineHeight);
     lh = Number.isFinite(lhRaw) ? lhRaw : base.size * 1.6;
 
@@ -188,7 +207,7 @@ export function FlowText(props: {
   return (
     <div
       ref={root}
-      class="text-neu-800 dark:text-neu-300 leading-relaxed relative"
+      class="text-neu-800 dark:text-neu-300 relative leading-relaxed"
       style={{
         height: `${height()}px`,
         transition: glide() ? `height ${dur()}ms ${EASE}` : "none",
@@ -225,11 +244,22 @@ export function FlowText(props: {
             );
           if (t.kind === "link")
             return (
-              <a href={t.href} class="text-inherit underline decoration-dotted" style={style()}>
+              <a
+                href={t.href}
+                class="text-inherit underline decoration-dotted"
+                style={style()}
+              >
                 {t.text}
               </a>
             );
-          const inner = t.kind === "em" ? <em>{t.text}</em> : t.kind === "strong" ? <strong>{t.text}</strong> : t.text;
+          const inner =
+            t.kind === "em" ? (
+              <em>{t.text}</em>
+            ) : t.kind === "strong" ? (
+              <strong>{t.text}</strong>
+            ) : (
+              t.text
+            );
           return <span style={style()}>{inner}</span>;
         }}
       </For>

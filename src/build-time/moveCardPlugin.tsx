@@ -40,4 +40,3 @@ function setAttribute(
   const attribute: MdxJsxAttribute = { type: "mdxJsxAttribute", name, value };
   node.attributes.push(attribute);
 }
-

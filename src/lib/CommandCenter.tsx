@@ -230,8 +230,8 @@ export function CommandItem(props: CommandItemProps) {
   const { isSelected, matchesFilter, onSelectedUnmount } =
     useCommandCenterCtx();
 
+  /* eslint-disable solid/reactivity -- static href, element built once */
   const res = (
-    // eslint-disable-next-line solid/reactivity -- static href, element built once
     own.href ? (
       <a
         href={own.href}
@@ -252,6 +252,7 @@ export function CommandItem(props: CommandItemProps) {
       </button>
     )
   ) as HTMLElement;
+  /* eslint-enable solid/reactivity */
 
   createEffect(() => {
     const text = getCommandText(res);

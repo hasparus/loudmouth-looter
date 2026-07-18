@@ -10,6 +10,17 @@ img:
 
 import HerosJourney from "./heros-journey.svg";
 
+import AftermathRules from "../../src/rules/why-dragon/aftermath.mdx";
+import BellowRules from "../../src/rules/why-dragon/bellow.mdx";
+import FaceFuryRules from "../../src/rules/why-dragon/face-fury.mdx";
+import JumpIntoFlamesRules from "../../src/rules/why-dragon/jump-into-flames.mdx";
+import LevelUpRules from "../../src/rules/why-dragon/level-up.mdx";
+import RaiseAToastRules from "../../src/rules/why-dragon/raise-a-toast.mdx";
+import RelinquishYourGoalRules from "../../src/rules/why-dragon/relinquish-your-goal.mdx";
+import StokeTheFireRules from "../../src/rules/why-dragon/stoke-the-fire.mdx";
+import ThrowSandRules from "../../src/rules/why-dragon/throw-sand.mdx";
+import TurnToAshRules from "../../src/rules/why-dragon/turn-to-ash.mdx";
+
 tldr: I wrote a small game kinda by accident. get it [on itch.io]
 
 [on itch.io]: https://hasparus.itch.io/
@@ -72,9 +83,7 @@ cannot do, and once per session it lets you **Bellow**.
 
 ### Bellow
 
-Once per session, _when you introduce a fact or narrative detail from your past
-life_, it affects the fiction immediately, no roll required. It must be related
-to your Class, not the Dragon. The DM and other players can ask you to adapt it.
+<BellowRules components={props.components} />
 
 </Move>
 
@@ -106,13 +115,7 @@ A Goal can be relinquished, of course. Character development, hell yeah!
 
 ### Relinquish Your Goal
 
-When you _give up on your original motivation_,
-
-- describe why you forsake your goal,
-- you are visibly changed: it's the way you walk, your facial expression, maybe
-  discard a symbol of your previous motivation.
-
-You may turn one of your rolls into a success now or later.
+<RelinquishYourGoalRules components={props.components} />
 
 </Move>
 
@@ -122,9 +125,7 @@ But even before you get rid of it, the pursuit of it lets you affect the game.
 
 ### Stoke the Fire
 
-When you _chase your Goal with abandon_, reroll a die, but **raise Pyre**.
-
-When your Goal _leads you into danger or costs you_ something, take **1 XP**.
+<StokeTheFireRules components={props.components} />
 
 </Move>
 
@@ -235,16 +236,7 @@ the small little village called ~~Stonetop~~ CC BY-SA 4.0, sharing is caring.
 
 ### Face Fury
 
-When the _stakes are dire, danger is imminent, and you act anyway_, roll:
-
-- **+Body** to endure, act fast or with finesse
-- **+Wits** to apply expertise, enact a clever plan, or rely on senses
-- **+Soul** to invoke the arcane, unleash mystical forces, resist esoteric
-  energies
-
-**On a 10+**, you pull it off as well as one could hope.\
-**On a 7-9**, the DM will present a partial success, a tradeoff, or a
-complication. **On a 6-**: mark XP and the DM makes a move.
+<FaceFuryRules components={props.components} />
 
 </Move>
 
@@ -268,9 +260,7 @@ own Goals, interfere with your actions.
 
 ### Jump Into Flames
 
-When you _throw yourself in to help another Hunter after their roll_, they
-reroll one die, but you share the consequences. More than one person can jump in
-on the same action.
+<JumpIntoFlamesRules components={props.components} />
 
 </Move>
 
@@ -284,10 +274,7 @@ on the same action.
 
 ### Throw Sand
 
-When you _interfere with another Hunter's action_, [**Face Fury**](#face-fury).\
-**On 7+** you impose -2 to their roll or diminish their effect. They may choose
-to stop what they're doing and get 1 XP.\
-**On 10+** you also avoid the consequences.
+<ThrowSandRules components={props.components} />
 
 </Move>
 
@@ -319,8 +306,7 @@ them and the Dragon proves too strong?
 
 ### Turn to Ash
 
-When one of your Stats gets to **-3** or lower, set it to **-3** and **raise
-Pyre**. You're downed: you succumb to your wounds for the time being.
+<TurnToAshRules components={props.components} />
 
 </Move>
 
@@ -361,8 +347,7 @@ what we can do with that hard-earned XP.
 
 ### Level Up
 
-When you _have **4 XP** or more, and a moment of rest_, spend **4 XP** to raise
-one of your stats by **+1** (up to **+3**) or clear **1 Pyre**.
+<LevelUpRules components={props.components} />
 
 </Move>
 
@@ -385,38 +370,33 @@ ever read in a game.
 
 ### Aftermath
 
-When _the game ends_, go around the table.
+<AftermathRules components={props.components} />
 
-Take **1 XP** if you have defeated the Dragon.\
-Take **1 XP** if you mention something another Hunter did that you like, which
-wasn't mentioned before.
+</Move>
 
-For each unspent **XP** you hold, choose one from the following:
-
-- **Fulfill your Goal.** Describe how getting what you wanted changes your life.
-- **Clear 1 Pyre**. Time and distance heal your wounds.
-- **Claim a piece of the Dragon** that wasn't destroyed, like the Dragon's
-  adamantium scales, its hoard, or its dormant horde of undead.
-
-Choices are repeatable. If you
-[**Relinquished your Goal**](#relinquish-your-goal), describe the life you found
-in its place.
-
-Then, go around the table once again.
-
-If you're **consumed** and dead, name the legend told about you. If you're
-**consumed**, but alive, tell of the desolation you've wrought upon the world.
-Otherwise, for each marked **Pyre**, another Hunter describes a shadow over your
-future.
-
-The DM looks at the remaining pieces of the Dragon and narrates their future.
 Maybe, even with the Dragon defeated, the story isn't over? Maybe the Wyrmlings
 have fled? Maybe someone has come to the battlefield after the Hunters left.
 
-When it's all over, for the last time, go around the table.
+I'd usually cut and zoom out immediately after the Dragon falls. Otherwise some
+players tend to narrate the parts Transformation, Atonement and Return in an
+unstructured way, and we risk skipping over the more shy storytellers.
 
-Say one Wish, something that could've been handled better or differently, in
-fiction or at the table; and Highlight one thing you liked in the game.
+If there is some kind of immediate danger, like the ceiling falling down, the
+nuclear reactor in the heart of the Dragon exploding or a betrayal by an NPC,
+please play it. The more Pyre you accumulate during the game, the more
+satisfying the Aftermath will be.
+
+Initially, **Aftermath** had the trigger "when the game ends" and asked for
+Wishes and Highlights, but playing for twenty minutes after the game technically
+ended was awkward.
+
+I extracted the end of session feedback loop into **Raise a Toast**.
+
+<Move illuminated isBaseMove>
+
+### Raise a Toast
+
+<RaiseAToastRules components={props.components} />
 
 </Move>
 
@@ -431,6 +411,13 @@ fiction or at the table; and Highlight one thing you liked in the game.
 I'm leaving the DM moves, agenda and principles as an exercise to the reader.
 Tis but a write-up for people who already played a lot of games. I'm playing
 this with a list yoinked from Stonetop, because I have it engraved in my brain.
+
+<aside className="text-sm!">
+  I later wrote an Agenda and a few short DM moves.
+  <br />
+  ~future Piotr
+</aside>
+
 _"Reveal an unwelcome truth"_ creates a new situational armor or tells us
 something about existing legendary armor. "Hurt someone" allows me to hurt them
 narratively and burn their stats.
@@ -538,6 +525,15 @@ out with me on Discord and helping me come up with something semi-decent.
 
 import { PrevListManicule } from "#components/PrevListManicule";
 
+<style>{`
+  #changelog ~ ol > li:not(:first-child) {
+    margin-top: 1rem;
+  }
+  #changelog ~ ol > li > ul > li {
+    margin-top: 0.5rem;
+  }
+`}</style>
+
 1. **Saturday, July 4, 2026** — After proofreading from Wafergix and Łukasz
    Bartoszewicz
 
@@ -560,5 +556,59 @@ import { PrevListManicule } from "#components/PrevListManicule";
      Relinquish to guaranteed success instead of bumping success level, and
      trying to figure out a better Stoke the Fire. Rerolling a chosen die is
      statistically better than rerolling two, but it doesn't _feel_ impactful.
+
+   <PrevListManicule />
+
+3. **Tuesday, July 14, 2026** — I ran the game thrice on Bazyliszek and twice
+   after it.
+
+   - Changed Jump into Flames to cost **-1 Stat** and reroll both dice instead
+     of a selected die. Everybody helping in one roll led to a certain success,
+     so I had to either limit the number of people who can help or nerf it. I
+     also ran the games for parties of 5 and 6, what happens on conventions, and
+     the game needs to handle that.
+
+   - The old reroll let you keep your best die, so bumping `[6][1]` up to a 10+
+     cost nothing. You'd never drop below it, and a full table could just grind
+     any roll into a full hit. When we reroll both, a fresh 2d6 can miss, so
+     there's a risk in rerolling a partial.
+
+   <PrevListManicule />
+
+4. **Friday, July 17, 2026** — Playtest 6. First one as a player.
+
+   - We played online, no whiteboard, just talking thru Discord on phones,
+     because my airpods refused to work with the computer. The game is
+     accessible enough for conventions, where everybody gets a copy of it.
+     Unfortunately, it's not accessible enough for a first-time player to play
+     fiction-first with GM calling moves, and without the list of moves on the
+     whiteboard.
+
+   - I'm adding "When it drops to -3, Turn to Ash" under Stats, so the character
+     sheet itself carries the information. The whole game _is_ the playbook, but
+     I'm gonna make this a desperate move for players who'll never open it and
+     look just at the character sheet.
+
+   - I'm not sure I'd ever be able to reach the accessibility of games like
+     Homebrew World and One Shot World, because a lot of things I _like_ about
+     this game, like the descent of raising Pyre and grinding down stats is
+     inherently less common and weirder than
+     ["If you have more than 1 HP you are ready to go"](https://youtu.be/NmzLeDWk-nA).
+     I ran dozens (almost a hundred?) oneshots in the tradition of John Aegard's
+     "[Dragonslaying on a Timetable](https://docs.google.com/document/d/17ypjtlHfcwqrU_-x4b7o0e8tZ_dN2TiNLUu48MLAw7Y/edit?hl=en&forcehl=1#heading=h.t8tfotiv4mt1):
+     Running Tight 4-Hour Dungeon World One-Shots With Zero Preparation". Every
+     oneshot game I run competes for the slot with the aforementioned. Tough
+     competition.
+
+   - I noticed WWYFaD delivers some less common types of fun. The DM is
+     responsible for increasing the stakes, pushing the Hunters and facilitating
+     the fight with the Dragon. They're not responsible for the setting really,
+     and as it's meant for oneshots, the players can have a lot of narrative
+     freedom. The freeform class allows players to try new things and express
+     themselves. I've seen people write in: _Goddess-Sorcerress_ (dragon's
+     wife), _Maiden-mutant_ (dragon's daughter), _Tyranosauroid Trickster,
+     Qunari, Despotic Pixie Princess_. Today I had a chance to portray a
+     _Starfighter Pilot_ to fight the DRAGON: Distributed Reactive Assembly of
+     Guardian Ordnance Nodes (i.e.&nbsp;a&nbsp;big mech made from other mechs).
 
    <PrevListManicule />

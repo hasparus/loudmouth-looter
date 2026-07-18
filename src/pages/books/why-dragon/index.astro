@@ -2,7 +2,20 @@
 /* eslint-disable better-tailwindcss/no-unknown-classes */
 import InitColorScheme from "../../../lib/color-scheme/InitColorScheme.astro";
 
-import Move from "./_Move.astro";
+import * as Aftermath from "../../../rules/why-dragon/aftermath.mdx";
+import * as RaiseAToast from "../../../rules/why-dragon/raise-a-toast.mdx";
+import * as Bellow from "../../../rules/why-dragon/bellow.mdx";
+import * as Burn from "../../../rules/why-dragon/burn.mdx";
+import * as FaceFury from "../../../rules/why-dragon/face-fury.mdx";
+import * as JumpIntoFlames from "../../../rules/why-dragon/jump-into-flames.mdx";
+import * as LevelUp from "../../../rules/why-dragon/level-up.mdx";
+import * as RelinquishYourGoal from "../../../rules/why-dragon/relinquish-your-goal.mdx";
+import * as StokeTheFire from "../../../rules/why-dragon/stoke-the-fire.mdx";
+import * as TheDragon from "../../../rules/why-dragon/the-dragon.mdx";
+import * as ThrowSand from "../../../rules/why-dragon/throw-sand.mdx";
+import * as TurnToAsh from "../../../rules/why-dragon/turn-to-ash.mdx";
+
+import { PrintMove } from "./_PrintMove";
 import dragonUrl from "./dragon.webp?url";
 import fireUrl from "./fire.webp?url";
 import pyre1 from "./pyre-1.webp?url";
@@ -12,6 +25,13 @@ import pyre4 from "./pyre-4.webp?url";
 
 import "../../../global-styles/base.css";
 import "./why-dragon.css";
+
+const title = (rule: { frontmatter: Record<string, unknown> }): string => {
+  const value = rule.frontmatter.title;
+  if (typeof value !== "string")
+    throw new Error(`rule MDX is missing a title: ${JSON.stringify(rule)}`);
+  return value;
+};
 
 const pyreLevels = [
   { src: pyre1, top: 94.5, h: 48 },
@@ -115,8 +135,12 @@ const pyreLevels = [
               ))
             }
             <p class="wd-hint">
-              Distribute −2 to +2 so the total equals +1:<br />
-              (+2, 0, −1) (+1, +1, −1) (+1, 0, 0) (+2, +1, −2)
+              Distribute −2 to +2 so the total equals +1, or choose one from <span
+                class="font-hand tracking-tighter"
+                >(+2,0,−1), (+1,+1,−1), (+1,0,0), (+2,+1,−2)</span
+              > and swap. When it drops to −3, <strong class="font-semibold"
+                >Turn to Ash</strong
+              >.
             </p>
           </section>
           <section class="wd-span-2">
@@ -219,7 +243,7 @@ const pyreLevels = [
 
           <p class="wd-colophon wd-full">
             Written by Piotr Monwid-Olechnowicz. Illustrated by Rouzeris.
-            Proofread by Zack Thomson, Wafergix, Łukasz Bartoszewicz.
+            Proofread by Zack Thomson, Wafergix, Łukasz Bartoszewicz, Radek MG.
           </p>
           <p class="wd-colophon wd-full">
             Based on <em>1 HP Dragon</em> by Clayton Notestine. <em
@@ -242,84 +266,25 @@ const pyreLevels = [
         <article class="wd-page wd-verso">
           <span class="wd-pageno">2 · moves I</span>
 
-          <Move name="Face Fury" span="full">
-            <p>
-              When the <em
-                >stakes are dire, danger is imminent,<br /> and you act anyway</em
-              >, roll 2d6:
-            </p>
-            <ul>
-              <li>
-                <strong>+Body</strong> to endure, act fast or with finesse
-              </li>
-              <li>
-                <strong>+Wits</strong> to apply expertise, enact a clever plan, or
-                rely on senses
-              </li>
-              <li>
-                <strong>+Soul</strong> to invoke the arcane, unleash mystical forces,
-                resist esoteric energies
-              </li>
-            </ul>
-            <p>
-              <strong>On a 10+</strong>, you pull it off as well as one could
-              hope.<br />
-              <strong>On a 7–9</strong>, the DM will present a partial success,
-              a tradeoff, or a complication.<br />
-              <strong>On a 6−</strong>, mark <strong>1 XP</strong> and the DM makes
-              a move.
-            </p>
-          </Move>
+          <PrintMove name={title(FaceFury)} span="full">
+            <FaceFury.Content />
+          </PrintMove>
 
-          <Move name="Bellow">
-            <p>
-              Once per session, when you <em
-                >introduce a fact or narrative detail from your past life</em
-              >, it affects the fiction immediately, no roll required. It must
-              be related to your Class, not the Dragon. The DM and other players
-              can ask you to adapt it.
-            </p>
-          </Move>
+          <PrintMove name={title(Bellow)}>
+            <Bellow.Content />
+          </PrintMove>
 
-          <Move name="Stoke the Fire">
-            <p>
-              When you <em>chase your Goal with&nbsp;abandon</em>:<br /> Reroll a
-              die, but
-              <strong>raise Pyre</strong>.
-            </p>
-            <p>
-              When your Goal <em>leads you into danger or&nbsp;costs you</em> something,
-              take <strong>1 XP</strong>.
-            </p>
-          </Move>
+          <PrintMove name={title(StokeTheFire)}>
+            <StokeTheFire.Content />
+          </PrintMove>
 
-          <Move name="Relinquish Your Goal">
-            <p>When you <em>give up on your original motivation</em>:</p>
-            <ul>
-              <li>Describe why you forsake your Goal.</li>
-              <li>
-                You are visibly changed: the way you walk, your facial
-                expression, maybe discard a symbol of your previous motivation.
-              </li>
-            </ul>
-            <p>You may turn one of your rolls into a success now or later.</p>
-          </Move>
+          <PrintMove name={title(RelinquishYourGoal)}>
+            <RelinquishYourGoal.Content />
+          </PrintMove>
 
-          <Move name="Burn">
-            <p>
-              When you <em>wield power torn from the Dragon</em>, roll
-              <strong>+Pyre</strong>.
-            </p>
-            <p>
-              <strong>On 10+</strong>, the power obeys.<br />
-              <strong>On 7–9</strong>, it works, but <strong>raise Pyre</strong
-              >{" "}
-              and say what else catches fire.<br />
-              <strong>On 6−</strong>, you lose control. <strong
-                >Raise Pyre</strong
-              >, mark <strong>1 XP</strong>, and the DM makes a move.
-            </p>
-          </Move>
+          <PrintMove name={title(Burn)}>
+            <Burn.Content />
+          </PrintMove>
 
           <section class="wd-full wd-dm mt-4">
             <div>
@@ -341,109 +306,39 @@ const pyreLevels = [
 
           <section class="wd-full wd-dragon-box mt-4">
             <h3 class="wd-rubric">The Dragon</h3>
-            <p>
-              The Dragon is made of Barriers: <em>Scales</em> to shield it, <em
-                >Fangs</em
-              > to deter attackers, and <em>Curses</em> to spell doom if it ever dies.
-              Each is <em>Known</em> or <em>Secret</em> until a Hunter unveils it.
-              Put them in the center of the table. For short games, use 3–5 and start
-              <em> in medias res</em>; for four-hour games, add 1–2 more and a
-              Curse on top.
-            </p>
+            <TheDragon.Content />
           </section>
         </article>
 
-        <article class="wd-page wd-recto">
+        <article class="wd-page wd-recto wd-flow">
           <span class="wd-pageno">3 · moves II</span>
 
-          <Move name="Jump Into Flames">
-            <p>
-              When you <em
-                >throw yourself in to help another Hunter after their roll</em
-              >, they reroll one die, but you share the consequences. More than
-              one person can jump in on the same action.
-            </p>
-          </Move>
+          <PrintMove name={title(JumpIntoFlames)}>
+            <JumpIntoFlames.Content />
+          </PrintMove>
 
-          <Move name="Throw Sand">
-            <p>
-              When you <em>interfere with another Hunter's action</em>, Face
-              Fury.<br />
-              <strong>On 7+</strong> you impose −2 to their roll or diminish their
-              effect. They may stop what they're doing and get 1 XP.<br />
-              <strong>On 10+</strong> you also avoid the consequences.
-            </p>
-          </Move>
+          <PrintMove name={title(TurnToAsh)}>
+            <TurnToAsh.Content />
+          </PrintMove>
 
-          <Move name="Turn to Ash">
-            <p>
-              When <em
-                >one of your Stats gets to <strong>−3</strong> or lower</em
-              >:<br />Set it to
-              <strong>−3</strong> and <strong>raise Pyre</strong>.
-            </p>
-            <p>You're downed: you succumb to your wounds for the time being.</p>
-          </Move>
+          <PrintMove name={title(ThrowSand)}>
+            <ThrowSand.Content />
+          </PrintMove>
 
-          <Move name="Level Up">
-            <p>
-              When you <em
-                >have <strong>4 XP</strong> or more, and a moment of rest</em
-              >, spend <strong>4 XP</strong> to raise one of your stats by
-              <strong>+1</strong> (up to <strong>+3</strong>) or clear
-              <strong>1 Pyre</strong>.
-            </p>
-          </Move>
+          <PrintMove name={title(LevelUp)}>
+            <LevelUp.Content />
+          </PrintMove>
 
-          <Move name="Aftermath" span="full" class="wd-aftermath">
-            <p>When <em>the game ends</em>, go around the table.</p>
-            <p>
-              Take <strong>1 XP</strong> if you have defeated the Dragon.<br />
-              Take <strong>1 XP</strong> if you mention something another Hunter did
-              that you like, which wasn't mentioned before.
-            </p>
-            <p>
-              For each unspent <strong>XP</strong> you hold, choose one from the following:
-            </p>
-            <ul>
-              <li>
-                <strong>Fulfill your Goal.</strong> Describe how getting what you
-                wanted changes your life.
-              </li>
-              <li>
-                <strong>Clear 1 Pyre</strong>. Time and distance heal your
-                wounds.
-              </li>
-              <li>
-                <strong>Claim a piece of the Dragon</strong> that wasn't destroyed,
-                like the Dragon's adamantium scales, its hoard, or its dormant horde
-                of undead.
-              </li>
-            </ul>
-            <p>
-              Choices are repeatable. If you <strong
-                >Relinquished your Goal</strong
-              >, describe the life you found in its place.
-            </p>
-            <p>Then, go around the table once again.</p>
-            <p>
-              If you're <strong>consumed</strong> and dead, name the legend told about
-              you. If you're <strong>consumed</strong>, but alive, tell of the
-              desolation you've wrought upon the world. Otherwise, for each
-              marked <strong>Pyre</strong>, another Hunter describes a shadow
-              over your future.
-            </p>
-            <p>
-              The DM looks at the remaining pieces of the Dragon and narrates
-              their future.
-            </p>
-            <p>When it's all over, for the last time, go around the table.</p>
-            <p>
-              Say one Wish, something that could've been handled better or
-              differently, in fiction or at the table; and Highlight one thing
-              you liked in the game.
-            </p>
-          </Move>
+          <PrintMove name={title(RaiseAToast)}>
+            <RaiseAToast.Content />
+          </PrintMove>
+
+          <PrintMove
+            name={title(Aftermath)}
+            class="wd-break break-before-column"
+          >
+            <Aftermath.Content />
+          </PrintMove>
         </article>
       </div>
 
@@ -468,7 +363,11 @@ const pyreLevels = [
       } from "@chenglou/pretext";
 
       const relayoutMoves = () => {
-        for (const move of document.querySelectorAll<HTMLElement>(".wd-move")) {
+        // Skip the column-flow page: min-height only aligned grid rows, and
+        // estimator overshoot shows up as blank space inside the column.
+        for (const move of document.querySelectorAll<HTMLElement>(
+          ".wd-move:not(.wd-flow .wd-move)",
+        )) {
           const copy = move.querySelector<HTMLElement>(".wd-move-copy");
           const initial = move.querySelector<HTMLElement>(".wd-initial");
           if (!copy || !initial) continue;
@@ -512,6 +411,25 @@ const pyreLevels = [
       else void document.fonts.ready.then(relayoutMoves);
 
       new ResizeObserver(relayoutMoves).observe(document.body);
+
+      // The visible move headings start at their second letter — the
+      // illuminated initial images stand in for the first — which breaks
+      // search and copy in exported PDFs ("ace Fury"). Collect the full names
+      // into a near-invisible line in each page's bottom margin (.wd-page-alt)
+      // so they survive in the text layer. See why-dragon.css for why neither
+      // sr-only nor `transparent` text works in print.
+      for (const page of document.querySelectorAll<HTMLElement>(".wd-page")) {
+        const names = [...page.querySelectorAll(".wd-move-name")]
+          .map((heading) => heading.getAttribute("aria-label"))
+          .filter(Boolean)
+          .join(" · ");
+        if (!names) continue;
+        const alt = document.createElement("span");
+        alt.className = "wd-page-alt";
+        alt.setAttribute("aria-hidden", "true");
+        alt.textContent = names;
+        page.append(alt);
+      }
     </script>
   </body>
 </html>

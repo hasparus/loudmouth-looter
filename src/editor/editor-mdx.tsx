@@ -19,7 +19,11 @@ import remarkParse from "remark-parse";
 import remarkStringify from "remark-stringify";
 import { unified } from "unified";
 
-import { buildToggleElement, buildTrackElement } from "./editor-atoms";
+import {
+  buildJsxElement,
+  buildToggleElement,
+  buildTrackElement,
+} from "./editor-atoms";
 import { buildMoveElement } from "./move-dom";
 import { resolveMoveFromMdx } from "./move-props";
 import { resolveTrackProps, type Shape, TRACK_SHAPES } from "./track-props";
@@ -37,6 +41,14 @@ export function htmlToMdx(html: string): string {
   return processor.stringify(tree);
 }
 
+// Preserved MDX (JSX atoms, imports, frontmatter) re-enters the tree as
+// `html` nodes: remark-stringify emits their value verbatim, so the source
+// stored on the atom survives the round-trip byte-for-byte.
+function rawMdxBlock(el: HTMLElement): RootContent | null {
+  const stored = el.dataset.mdx;
+  return stored?.trim() ? { type: "html", value: stored } : null;
+}
+
 function blocksFrom(parent: ParentNode): RootContent[] {
   const out: RootContent[] = [];
   for (const node of parent.childNodes) {
@@ -52,6 +64,8 @@ function blockFrom(node: ChildNode): RootContent | null {
     return value.trim() ? { type: "paragraph", children: [text(value)] } : null;
   }
   if (!(node instanceof HTMLElement)) return null;
+
+  if (node.classList.contains("te-jsx")) return rawMdxBlock(node);
 
   switch (node.tagName) {
     case "H1":
@@ -93,7 +107,7 @@ function moveElement(el: HTMLElement): MdxJsxFlowElement {
     children.push(...(blocksFrom(bodyRoot) as BlockContent[]));
     return {
       type: "mdxJsxFlowElement",
-      attributes: [],
+      attributes: storedMoveAttributes(el),
       children,
       name: "Move",
     };
@@ -101,10 +115,26 @@ function moveElement(el: HTMLElement): MdxJsxFlowElement {
 
   return {
     type: "mdxJsxFlowElement",
-    attributes: [],
+    attributes: storedMoveAttributes(el),
     children: blocksFrom(el) as BlockContent[],
     name: "Move",
   };
+}
+
+// Restore the Move's original attributes (illuminated, isBaseMove, resources,
+// …) that mdxToHtml stashed on the card, so open→save doesn't strip them.
+function storedMoveAttributes(
+  el: HTMLElement,
+): MdxJsxFlowElement["attributes"] {
+  const stored = el.dataset.moveAttrs;
+  if (!stored) return [];
+  try {
+    const first = processor.parse(stored).children[0];
+    if (first?.type === "mdxJsxFlowElement") return first.attributes;
+  } catch {
+    // Corrupted attribute payloads are dropped rather than corrupting the doc.
+  }
+  return [];
 }
 
 function heading(depth: 1 | 2, el: HTMLElement): Heading {
@@ -164,6 +194,11 @@ function phrasingFrom(parent: HTMLElement): PhrasingContent[] {
       if (children.length > 1) out.push({ type: "break" });
       continue;
     }
+    if (node.classList.contains("te-jsx-inline")) {
+      const stored = node.dataset.mdx;
+      if (stored?.trim()) out.push({ type: "html", value: stored });
+      continue;
+    }
     if (node.classList.contains("te-toggle")) continue;
     if (node.classList.contains("te-track")) {
       out.push(trackElement(node));
@@ -218,14 +253,57 @@ function trackElement(track: HTMLElement): MdxJsxTextElement {
   };
 }
 
+// remark-mdx has no frontmatter support, so a leading YAML block would parse
+// as thematic breaks and garbage paragraphs. Cut it off up front and keep it
+// as an opaque atom instead.
+const FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/;
+
+// The source currently being converted by mdxToHtml, so nested handlers can
+// slice the original text of nodes they preserve as opaque atoms. Module-level
+// because the conversion is synchronous and the handlers are deeply recursive.
+let mdxSource = "";
+
+function sliceSource(node: RootContent | PhrasingContent): string | null {
+  const start = node.position?.start.offset;
+  const end = node.position?.end.offset;
+  return start != null && end != null ? mdxSource.slice(start, end) : null;
+}
+
+function flowSource(node: RootContent): string {
+  return (
+    sliceSource(node) ??
+    processor.stringify({ type: "root", children: [node] }).trimEnd()
+  );
+}
+
+function phrasingSource(node: PhrasingContent): string {
+  return (
+    sliceSource(node) ??
+    processor
+      .stringify({
+        type: "root",
+        children: [{ type: "paragraph", children: [node] }],
+      })
+      .trimEnd()
+  );
+}
+
 export function mdxToHtml(mdx: string): string {
-  const tree = processor.parse(mdx);
-  const container = document.createElement("div");
-  for (const node of tree.children) {
-    const el = blockToDom(node);
-    if (el) container.append(el);
+  const frontmatter = FRONTMATTER_RE.exec(mdx)?.[0] ?? "";
+  const body = mdx.slice(frontmatter.length);
+  mdxSource = body;
+  try {
+    const tree = processor.parse(body);
+    const container = document.createElement("div");
+    if (frontmatter) container.append(buildJsxElement(frontmatter.trimEnd()));
+    for (const node of tree.children) {
+      const el = blockToDom(node);
+      if (el) container.append(el);
+    }
+    return container.innerHTML;
+  } finally {
+    mdxSource = "";
   }
-  return container.innerHTML;
 }
 
 function blockToDom(node: RootContent): HTMLElement | null {
@@ -237,8 +315,12 @@ function blockToDom(node: RootContent): HTMLElement | null {
     }
     case "list":
       return listToDom(node);
+    case "mdxFlowExpression":
+      return buildJsxElement(flowSource(node));
+    case "mdxjsEsm":
+      return buildJsxElement(node.value);
     case "mdxJsxFlowElement":
-      return flowElementToDom(node);
+      return flowElementToDom(node) ?? buildJsxElement(flowSource(node));
     case "paragraph": {
       const only = node.children.length === 1 ? node.children[0] : null;
       if (only?.type === "mdxJsxTextElement" && only.name === "Line")
@@ -302,7 +384,24 @@ function moveToDom(node: MdxJsxFlowElement): HTMLElement {
     const childEl = blockToDom(child);
     if (childEl) bodyEls.push(childEl);
   }
-  return buildMoveElement(title, id, bodyEls);
+  const el = buildMoveElement(title, id, bodyEls);
+  // Stash the original attributes (minus title, which round-trips as the
+  // heading) so saving the card re-emits them. Serialized through the same
+  // processor so expression values survive too.
+  const attributes = node.attributes.filter(
+    (attr) => !(attr.type === "mdxJsxAttribute" && attr.name === "title"),
+  );
+  if (attributes.length > 0) {
+    el.dataset.moveAttrs = processor
+      .stringify({
+        type: "root",
+        children: [
+          { type: "mdxJsxFlowElement", name: "Move", attributes, children: [] },
+        ],
+      })
+      .trimEnd();
+  }
+  return el;
 }
 
 function appendBlocksInline(
@@ -355,7 +454,7 @@ function appendPhrasing(parent: HTMLElement, nodes: PhrasingContent[]): void {
       }
       case "mdxJsxTextElement":
         if (node.name === "Track") parent.append(trackToDom(node));
-        else appendPhrasing(parent, node.children);
+        else parent.append(buildJsxElement(phrasingSource(node), true));
         break;
       case "strong": {
         const el = document.createElement("strong");

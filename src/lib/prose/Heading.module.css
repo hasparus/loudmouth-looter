@@ -13,33 +13,39 @@
       color: var(--color-neu-200);
     }
 
-    &>a:focus-visible {
+    & > a:focus-visible {
       outline: none;
     }
   }
 
-  &>a {
+  & > a {
     @apply relative isolate;
   }
 
-  &>a::before {
+  & > a::before {
     @apply absolute -inset-x-2 -inset-y-1.5 -z-10 rounded-sm opacity-0 transition-opacity ease-out;
 
     content: "";
-    background-image: linear-gradient(to bottom, transparent,
-        color-mix(in srgb, var(--color-link-500) 10%, transparent));
+    background-image: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in srgb, var(--color-link-500) 10%, transparent)
+    );
   }
 
-  :global(.dark) &>a::before {
-    background-image: linear-gradient(to bottom, transparent,
-        color-mix(in srgb, var(--color-link-500) 18%, transparent));
+  :global(.dark) & > a::before {
+    background-image: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in srgb, var(--color-link-500) 18%, transparent)
+    );
   }
 
-  &:hover>a::before {
+  &:hover > a::before {
     @apply opacity-100 duration-0;
   }
 
-  &>a::after {
+  & > a::after {
     @apply transition-opacity;
 
     content: "🔗";
@@ -51,7 +57,7 @@
     opacity: 0;
   }
 
-  &:hover>a::after {
+  &:hover > a::after {
     opacity: 1;
   }
 }
