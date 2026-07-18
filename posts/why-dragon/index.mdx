@@ -396,6 +396,13 @@ have fled? Maybe someone has come to the battlefield after the Hunters left.
 I'm leaving the DM moves, agenda and principles as an exercise to the reader.
 Tis but a write-up for people who already played a lot of games. I'm playing
 this with a list yoinked from Stonetop, because I have it engraved in my brain.
+
+<aside className="text-sm!">
+  I later wrote an Agenda and a few short DM moves.
+  <br />
+  ~future Piotr
+</aside>
+
 _"Reveal an unwelcome truth"_ creates a new situational armor or tells us
 something about existing legendary armor. "Hurt someone" allows me to hurt them
 narratively and burn their stats.
@@ -504,9 +511,11 @@ out with me on Discord and helping me come up with something semi-decent.
 import { PrevListManicule } from "#components/PrevListManicule";
 
 <style>{`
-  #changelog + ol > li:not(:first-child),
-  #changelog + ol > li > ul > li {
-    margin-top: 0.5rem; /* mt-2 */
+  #changelog ~ ol > li:not(:first-child) {
+    margin-top: 1rem;
+  }
+  #changelog ~ ol > li > ul > li {
+    margin-top: 0.5rem;
   }
 `}</style>
 
@@ -535,44 +544,56 @@ import { PrevListManicule } from "#components/PrevListManicule";
 
    <PrevListManicule />
 
-3. **Friday, July 17, 2026** — I ran the game thrice on Bazyliszek and twice after it.
+3. **Tuesday, July 14, 2026** — I ran the game thrice on Bazyliszek and twice
+   after it.
 
-    - Changed Jump into Flames to reroll both dice instead of just one. Everybody helping in one roll always led to a success, so I had to either limit the number of people that can help or nerf the reroll. I also ran the games for parties of 5 and 6, what _happens_ on conventions, and the game needs to handle that.
+   - Changed Jump into Flames to cost **-1 Stat** and reroll both dice instead
+     of a selected die. Everybody helping in one roll led to a certain success,
+     so I had to either limit the number of people who can help or nerf it. I
+     also ran the games for parties of 5 and 6, what happens on conventions, and
+     the game needs to handle that.
 
-    - If you only help with misses and stop at the first 7+, the Hunters still erase almost every miss either way, but they can't consistently upgrade to a full success.
+   - The old reroll let you keep your best die, so bumping `[6][1]` up to a 10+
+     cost nothing. You'd never drop below it, and a full table could just grind
+     any roll into a full hit. When we reroll both, a fresh 2d6 can miss, so
+     there's a risk in rerolling a partial.
 
-    <PrevListManicule />
+   <PrevListManicule />
 
-    <figure className="mx-auto w-fit [&>table]:w-full">
+4. **Friday, July 17, 2026** — Playtest 6. First one as a player.
 
-    | Helpers         | Reroll one     | Reroll both      |
-    | --------------: | :------------: | :--------------: |
-    |               0 |          41.7% |            41.7% |
-    |               1 |          19.4% |            17.4% |
-    |               2 |           9.1% |             7.3% |
-    |               3 |           4.2% |             3.0% |
-    |               4 |           2.0% |             1.3% |
-    |               5 |           1.0% |             0.5% |
+   - We played online, no whiteboard, just talking thru Discord on phones,
+     because my airpods refused to work with the computer. The game is
+     accessible enough for conventions, where everybody gets a copy of it.
+     Unfortunately, it's not accessible enough for a first-time player to play
+     fiction-first with GM calling moves, and without the list of moves on the
+     whiteboard.
 
-    <figcaption>Miss rate (the roll stays a 6−) by party size helping one Jump Into Flames</figcaption>
+   - I'm adding "When it drops to -3, Turn to Ash" under Stats, so the character
+     sheet itself carries the information. The whole game _is_ the playbook, but
+     I'm gonna make this a desperate move for players who'll never open it and
+     look just at the character sheet.
 
-    </figure>
+   - I'm not sure I'd ever be able to reach the accessibility of games like
+     Homebrew World and One Shot World, because a lot of things I _like_ about
+     this game, like the descent of raising Pyre and grinding down stats is
+     inherently less common and weirder than
+     ["If you have more than 1 HP you are ready to go"](https://youtu.be/NmzLeDWk-nA).
+     I ran dozens (almost a hundred?) oneshots in the tradition of John Aegard's
+     "[Dragonslaying on a Timetable](https://docs.google.com/document/d/17ypjtlHfcwqrU_-x4b7o0e8tZ_dN2TiNLUu48MLAw7Y/edit?hl=en&forcehl=1#heading=h.t8tfotiv4mt1):
+     Running Tight 4-Hour Dungeon World One-Shots With Zero Preparation". Every
+     oneshot game I run competes for the slot with the aforementioned. Tough
+     competition.
 
-    - The old reroll let you keep your best die, so shoving a 7–9 up to a 10+ cost nothing. You'd never drop below it, and a full table would just grind any roll into a crit. Rerolling both dice kills that. A fresh 2d6 can crash back to a miss, so there's a risk in rerolling a partial.
+   - I noticed WWYFaD delivers some less common types of fun. The DM is
+     responsible for increasing the stakes, pushing the Hunters and facilitating
+     the fight with the Dragon. They're not responsible for the setting really,
+     and as it's meant for oneshots, the players can have a lot of narrative
+     freedom. The freeform class allows players to try new things and express
+     themselves. I've seen people write in: _Goddess-Sorcerress_ (dragon's
+     wife), _Maiden-mutant_ (dragon's daughter), _Tyranosauroid Trickster,
+     Qunari, Despotic Pixie Princess_. Today I had a chance to portray a
+     _Starfighter Pilot_ to fight the DRAGON: Distributed Reactive Assembly of
+     Guardian Ordnance Nodes (i.e.&nbsp;a&nbsp;big mech made from other mechs).
 
-    <PrevListManicule />
-
-    <figure className="mx-auto w-fit [&>table]:w-full">
-
-    | Helpers         | Reroll one     | Reroll both      |
-    | --------------: | :------------: | :--------------: |
-    |               0 |          16.7% |            16.7% |
-    |               1 |          35.7% |            30.6% |
-    |               2 |          52.3% |            42.1% |
-    |               3 |          65.2% |            51.9% |
-    |               4 |          74.9% |            59.8% |
-    |               5 |          82.1% |            66.5% |
-
-    <figcaption>Full-success (10+) rate when the Hunters keep pushing for the full hit</figcaption>
-
-    </figure>
+   <PrevListManicule />
