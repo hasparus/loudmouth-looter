@@ -112,7 +112,7 @@
 }
 
 html.dark .wd-book {
-  --wd-paper: var(--color-neu-900);
+  --wd-paper: #1c1917;
   --wd-ink: var(--color-neu-100);
   --wd-frame: var(--color-neu-600);
 }
