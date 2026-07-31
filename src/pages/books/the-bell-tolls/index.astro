@@ -1,0 +1,357 @@
+---
+/* eslint-disable better-tailwindcss/no-unknown-classes */
+import logoUrl from "./compatible-mork-borg.png?url";
+
+import "@fontsource/unifrakturcook/700.css";
+import "@fontsource/pirata-one/400.css";
+import "@fontsource/eb-garamond/400.css";
+import "@fontsource/eb-garamond/400-italic.css";
+
+import "../../../global-styles/base.css";
+import "./the-bell-tolls.css";
+
+const odds = [
+  { mod: "−3", fail: "72%", cost: "22%", clean: "6%" },
+  { mod: "−2", fail: "64%", cost: "26%", clean: "10%" },
+  { mod: "−1", fail: "55%", cost: "30%", clean: "15%" },
+  { mod: "+0", fail: "45%", cost: "34%", clean: "21%" },
+  { mod: "+1", fail: "36%", cost: "36%", clean: "28%" },
+  { mod: "+2", fail: "28%", cost: "36%", clean: "36%" },
+  { mod: "+3", fail: "21%", cost: "34%", clean: "45%" },
+];
+
+const abilities = [
+  { name: "Strength", body: "Crush, lift, strike, grapple. Overpowers." },
+  { name: "Agility", body: "Dodge, flee, balance, climb, swim. Outmaneuvers." },
+  { name: "Presence", body: "Perceive, aim, charm, wield scrolls. Commands." },
+  { name: "Toughness", body: "Resist poison, cold, heat. Survive falling. Sets your HP." },
+];
+
+const changes = [
+  "d20 against a DR becomes 2d10 read as bands.",
+  "Difficulty ratings are gone. There is no number to hit.",
+  "Monsters never roll. One exchange settles it.",
+  "Damage is flat. Armor subtracts.",
+];
+
+const broken = [
+  { roll: "1 · Out cold", body: "Out of the fight. You come round at d4 HP." },
+  { roll: "2 · Maimed", body: "A limb breaks or comes off (d6: a 6 takes an eye). Out of the fight, then d4 HP." },
+  { roll: "3–4 · Bleeding", body: "Haemorrhage." },
+];
+
+const scrolls = [
+  { band: "≤10", body: "Misfire. It fails. Take d2 damage and go dizzy. No scrolls for an hour." },
+  { band: "11–14", body: "It works, but the scroll takes something. A wound, an Omen, or itself." },
+  { band: "15+", body: "Clean. It works, no cost." },
+];
+
+const armor = [
+  { tier: "Light", body: "Removes 1 damage. Advantage on Agility rolls." },
+  { tier: "Medium", body: "Removes 2 damage." },
+  { tier: "Heavy", body: "Removes 3 damage. Disadvantage on Agility rolls." },
+];
+
+const art = import.meta.glob<{ default: ImageMetadata }>("./art/*.png", {
+  eager: true,
+});
+const coverBell = art["./art/cover-bell.png"]?.default;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>The Bell Tolls — a 2d10 hack for MÖRK BORG</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div class="bt">
+      <p class="bt-proof">
+        <strong>Print:</strong> A4 · landscape · double-sided · <strong
+          >short-edge flip</strong
+        > · 100% (no fit-to-page) · background graphics <strong>on</strong>. Folded, it
+        opens to <code>Resolution</code> ‖ <code>Combat</code>.
+      </p>
+
+      <section class="bt-page">
+        <article class="bt-panel">
+          <span class="bt-label">P4 · back</span>
+
+          <h2 class="bt-h2">The Odds</h2>
+          <table class="bt-table">
+            <thead>
+              <tr><th>Mod</th><th>Fail</th><th>Cost</th><th>Clean</th></tr>
+            </thead>
+            <tbody>
+              {
+                odds.map((r, i) => (
+                  <tr class={i % 2 ? "bt-row-even" : ""}>
+                    <td>{r.mod}</td>
+                    <td>{r.fail}</td>
+                    <td>{r.cost}</td>
+                    <td class="bt-clean">{r.clean}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+          <p class="bt-caption">
+            2d10 runs flatter than 2d6. The tails are fat — a good mod swings hard, a
+            bad one damns you. At +0 you fail nearly half the time. Nobody is safe.
+          </p>
+
+          <hr class="bt-rule" />
+
+          <h3 class="bt-h3">Broken</h3>
+          <p class="bt-body">
+            At <span class="bt-em">0 HP or below</span>, roll d4. Nothing here kills
+            you on the spot.
+          </p>
+          <dl class="bt-kv">
+            {broken.map((r) => (<><dt>{r.roll}</dt><dd>{r.body}</dd></>))}
+          </dl>
+
+          <h3 class="bt-h3 bt-h3-tight">Haemorrhage</h3>
+          <p class="bt-body">
+            Every roll you make is at disadvantage. Roll d2. That is your clock. It
+            ticks on your own rolls while something presses you, on hours while
+            nothing does. Lie still and it stops. When it runs out you bleed to
+            death, unless someone closes the wound.
+          </p>
+
+          <hr class="bt-rule" />
+
+          <h3 class="bt-h3">Morale</h3>
+          <p class="bt-body">
+            The GM rolls 2d6 against a creature's Morale when its leader dies, half
+            its group is down, or a lone enemy drops to a third of its HP. Roll over
+            and it breaks. Then d6: on 1–3 it runs, on 4–6 it surrenders. Mindless
+            things never check.
+          </p>
+
+          <hr class="bt-rule" />
+
+          <h3 class="bt-h3">What stays from the book</h3>
+          <p class="bt-body">
+            Scvm and classes. Gear, weapons, scrolls. Omens. Broken. The bestiary.
+            Reaction and Morale. Getting better. Every random table.{" "}
+            <span class="bt-em">Only the player's dice change.</span>
+          </p>
+
+          <div class="bt-colophon">
+            <img class="bt-logo" src={logoUrl} alt="Compatible with MÖRK BORG" />
+            <p class="bt-fine">
+              <span class="bt-colophon-title">The Bell Tolls</span> is an independent
+              production by Piotr Monwid-Olechnowicz and is not affiliated with Ockult
+              Örtmästare Games or Stockholm Kartell. It is published under the MÖRK
+              BORG Third Party License. MÖRK BORG is copyright Ockult Örtmästare Games
+              and Stockholm Kartell. · haspar.us · 2026
+            </p>
+          </div>
+        </article>
+
+        <article class="bt-panel bt-cover">
+          <span class="bt-label">P1 · cover</span>
+
+          <p class="bt-kicker">A 2d10 hack for MÖRK BORG</p>
+
+          <div>
+            <h1 class="bt-title">The Bell<br />Tolls</h1>
+            <hr class="bt-rule bt-cover-rule" />
+            <p class="bt-dice">2d10</p>
+          </div>
+
+          {coverBell && <img class="bt-cover-art" src={coverBell.src} alt="" />}
+
+          <div class="bt-cover-body">
+            <p class="bt-tagline">
+              For the Masters of Ceremonies spawned by the Apocalypse.
+            </p>
+            <hr class="bt-rule bt-cover-rule" />
+            <p class="bt-body">
+              <span class="bt-em">Say what you do.</span> If it's in doubt and can bite,
+              roll 2d10 + mod. Read the band and live with it.
+            </p>
+            <hr class="bt-rule bt-cover-rule" />
+            <ul class="bt-list">
+              {changes.map((c) => (<li><span>{c}</span></li>))}
+            </ul>
+          </div>
+
+          <p class="bt-footer">Roll · Read the band · Live with it</p>
+        </article>
+      </section>
+
+      <section class="bt-page">
+        <article class="bt-panel">
+          <span class="bt-label">P3 · combat &amp; magic</span>
+
+          <h2 class="bt-h2">Fighting</h2>
+          <p class="bt-lead">
+            Monsters don't roll.<br />One <span class="bt-em">2d10</span> + mod settles
+            the exchange.
+          </p>
+
+          <div class="bt-band">
+            <span class="bt-band-n">≤10</span>
+            <span>
+              <span class="bt-band-label">Miss &amp; get hit</span>
+              <span class="bt-band-body"
+                >Your blow fails, theirs lands. Take the wound.</span
+              >
+            </span>
+          </div>
+          <div class="bt-band">
+            <span class="bt-band-n">11–14</span>
+            <span>
+              <span class="bt-band-label">Trade blows</span>
+              <span class="bt-band-body"
+                >You both connect. Deal your harm, take theirs.</span
+              >
+            </span>
+          </div>
+          <div class="bt-band bt-band-clean">
+            <span class="bt-band-n">15+</span>
+            <span>
+              <span class="bt-band-label">Clean hit</span>
+              <span class="bt-band-body">You land it. They don't touch you.</span>
+            </span>
+          </div>
+
+          <p class="bt-body">
+            Fight with what you are. The fiction gates the stat. No finesse while pinned.
+          </p>
+          <dl class="bt-kv">
+            <dt>Strength</dt><dd>Overpower. Grapple. Heavy weapons.</dd>
+            <dt>Agility</dt><dd>Outmaneuver. Skirmish. Knives. Leap aside when the rock falls.</dd>
+            <dt>Presence</dt><dd>Command. Aim. Anything ranged.</dd>
+            <dt>Toughness</dt><dd>Kills nothing. Decides how much dying you can take.</dd>
+          </dl>
+
+          <h3 class="bt-h3 bt-h3-tight">Harm</h3>
+          <p class="bt-body">
+            A hit deals its weapon's <span class="bt-em">maximum</span>, less armor.
+            You never roll for damage. No bare numbers. The wound is described
+            in the fiction, then HP drops. A number alone is never the consequence.
+          </p>
+
+          <hr class="bt-rule" />
+
+          <h3 class="bt-h3">Armor</h3>
+          <dl class="bt-kv">
+            {armor.map((a) => (<><dt>{a.tier}</dt><dd>{a.body}</dd></>))}
+          </dl>
+
+          <hr class="bt-rule" />
+
+          <h3 class="bt-h3">Crit &amp; Fumble</h3>
+          <p class="bt-body">
+            Read the two dice you keep, before your mod.{" "}
+            <span class="bt-em">Natural 19 or more:</span> shred their armor a tier, then
+            double the damage. <span class="bt-em">Natural 3 or less:</span> your own armor
+            shreds a tier, and the harm to you doubles. Armor lost stays lost.
+          </p>
+
+          <hr class="bt-rule" />
+
+          <h3 class="bt-h3">Scrolls</h3>
+          <p class="bt-body">
+            Cast with <span class="bt-em">2d10 + Presence</span>. You get Presence + d4
+            castings a day.
+          </p>
+          <dl class="bt-kv">
+            {scrolls.map((s) => (<><dt>{s.band}</dt><dd>{s.body}</dd></>))}
+          </dl>
+        </article>
+
+        <article class="bt-panel">
+          <span class="bt-label">P2 · resolution</span>
+
+          <h2 class="bt-h2">The Roll</h2>
+          <p class="bt-lead">
+            Roll <span class="bt-em">2d10</span> + ability mod.<br />Read the band.
+          </p>
+
+          <div class="bt-band">
+            <span class="bt-band-n">≤10</span>
+            <span>
+              <span class="bt-band-label">You fail</span>
+              <span class="bt-band-body"
+                >Something bad happens and the world moves against you.</span
+              >
+            </span>
+          </div>
+          <div class="bt-band">
+            <span class="bt-band-n">11–14</span>
+            <span>
+              <span class="bt-band-label">Cost</span>
+              <span class="bt-band-body"
+                >You do it, but the situation bites back — a price, a complication, a
+                piece of you left behind.</span
+              >
+            </span>
+          </div>
+          <div class="bt-band bt-band-clean">
+            <span class="bt-band-n">15+</span>
+            <span>
+              <span class="bt-band-label">Clean</span>
+              <span class="bt-band-body">You do it. No strings.</span>
+            </span>
+          </div>
+
+          <h3 class="bt-h3">When to roll</h3>
+          <ul class="bt-list">
+            <li>
+              <span>Only when the outcome is in doubt and failure has teeth.</span>
+            </li>
+            <li>
+              <span
+                >Difficulty is framing. Zoom in, change the stakes or the fiction.
+                Leave the number alone.</span
+              >
+            </li>
+            <li><span>Impossible stays impossible until the plan changes.</span></li>
+          </ul>
+
+          <hr class="bt-rule" />
+
+          <h3 class="bt-h3">Abilities · −3 to +3</h3>
+          <dl class="bt-kv">
+            {abilities.map((a) => (<><dt>{a.name}</dt><dd>{a.body}</dd></>))}
+          </dl>
+
+          <hr class="bt-rule" />
+
+          <h3 class="bt-h3">Swing the odds</h3>
+          <p class="bt-body">
+            <span class="bt-em">Disadvantage</span> — hurt, blind, cornered, bleeding:
+            roll 3d10, keep the lowest two. Haemorrhage and its kin work this way, with
+            no rising DR to track.<br />
+            <span class="bt-em">Advantage</span> — set up, flanking, the right tool: roll
+            3d10, keep the highest two.
+          </p>
+          <p class="bt-fine">
+            Each is worth about ±3. Two advantages are still one advantage. Advantage
+            and disadvantage cancel.
+          </p>
+
+          <hr class="bt-rule" />
+
+          <h3 class="bt-h3">Omens</h3>
+          <p class="bt-body">Spend one to:</p>
+          <ul class="bt-list">
+            <li><span>treat this hit as a crit;</span></li>
+            <li><span>halve the damage dealt to you;</span></li>
+            <li><span>bump one band up.</span></li>
+          </ul>
+          <p class="bt-fine">
+            No Omen undoes a natural 3 or 19. You may halve a fumble's damage, but
+            your armor still shreds and the exchange is still lost.
+          </p>
+        </article>
+      </section>
+    </div>
+  </body>
+</html>
