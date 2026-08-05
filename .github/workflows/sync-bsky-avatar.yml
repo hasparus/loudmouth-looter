@@ -1,0 +1,51 @@
+name: Sync Bluesky avatar
+
+# The OG card embeds the avatar rather than hotlinking it, so the Bluesky CDN
+# isn't a render-time dependency (and the URL's CID changes on every avatar
+# swap). This re-vendors it on demand and weekly.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Mondays, 05:17 UTC — off the hour to dodge the scheduler stampede.
+    - cron: "17 5 * * 1"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      HANDLE: haspar.us
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+
+      - name: Fetch avatar
+        run: |
+          set -euo pipefail
+
+          avatar_url=$(
+            curl -sSf --retry 3 --retry-delay 2 \
+              "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${HANDLE}" \
+              | jq -er '.avatar'
+          )
+          echo "Profile avatar: ${avatar_url}"
+
+          # The card renders it at 92px, so the thumb is plenty — the full-size
+          # blob would bloat the edge bundle once it's base64'd.
+          thumb_url=${avatar_url/\/img\/avatar\//\/img\/avatar_thumb\/}
+
+          curl -sSf --retry 3 --retry-delay 2 -o assets/og/avatar.jpg "${thumb_url}" \
+            || curl -sSf --retry 3 --retry-delay 2 -o assets/og/avatar.jpg "${avatar_url}"
+
+          file assets/og/avatar.jpg | grep -q JPEG
+          ls -l assets/og/avatar.jpg
+
+      - name: Commit
+        uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321
+        with:
+          add: "assets/og/avatar.jpg"
+          fetch: false
+          github_token: "${{ github.token }}"
+          message: "Sync Bluesky avatar"
