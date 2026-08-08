@@ -1,5 +1,5 @@
 ---
-import { SITE_NAME } from "./siteMeta";
+import { SITE_NAME, SITE_OG_IMAGE } from "./siteMeta";
 
 interface Props {
   title: string;
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const { title, description, ogType = "website" } = Astro.props;
-let { ogImage } = Astro.props;
+let { ogImage = SITE_OG_IMAGE } = Astro.props;
 
 ogImage &&= new URL(ogImage, import.meta.env.PUBLIC_URL).href;
 ---
