@@ -7,12 +7,9 @@
 import { ImageResponse } from "@vercel/og";
 import type * as React from "react";
 
-const author = {
-  name: "Yours Truly",
-  avatarSrc: "https://i.pravatar.cc/256?u=30",
-};
+const AUTHOR_NAME = "Piotr Monwid-Olechnowicz";
 
-type Author = typeof author;
+type Author = { name: string; avatarSrc: string | null };
 
 export const config = { runtime: "edge" };
 
@@ -21,6 +18,11 @@ const crimsonRegular = fetchFont(
 );
 const avaraBlack = fetchFont(
   new URL("../assets/og/Avara-Black.ttf", import.meta.url),
+);
+
+const authorAvatar = fetchDataUri(
+  new URL("../assets/og/avatar.jpg", import.meta.url),
+  "image/jpeg",
 );
 
 const width = 1200;
@@ -53,7 +55,10 @@ export default async function og(req: Request) {
           { imageHref: post.img },
           post.img ? null : h(Title, { title: post.title }),
         ),
-        h(Footer, { author, post }),
+        h(Footer, {
+          author: { name: AUTHOR_NAME, avatarSrc: await authorAvatar },
+          post,
+        }),
       ),
       {
         width,
@@ -151,12 +156,13 @@ function Footer({ author, post }: { author: Author; post: Post }) {
       flex flex-row justify-center items-center
     `,
     },
-    h("img", {
-      width: 92,
-      height: 92,
-      src: author.avatarSrc,
-      tw: `rounded-full`,
-    }),
+    !!author.avatarSrc &&
+      h("img", {
+        width: 92,
+        height: 92,
+        src: author.avatarSrc,
+        tw: `rounded-full`,
+      }),
     h("span", { tw: `ml-4` }, author.name),
     h("div", { tw: `flex-1` }),
     h(
@@ -189,7 +195,25 @@ function h<T extends React.ElementType>(
 }
 
 function fetchFont(url: URL) {
-  return fetch(url).then((res) => res.arrayBuffer());
+  return fetch(url).then((res) => {
+    if (!res.ok) {
+      throw new Error(`Failed to fetch font: ${res.status} ${res.statusText}`);
+    }
+    return res.arrayBuffer();
+  });
+}
+
+function fetchDataUri(url: URL, mimeType: string) {
+  return fetchFont(url)
+    .then((buffer) => {
+      let binary = "";
+      for (const byte of new Uint8Array(buffer)) {
+        binary += String.fromCodePoint(byte);
+      }
+
+      return `data:${mimeType};base64,${btoa(binary)}`;
+    })
+    .catch(() => null);
 }
 
 type Post = {

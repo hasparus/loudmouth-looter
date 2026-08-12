@@ -57,6 +57,22 @@ test.describe("OG images", () => {
     const ogImage = page.locator('meta[property="og:image"]');
     await expect(ogImage).toHaveAttribute("content", /.+/);
   });
+
+  test("pages without their own image fall back to one that exists", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/");
+    const ogImage = page.locator('meta[property="og:image"]');
+    await expect(ogImage).toHaveAttribute("content", /.+/);
+
+    // A card pointing at a 404 renders worse than no card at all, so check the
+    // file is really there. The tag is absolutized against PUBLIC_URL, which
+    // isn't the preview server — re-request the path against baseURL.
+    const content = await ogImage.getAttribute("content");
+    const response = await request.get(new URL(content!).pathname);
+    expect(response.status()).toBe(200);
+  });
 });
 
 test.describe("Move cards (published)", () => {
