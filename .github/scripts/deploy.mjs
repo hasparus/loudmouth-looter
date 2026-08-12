@@ -19,6 +19,11 @@ if (!token) {
 }
 
 const environment = prod ? "production" : "preview";
+const deploymentAlias = createDeploymentAlias();
+
+process.env.DEPLOYMENT_ALIAS = deploymentAlias;
+// eslint-disable-next-line no-console -- progress output for the GitHub Actions log
+console.log(`deployment alias: ${deploymentAlias}`);
 
 /**
  * Run `bunx <args...>` and exit the script on failure.
@@ -100,10 +105,6 @@ console.log(`deployment URL: ${deploymentUrl}`);
 
 // 4. Alias the deployment to `${branch}--loudmouth-looter.vercel.app` and write the
 //    alias to $GITHUB_ENV so later steps can reference it.
-const deploymentAlias = createDeploymentAlias();
-// eslint-disable-next-line no-console -- progress output for the GitHub Actions log
-console.log(`deployment alias: ${deploymentAlias}`);
-
 if (process.env.GITHUB_ENV) {
   appendFileSync(
     process.env.GITHUB_ENV,
