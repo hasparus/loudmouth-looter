@@ -195,7 +195,12 @@ function h<T extends React.ElementType>(
 }
 
 function fetchFont(url: URL) {
-  return fetch(url).then((res) => res.arrayBuffer());
+  return fetch(url).then((res) => {
+    if (!res.ok) {
+      throw new Error(`Failed to fetch font: ${res.status} ${res.statusText}`);
+    }
+    return res.arrayBuffer();
+  });
 }
 
 function fetchDataUri(url: URL, mimeType: string) {
