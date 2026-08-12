@@ -20,8 +20,6 @@ const avaraBlack = fetchFont(
   new URL("../assets/og/Avara-Black.ttf", import.meta.url),
 );
 
-// Vendored by .github/workflows/sync-bsky-avatar.yml. Inlined rather than
-// hotlinked so a CDN hiccup can't stall the card; a miss just drops the face.
 const authorAvatar = fetchDataUri(
   new URL("../assets/og/avatar.jpg", import.meta.url),
   "image/jpeg",
