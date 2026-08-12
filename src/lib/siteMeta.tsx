@@ -13,4 +13,4 @@ export const SITE_BLURB = "rants, mechanics and kitbashes";
  * go stale when a page is retitled. Lives in `public/`, so the path is the
  * filename — swap both together.
  */
-export const SITE_OG_IMAGE = "/og-default.jpg";
+export const SITE_OG_IMAGE = "/og-default.webp";
