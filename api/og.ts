@@ -28,7 +28,12 @@ const authorAvatar = fetchDataUri(
 const width = 1200;
 const height = 630;
 
-const env = (process as { env: Record<string, string | undefined> }).env;
+// Declared locally (rather than relying on @types/node's ambient `process`) because
+// Vercel's edge function build type-checks this file in isolation and doesn't resolve
+// the project tsconfig's `types` field, so the ambient Node global isn't visible there.
+declare const process: { env: Record<string, string | undefined> };
+
+const env = process.env;
 
 // eslint-disable-next-line import-x/no-default-export -- Vercel edge functions must default-export the handler
 export default async function og(req: Request) {
