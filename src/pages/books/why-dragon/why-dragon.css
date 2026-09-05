@@ -411,6 +411,21 @@ html.dark .wd-dragon-overlay {
   filter: invert(1) hue-rotate(180deg);
 }
 
+.wd-sword-overlay {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: calc(-50% + 2px) 0;
+  block-size: 100%;
+  inline-size: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+html.dark .wd-sword-overlay {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 .wd-colophon {
   margin: 0;
   font-size: 7.8pt;

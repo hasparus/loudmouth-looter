@@ -17,6 +17,7 @@ import * as TurnToAsh from "../../../rules/why-dragon/turn-to-ash.mdx";
 
 import { PrintMove } from "./_PrintMove";
 import dragonUrl from "./dragon.webp?url";
+import swordUrl from "./dragonsword.png?url";
 import fireUrl from "./fire.webp?url";
 import pyre1 from "./pyre-1.webp?url";
 import pyre2 from "./pyre-2.webp?url";
@@ -340,6 +341,11 @@ const pyreLevels = [
             <RaiseAToast.Content />
           </PrintMove>
         </article>
+        <img
+          class="wd-sword-overlay"
+          src={swordUrl}
+          alt="Dragon sword"
+        />
       </div>
 
       <aside
