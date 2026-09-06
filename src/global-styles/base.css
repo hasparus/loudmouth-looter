@@ -2,6 +2,8 @@
 @import "tailwindcss";
 
 @source "../../posts/**/*.mdx";
+@source not "../talks";
+@source not "../pages/talks";
 
 @import "./skin.css";
 
