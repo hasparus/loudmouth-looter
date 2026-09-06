@@ -1,11 +1,6 @@
-import type { JSX } from "solid-js";
-
-import dragonSheet from "./images/dragon-sheet.png";
-import stonetopThreats from "./images/stonetop-threats.png";
-import stonetopWiderWorld from "./images/stonetop-wider-world.png";
+import { type Slide } from "../deck";
 import {
   Aside,
-  Bio,
   BoxedText,
   Bullets,
   Card,
@@ -14,21 +9,13 @@ import {
   FullImage,
   Hero,
   Impressions,
-  Pipeline,
   Quote,
-  Systems,
   Title,
-  Triangle,
-} from "./layout";
-
-export interface Slide {
-  /** Speaker notes, shown on N. */
-  notes?: string;
-  dark?: boolean;
-  /** Edge-to-edge image: no rules, notch or folio. */
-  bare?: boolean;
-  content: () => JSX.Element;
-}
+} from "../ui";
+import dragonSheet from "./images/dragon-sheet.png";
+import stonetopThreats from "./images/stonetop-threats.png";
+import stonetopWiderWorld from "./images/stonetop-wider-world.png";
+import { Bio, Pipeline, Systems, Triangle } from "./layout";
 
 const links = [
   ["lol.haspar.us", "https://lol.haspar.us"],
@@ -46,6 +33,7 @@ export const slides: Slide[] = [
         title="Jak jeszcze raz usłyszę questgiver…"
         hero="wyrzucę za burtę"
         tags={["sandbox", "threats", "frakcje", "pytania", "impressions"]}
+        flourish="!"
       />
     ),
   },

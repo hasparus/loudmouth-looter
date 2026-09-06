@@ -38,13 +38,6 @@ export default [
   },
 
   {
-    // deck.css is hand-written, not Tailwind — its class names are not utilities
-    // TODO: deck.css should use Tailwind
-    files: ["src/talks/**"],
-    rules: { "better-tailwindcss/no-unknown-classes": "off" },
-  },
-
-  {
     files: ["src/**/*.ts"],
     ignores: ["**/*.d.ts", "**/*.xml.ts", "**/*.txt.ts", "**/*.md.ts"],
     plugins: { "check-file": checkFile },

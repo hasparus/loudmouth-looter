@@ -1,134 +1,79 @@
-import { For, Show, type JSX } from "solid-js";
-
-export function Title(props: { kicker?: string; children: JSX.Element }) {
-  return (
-    <>
-      <Show when={props.kicker}>
-        {(kicker) => <div class="kicker">{kicker()}</div>}
-      </Show>
-      <h2 class="slide-title">{props.children}</h2>
-    </>
-  );
-}
-
-export function Hero(props: { children: JSX.Element }) {
-  return <div class="display">{props.children}</div>;
-}
-
-/** Full-height slide ending in one big line. */
-export function Quote(props: { title: string; children: JSX.Element }) {
-  return (
-    <div class="quote">
-      <Title>{props.title}</Title>
-      <div class="display">{props.children}</div>
-    </div>
-  );
-}
-
-export function Aside(props: { children: JSX.Element }) {
-  return <div class="aside">{props.children}</div>;
-}
-
-export function Bullets(props: { items: string[]; compact?: boolean }) {
-  return (
-    <ul
-      class="bullets"
-      classList={{ compact: props.compact ?? props.items.length > 6 }}
-    >
-      <For each={props.items}>{(item) => <li>{item}</li>}</For>
-    </ul>
-  );
-}
-
-export function Cover(props: { title: string; hero: string; tags: string[] }) {
-  return (
-    <div class="cover-layout">
-      <div class="cover-copy">
-        <h1 class="cover-title">{props.title}</h1>
-        <div class="cover-hero">{props.hero}</div>
-        <div class="tag-row cover-tags">
-          <For each={props.tags}>{(tag) => <span class="tag">{tag}</span>}</For>
-        </div>
-      </div>
-      <div class="cover-exclamation" aria-hidden="true">
-        !
-      </div>
-    </div>
-  );
-}
-
-export function FullImage(props: { src: string; alt: string }) {
-  return <img class="full-slide-image" src={props.src} alt={props.alt} />;
-}
+import { For, Show } from "solid-js";
 
 export function Pipeline(props: { steps: string[] }) {
   return (
-    <div class="pipeline">
+    <div class="mt-[10%] grid grid-cols-5 items-stretch gap-[1.1%]">
       <For each={props.steps}>
-        {(step) => <div class="pipeline-step">{step}</div>}
+        {(step, i) => (
+          <div class="border-neu-300 bg-neu-100/78 relative grid min-h-38 place-items-center border p-4 text-center text-[clamp(18px,1.75cqw,32px)] leading-[0.98]">
+            {step}
+            <Show when={i() < props.steps.length - 1}>
+              <span class="text-accent-800 absolute top-[40%] right-[-11%] z-2 text-[1.5em]">
+                →
+              </span>
+            </Show>
+          </div>
+        )}
       </For>
-    </div>
-  );
-}
-
-export function Columns(props: { split?: boolean; children: JSX.Element }) {
-  return (
-    <div class="columns" classList={{ split: props.split }}>
-      {props.children}
-    </div>
-  );
-}
-
-export function Card(props: { title: string; items: string[] }) {
-  return (
-    <div class="card">
-      <h3>{props.title}</h3>
-      <Bullets items={props.items} compact />
-    </div>
-  );
-}
-
-export function BoxedText(props: { label: string; children: JSX.Element }) {
-  return (
-    <div class="boxed">
-      <div class="boxed-label">{props.label}</div>
-      {props.children}
-    </div>
-  );
-}
-
-export function Impressions(props: { items: string[] }) {
-  return (
-    <div>
-      <div class="boxed-label accent">impressions</div>
-      <Bullets items={props.items} compact />
     </div>
   );
 }
 
 export function Triangle(props: { nodes: [string, string, string] }) {
   return (
-    <div class="triangle">
-      <svg viewBox="0 0 100 70" aria-hidden="true">
-        <line x1="50" y1="5" x2="13" y2="63" />
-        <line x1="50" y1="5" x2="87" y2="63" />
-        <line x1="13" y1="63" x2="87" y2="63" />
+    <div class="relative mx-auto mt-[4%] aspect-[1.45] w-[min(62%,36rem)]">
+      <svg
+        class="absolute inset-[8%_10%] h-[78%] w-[80%] overflow-visible"
+        viewBox="0 0 100 70"
+        aria-hidden="true"
+      >
+        <line
+          class="stroke-accent-800 stroke-[1.5] opacity-[0.78]"
+          x1="50"
+          y1="5"
+          x2="13"
+          y2="63"
+        />
+        <line
+          class="stroke-accent-800 stroke-[1.5] opacity-[0.78]"
+          x1="50"
+          y1="5"
+          x2="87"
+          y2="63"
+        />
+        <line
+          class="stroke-accent-800 stroke-[1.5] opacity-[0.78]"
+          x1="13"
+          y1="63"
+          x2="87"
+          y2="63"
+        />
       </svg>
-      <div class="triangle-node a">{props.nodes[0]}</div>
-      <div class="triangle-node b">{props.nodes[1]}</div>
-      <div class="triangle-node c">{props.nodes[2]}</div>
+      <div class="border-neu-400 bg-neu-100/92 absolute top-0 left-[34.5%] grid min-h-18 w-[31%] place-items-center border p-[0.6rem] text-center text-[clamp(16px,1.7cqw,30px)] leading-[0.95]">
+        {props.nodes[0]}
+      </div>
+      <div class="border-neu-400 bg-neu-100/92 absolute bottom-0 left-[4%] grid min-h-18 w-[31%] place-items-center border p-[0.6rem] text-center text-[clamp(16px,1.7cqw,30px)] leading-[0.95]">
+        {props.nodes[1]}
+      </div>
+      <div class="border-neu-400 bg-neu-100/92 absolute right-[4%] bottom-0 grid min-h-18 w-[31%] place-items-center border p-[0.6rem] text-center text-[clamp(16px,1.7cqw,30px)] leading-[0.95]">
+        {props.nodes[2]}
+      </div>
     </div>
   );
 }
 
 export function Systems(props: { rows: [name: string, technique: string][] }) {
   return (
-    <div class="systems-list">
+    <div class="mt-[4.2%] grid gap-[clamp(5px,0.55cqw,10px)]">
       <For each={props.rows}>
         {([name, technique]) => (
-          <div class="system-row">
-            <div class="system-name">{name}</div>
-            <div class="system-tech">{technique}</div>
+          <div class="border-neu-300/80 grid grid-cols-[0.9fr_1.45fr] items-baseline gap-[2%] border-t pt-[clamp(5px,0.5cqw,9px)]">
+            <div class="text-[clamp(17px,1.85cqw,34px)] leading-[0.96]">
+              {name}
+            </div>
+            <div class="text-neu-600 text-[clamp(15px,1.55cqw,28px)] leading-[0.98]">
+              {technique}
+            </div>
           </div>
         )}
       </For>
@@ -138,7 +83,11 @@ export function Systems(props: { rows: [name: string, technique: string][] }) {
 
 function ZagrajmyMark() {
   return (
-    <svg class="zagrajmy-mark" viewBox="0 0 120 120" aria-hidden="true">
+    <svg
+      class="text-neu-900 size-[1.05em] shrink-0"
+      viewBox="0 0 120 120"
+      aria-hidden="true"
+    >
       <path
         d="M92 60C92 91.82 91.82 92 60 92C28.18 92 28 91.82 28 60C28 28.18 28.18 28 60 28C91.82 28 92 28.18 92 60Z"
         fill="#f85a3c"
@@ -169,22 +118,35 @@ export function Bio(props: {
   links: readonly (readonly [label: string, href: string])[];
 }) {
   return (
-    <div class="bio-showcase">
-      <div class="bio-credits">
-        <span class="bio-name">{props.name}</span>
+    <div class="absolute inset-x-0 top-[8.2%] bottom-[8.8%] grid grid-cols-2 items-center">
+      <div class="text-neu-600 flex min-w-0 flex-col items-start gap-[0.12em] pr-[6%] pl-[6.2cqw] text-[clamp(18px,2.05cqw,36px)] leading-[1.24]">
+        <span class="text-neu-900 mb-[0.5em] font-serif text-[1.18em] leading-[1.08] font-extrabold tracking-[0.04em] [font-variant-caps:small-caps]">
+          {props.name}
+        </span>
         <For each={props.links}>
           {([label, href]) => (
-            <a href={href} target="_blank" rel="noreferrer">
+            <a
+              class="hover:text-accent-800 focus-visible:text-accent-800 focus-visible:outline-accent-600 inline-flex items-center gap-[0.35em] text-inherit no-underline focus-visible:outline-2 focus-visible:outline-offset-3"
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+            >
               <Show when={href === "https://zagrajmy.net"}>
                 <ZagrajmyMark />
               </Show>
-              <span>{label}</span>
+              <span class="underline decoration-1 underline-offset-[0.2em]">
+                {label}
+              </span>
             </a>
           )}
         </For>
       </div>
-      <div class="bio-figure">
-        <img class="bio-dragon-sheet" src={props.image} alt="" />
+      <div class="h-full min-h-0 min-w-0 pr-[5.6cqw]">
+        <img
+          class="block size-full object-contain object-right drop-shadow-[0_14px_22px_rgb(28_25_23/0.12)]"
+          src={props.image}
+          alt=""
+        />
       </div>
     </div>
   );
