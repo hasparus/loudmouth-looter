@@ -81,8 +81,14 @@ export function Cover(props: {
   flourish?: string;
 }) {
   return (
-    <div class="relative grid h-full grid-cols-[minmax(0,1fr)_31%] gap-[2%]">
-      <div class="relative z-2 flex min-w-0 flex-col">
+    <div
+      class="relative grid h-full gap-[2%]"
+      classList={{
+        "grid-cols-[minmax(0,1fr)_31%]": Boolean(props.flourish),
+        "grid-cols-1": !props.flourish,
+      }}
+    >
+       <div class="relative z-2 flex min-w-0 flex-col">
         <h1 class="m-0 max-w-full font-serif text-[clamp(58px,7.35cqw,134px)] leading-[0.82] font-normal tracking-[-0.018em]">
           {props.title}
         </h1>

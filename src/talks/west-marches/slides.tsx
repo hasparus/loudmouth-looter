@@ -1,5 +1,7 @@
 import { type Slide } from "../deck";
+import { Systems } from "../neverquest/layout";
 import { Aside, Bullets, Cover, FullImage, Hero, Title } from "../ui";
+import bearFitScreenshot from "./images/bear-fit.png";
 import vahidLetter from "./images/vahid-letter.png";
 import westMarches from "./images/west-marches.png";
 import writingLoveLetters from "./images/writing-love-letters.png";
@@ -11,8 +13,8 @@ export const slides: Slide[] = [
       "Idę o zakład, że większość waszych kampanii nie skończyła się, bo skończyła się historia, ani nawet bo inny gracz był wkurzający i przynosił zbyt ostre czipsy. Zderzenie z dorosłym życiem, priorytety, i boss rodem z Elden Ringa: Kalendarz.",
     content: () => (
       <Cover
-        title="Boss: Kalendarz"
-        hero="rodem z Elden Ringa"
+        title="West Marches"
+        hero="jak prowadzić kampanie, których nie zabija kalendarz"
         tags={[
           "otwarty stół",
           "upływ czasu",
@@ -21,6 +23,64 @@ export const slides: Slide[] = [
           "just-in-time",
         ]}
       />
+    ),
+  },
+  {
+    dark: true,
+    bare: true,
+    notes:
+      "West Marches: nie ma stałego terminu, stałej drużyny, stałego plotu. Gracze składają stół. To otwarty stół, nie weekly obligatory session.",
+    content: () => (
+      <FullImage
+        src={westMarches.src}
+        alt="ars ludi: Grand Experiments: West Marches"
+        href="https://arsludi.lamemage.com/index.php/78/grand-experiments-west-marches/"
+      />
+    ),
+  },
+  {
+    notes:
+      "Kampanie umierają na dorosłość. Kalendarz wygrywa, jeśli sesja zależy od tego, że wszyscy przyjdą w ten sam wtorek.",
+    content: () => (
+      <>
+        <Hero>Kalendarz.</Hero>
+        <Bullets
+          items={[
+            "zderzenie z dorosłym życiem",
+            "deadline",
+            "już nie mogę we wtorek",
+            "w czwartek jest trening",
+            "a weekend to się wyjeżdża",
+          ]}
+        />
+      </>
+    ),
+  },
+  {
+    notes:
+      "Z kampanii kolegi, która przeżyła tylko sesję zero, wyrzeźbiłem kampanię na 10 osób. Prowadziłem przez ponad rok, aż do finału.",
+    content: () => (
+      <>
+        <Title>Nie wystartowała nam kampania Blades in the Dark</Title>
+        <Hero>Zrecyklingowałem ją.</Hero>
+      </>
+    ),
+  },
+  {
+    content: () => <Hero>Bez scenariusza.</Hero>,
+  },
+  {
+    content: () => <Hero>Bez questów.</Hero>,
+  },
+  {
+    content: () => <Hero>Bez stałego terminu.</Hero>,
+  },
+  {
+    content: () => <Hero>Otwarty stół. Gracze inicjują.</Hero>,
+  },
+  {
+    content: () => (
+      <Hero>Upływ czasu 1-1 z rzeczywistością pomiędzy sesjami.</Hero>
     ),
   },
   {
@@ -45,46 +105,37 @@ export const slides: Slide[] = [
     ),
   },
   {
-    dark: true,
-    bare: true,
     notes:
-      "West Marches: nie ma stałego terminu, stałej drużyny, stałego plotu. Gracze składają stół. To otwarty stół, nie weekly obligatory session.",
-    content: () => (
-      <FullImage
-        src={westMarches.src}
-        alt="ars ludi: Grand Experiments: West Marches"
-        href="https://arsludi.lamemage.com/index.php/78/grand-experiments-west-marches/"
-      />
-    ),
-  },
-  {
-    notes:
-      "Kampanie umierają na dorosłość. Kalendarz wygrywa, jeśli sesja zależy od tego, że wszyscy przyjdą w ten sam wtorek.",
+      "Scheduling online",
     content: () => (
       <>
-        <Title>Nie historia. Nie czipsy.</Title>
-        <Hero>Kalendarz.</Hero>
-        <Bullets
-          items={[
-            "zderzenie z dorosłym życiem",
-            "priorytety",
-            "ktoś nie może we wtorek",
-            "potem we czwartek też nie",
-          ]}
-        />
+        <Title>Scheduling online</Title>
+        <div class="mt-[4%] grid min-h-0 flex-1 grid-cols-2 items-stretch gap-[4%]">
+          <img
+            class="size-full min-h-0 object-contain"
+            src={bearFitScreenshot.src}
+            alt="bear-fit: kalendarz Lodowiec, heatmap dostępności"
+          />
+        </div>
       </>
     ),
   },
   {
-    notes:
-      "Z kampanii kolegi, która przeżyła tylko sesję zero, wyrzeźbiłem kampanię na 10 osób. Prowadziłem przez ponad rok, aż do finału.",
+    notes: "",
     content: () => (
       <>
-        <Title>Z sesji zero</Title>
-        <Hero>10 osób, rok, finał</Hero>
-        <Aside>
-          Kolega miał tylko sesję zero. Ja miałem kalendarz do zabicia.
-        </Aside>
+        <Title>Mechanizmy zamiast scenariuszy</Title>
+        <Systems
+          rows={[
+            ["Apocalypse World", "triangles / threats"],
+            ["Dungeon World", "dangers / portents / doom"],
+            ["Blades in the Dark", "frakcje / clocks"],
+            ["Stonetop", "Wider World / pytania"],
+            ["Trophy", "impressions / modular prep"],
+            ["MÖRK BORG", "tables / generators / instant trouble"],
+            ["The Alexandrian", "Don't Prep Plots / node-based design"],
+          ]}
+        />
       </>
     ),
   },
@@ -114,3 +165,4 @@ export const slides: Slide[] = [
     ),
   },
 ];
+  

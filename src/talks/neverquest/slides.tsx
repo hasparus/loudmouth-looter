@@ -252,9 +252,9 @@ export const slides: Slide[] = [
         <Triangle
           nodes={[
             // todo: do wymiany
-            "Kapłan potrzebuje Huntera",
-            "Hunter ufa wiedźmie",
-            "Wiedźma chce śmierci kapłana",
+            "soltys zatrudnił Postać",
+            "Postać kocha czarownicę",
+            "czarownica chce śmierci soltysa",
           ]}
         />
         <Aside>Relacje same produkują sceny.</Aside>
@@ -340,7 +340,7 @@ export const slides: Slide[] = [
     ),
   },
   {
-    notes: "Praktyczna bibliografia. Jedna technika z każdego źródła.",
+    notes: "",
     content: () => (
       <>
         <Title>Kradnij techniki</Title>
