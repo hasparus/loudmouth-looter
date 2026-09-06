@@ -1,6 +1,7 @@
 import { type Slide } from "../deck";
 import { Systems } from "../neverquest/layout";
 import { Bullets, Cover, FullImage, Hero, Title } from "../ui";
+import americanProgress from "./images/american-progress.jpg";
 import bearFitScreenshot from "./images/bear-fit.png";
 import vahidLetter from "./images/vahid-letter.png";
 import westMarches from "./images/west-marches.png";
@@ -207,6 +208,24 @@ export const slides: Slide[] = [
             "worldbuilding just-in-time",
           ]}
         />
+      </>
+    ),
+  },
+  {
+    dark: true,
+    bare: true,
+    content: () => (
+      <>
+        <img
+          class="absolute inset-0 size-full object-cover object-center"
+          src={americanProgress.src}
+          alt=""
+        />
+        <div class="absolute inset-0 grid place-items-center">
+          <p class="m-0 font-serif text-[clamp(72px,12cqw,220px)] leading-none font-normal text-white [text-shadow:0_2px_24px_rgb(0_0_0/0.55)]">
+            dzięki
+          </p>
+        </div>
       </>
     ),
   },
