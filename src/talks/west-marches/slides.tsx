@@ -85,6 +85,53 @@ export const slides: Slide[] = [
   },
   {
     notes:
+      "Just-in-time nie oznacza, że świat powstaje wyłącznie przed sesją. Przed grą przygotowuję tylko to, co zaraz trafi na stół. W trakcie gry zadaję otwarte pytania, a odpowiedzi graczy stają się częścią świata. Po grze używam Love Letters, żeby dopowiedzieć downtime, konsekwencje i powroty nieobecnych postaci.",
+    content: () => (
+      <>
+        <Title>Worldbuilding just-in-time</Title>
+        <div class="mt-[7%] grid grid-cols-3 gap-[4%]">
+          <section class="border-accent-800 border-t-2 pt-[1.1rem]">
+            <h3 class="m-0 font-serif text-[clamp(24px,2.75cqw,50px)] leading-[0.96]">
+              Przed grą
+            </h3>
+            <Bullets
+              compact
+              class="mt-[1.2em]"
+              items={["draw maps, leave blanks", "tajemnice, nie ciekawostki"]}
+            />
+          </section>
+          <section class="border-accent-800 border-t-2 pt-[1.1rem]">
+            <h3 class="m-0 font-serif text-[clamp(24px,2.75cqw,50px)] leading-[0.96]">
+              W trakcie gry
+            </h3>
+            <Bullets
+              compact
+              class="mt-[1.2em]"
+              items={[
+                "zadawaj otwarte pytania",
+                "odpowiedzi graczy stają się kanonem",
+              ]}
+            />
+          </section>
+          <section class="border-accent-800 border-t-2 pt-[1.1rem]">
+            <h3 class="m-0 font-serif text-[clamp(24px,2.75cqw,50px)] leading-[0.96]">
+              Po grze
+            </h3>
+            <Bullets
+              compact
+              class="mt-[1.2em]"
+              items={[
+                "Love Letters",
+                "downtime, konsekwencje i powroty nieobecnych, dokańczanie wątków",
+              ]}
+            />
+          </section>
+        </div>
+      </>
+    ),
+  },
+  {
+    notes:
       "Love letters to jednorazowe custom moves do konkretnego PC. Piszesz w prepie, oddajesz na starcie sesji. Downtime, solo, nieobecność, momentum.",
     content: () => (
       <>
