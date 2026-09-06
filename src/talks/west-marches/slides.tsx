@@ -1,6 +1,6 @@
 import { type Slide } from "../deck";
 import { Systems } from "../neverquest/layout";
-import { Aside, Bullets, Cover, FullImage, Hero, Title } from "../ui";
+import { Bullets, Cover, FullImage, Hero, Title } from "../ui";
 import bearFitScreenshot from "./images/bear-fit.png";
 import vahidLetter from "./images/vahid-letter.png";
 import westMarches from "./images/west-marches.png";
@@ -43,7 +43,7 @@ export const slides: Slide[] = [
       "Kampanie umierają na dorosłość. Kalendarz wygrywa, jeśli sesja zależy od tego, że wszyscy przyjdą w ten sam wtorek.",
     content: () => (
       <>
-        <Hero>Kalendarz.</Hero>
+        <Hero>Kalendarz</Hero>
         <Bullets
           items={[
             "zderzenie z dorosłym życiem",
@@ -105,8 +105,7 @@ export const slides: Slide[] = [
     ),
   },
   {
-    notes:
-      "Scheduling online",
+    notes: "Scheduling online",
     content: () => (
       <>
         <Title>Scheduling online</Title>
@@ -165,4 +164,3 @@ export const slides: Slide[] = [
     ),
   },
 ];
-  

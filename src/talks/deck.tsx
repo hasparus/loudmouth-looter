@@ -21,7 +21,7 @@ function SlideFrame(props: {
 }) {
   return (
     <div
-      class="font-text text-neu-900 after:border-neu-500/35 [container-type:size] absolute inset-0 flex flex-col px-[6.2%] pt-[5.8%] pb-[4.8%] before:pointer-events-none before:absolute before:inset-0 before:z-0 before:bg-[radial-gradient(var(--color-neu-500)_0.5px,transparent_0.5px)] before:bg-size-[5px_5px] before:opacity-[0.14] after:pointer-events-none after:absolute after:inset-x-[3.6%] after:top-[4.25%] after:z-0 after:border-t"
+      class="font-text text-neu-900 after:border-neu-500/35 @container-size absolute inset-0 flex flex-col px-[6.2%] pt-[5.8%] pb-[4.8%] before:pointer-events-none before:absolute before:inset-0 before:z-0 before:bg-[radial-gradient(var(--color-neu-500)_0.5px,transparent_0.5px)] before:bg-size-[5px_5px] before:opacity-[0.14] after:pointer-events-none after:absolute after:inset-x-[3.6%] after:top-[4.25%] after:z-0 after:border-t"
       classList={{
         dark: props.slide.dark,
         "bg-neu-100 dark:bg-neu-900 dark:text-neu-100 dark:before:bg-[radial-gradient(var(--color-neu-300)_0.5px,transparent_0.5px)] dark:before:opacity-[0.08] dark:after:border-neu-400/30":
