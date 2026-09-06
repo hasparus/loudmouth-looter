@@ -263,6 +263,7 @@ export const slides: Slide[] = [
         <Title>Character pressure</Title>
         <Triangle
           nodes={[
+            // todo: do wymiany
             "Kapłan potrzebuje Huntera",
             "Hunter ufa wiedźmie",
             "Wiedźma chce śmierci kapłana",
@@ -304,12 +305,11 @@ export const slides: Slide[] = [
           </BoxedText>
           <Impressions
             items={[
-              "zapach mokrego popiołu",
-              "dzwon rusza się bez wiatru",
-              "stopione twarze świętych",
-              "świeże bose ślady",
-              "coś ciężkiego przesuwa się niżej",
-              "ptaki omijają dach",
+              "Drip drip drip of snow melting from roofs, collecting in jugs and puddles",
+              "Petrichor smell on a southerly breeze",
+              "Hopeful green poking through dead-brown grass and soil",
+              "Bare skin reveling in the still-chilly sun; cheerful voices; smiles and songs",
+              "Tall thin trees (aspen, pines, firs) in the lower slopes and valleys; windswept junipers higher up",
             ]}
           />
         </Columns>

@@ -93,28 +93,87 @@ button {
   user-select: none;
 }
 
-.bio-showcase {
-  position: relative;
-  flex: 1;
+.slide > .bio-showcase {
+  position: absolute;
+  inset: 8.2% 0 8.8%;
   display: grid;
-  place-items: center;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  min-width: 0;
   min-height: 0;
 }
 
-.zagrajmy-mark-only {
-  position: absolute;
-  left: 0.2%;
-  top: 2.8%;
-  width: clamp(36px, 4.1cqw, 74px);
-  height: auto;
-  color: var(--color-neu-900);
+.bio-credits {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12em;
+  min-width: 0;
+  padding-left: 6.2cqw;
+  padding-right: 6%;
+  font-size: clamp(18px, 2.05cqw, 36px);
+  line-height: 1.24;
+  color: var(--soft);
+}
+
+.bio-name {
+  margin-bottom: 0.5em;
+  color: var(--ink);
+  font-size: 1.18em;
+  font-weight: 800;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.04em;
+  line-height: 1.08;
+}
+
+.bio-credits a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  color: inherit;
+  text-decoration: none;
+}
+
+.bio-credits a span {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.bio-credits a:visited {
+  color: inherit;
+}
+
+.bio-credits a:hover {
+  color: var(--color-accent-800);
+}
+
+.bio-credits a:focus-visible {
+  outline: 2px solid var(--color-accent-600);
+  outline-offset: 3px;
+  color: var(--color-accent-800);
+}
+
+.zagrajmy-mark {
+  width: 1.05em;
+  height: 1.05em;
+  flex-shrink: 0;
+  color: var(--ink);
+}
+
+.bio-figure {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding-right: 5.6cqw;
 }
 
 .bio-dragon-sheet {
   display: block;
-  width: min(48%, 680px);
-  max-height: 48cqh;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  object-position: center right;
   filter: drop-shadow(0 14px 22px rgb(28 25 23 / 0.12));
 }
 
@@ -604,25 +663,3 @@ button {
   line-height: 0.98;
 }
 
-.bio-credits {
-  position: absolute;
-  bottom: 2%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0 1.4em;
-  font-size: clamp(12px, 1.25cqw, 22px);
-  color: var(--soft);
-}
-.bio-name {
-  font-variant-caps: small-caps;
-  letter-spacing: 0.04em;
-}
-.bio-credits a {
-  color: inherit;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
-}
-.bio-credits a:hover {
-  color: var(--color-accent-800);
-}

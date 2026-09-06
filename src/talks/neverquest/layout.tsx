@@ -136,6 +136,33 @@ export function Systems(props: { rows: [name: string, technique: string][] }) {
   );
 }
 
+function ZagrajmyMark() {
+  return (
+    <svg class="zagrajmy-mark" viewBox="0 0 120 120" aria-hidden="true">
+      <path
+        d="M92 60C92 91.82 91.82 92 60 92C28.18 92 28 91.82 28 60C28 28.18 28.18 28 60 28C91.82 28 92 28.18 92 60Z"
+        fill="#f85a3c"
+      />
+      <path
+        d="M75.5 11.5C75.5 21.05 74.09 22 60 22C45.91 22 44.5 21.05 44.5 11.5C44.5 1.95 45.91 1 60 1C74.09 1 75.5 1.95 75.5 11.5Z"
+        fill="currentColor"
+      />
+      <path
+        d="M119 60C119 74.09 118.05 75.5 108.5 75.5C98.95 75.5 98 74.09 98 60C98 45.91 98.95 44.5 108.5 44.5C118.05 44.5 119 45.91 119 60Z"
+        fill="currentColor"
+      />
+      <path
+        d="M75.5 108.5C75.5 118.05 74.09 119 60 119C45.91 119 44.5 118.05 44.5 108.5C44.5 98.95 45.91 98 60 98C74.09 98 75.5 98.95 75.5 108.5Z"
+        fill="currentColor"
+      />
+      <path
+        d="M22 60C22 74.09 21.05 75.5 11.5 75.5C1.95 75.5 1 74.09 1 60C1 45.91 1.95 44.5 11.5 44.5C21.05 44.5 22 45.91 22 60Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 export function Bio(props: {
   image: string;
   name: string;
@@ -143,38 +170,21 @@ export function Bio(props: {
 }) {
   return (
     <div class="bio-showcase">
-      <svg class="zagrajmy-mark-only" viewBox="0 0 120 120" aria-hidden="true">
-        <path
-          d="M92 60C92 91.82 91.82 92 60 92C28.18 92 28 91.82 28 60C28 28.18 28.18 28 60 28C91.82 28 92 28.18 92 60Z"
-          fill="#f85a3c"
-        />
-        <path
-          d="M75.5 11.5C75.5 21.05 74.09 22 60 22C45.91 22 44.5 21.05 44.5 11.5C44.5 1.95 45.91 1 60 1C74.09 1 75.5 1.95 75.5 11.5Z"
-          fill="currentColor"
-        />
-        <path
-          d="M119 60C119 74.09 118.05 75.5 108.5 75.5C98.95 75.5 98 74.09 98 60C98 45.91 98.95 44.5 108.5 44.5C118.05 44.5 119 45.91 119 60Z"
-          fill="currentColor"
-        />
-        <path
-          d="M75.5 108.5C75.5 118.05 74.09 119 60 119C45.91 119 44.5 118.05 44.5 108.5C44.5 98.95 45.91 98 60 98C74.09 98 75.5 98.95 75.5 108.5Z"
-          fill="currentColor"
-        />
-        <path
-          d="M22 60C22 74.09 21.05 75.5 11.5 75.5C1.95 75.5 1 74.09 1 60C1 45.91 1.95 44.5 11.5 44.5C21.05 44.5 22 45.91 22 60Z"
-          fill="currentColor"
-        />
-      </svg>
-      <img class="bio-dragon-sheet" src={props.image} alt="" />
       <div class="bio-credits">
         <span class="bio-name">{props.name}</span>
         <For each={props.links}>
           {([label, href]) => (
             <a href={href} target="_blank" rel="noreferrer">
-              {label}
+              <Show when={href === "https://zagrajmy.net"}>
+                <ZagrajmyMark />
+              </Show>
+              <span>{label}</span>
             </a>
           )}
         </For>
+      </div>
+      <div class="bio-figure">
+        <img class="bio-dragon-sheet" src={props.image} alt="" />
       </div>
     </div>
   );

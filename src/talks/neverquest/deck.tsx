@@ -46,6 +46,13 @@ export function Deck() {
 
   const onHashChange = () => setIndex(hashIndex());
   const onKeyDown = (event: KeyboardEvent) => {
+    if (
+      event.target instanceof Element &&
+      event.target.closest("a") &&
+      (event.key === " " || event.key === "Enter")
+    ) {
+      return;
+    }
     const actions: Record<string, () => void> = {
       arrowright: () => go(index() + 1),
       pagedown: () => go(index() + 1),
@@ -98,7 +105,10 @@ export function Deck() {
       <div
         class="deck-shell"
         onClick={(event) => {
-          if (event.target instanceof Element && event.target.closest("button"))
+          if (
+            event.target instanceof Element &&
+            event.target.closest("button, a")
+          )
             return;
           const ratio = event.clientX / window.innerWidth;
           if (ratio > 0.72) go(index() + 1);
