@@ -1,0 +1,7 @@
+@import "tailwindcss" source(none);
+@import "../global-styles/skin.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source "./**/*.{tsx,astro}";
+@source "../pages/talks/**/*.astro";
