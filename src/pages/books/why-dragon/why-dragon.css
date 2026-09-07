@@ -364,14 +364,6 @@ html.dark .wd-marker {
   display: inline;
 }
 
-.wd-booklet,
-.wd-hunters {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 18mm;
-}
-
 .wd-print-note-hunters {
   display: none;
 }
@@ -854,11 +846,6 @@ html.dark .wd-pyre-num {
     gap: 0;
     --wd-paper: var(--color-white);
     --wd-ink: var(--color-neu-900);
-  }
-
-  .wd-booklet,
-  .wd-hunters {
-    gap: 0;
   }
 
   .wd-sheet {
