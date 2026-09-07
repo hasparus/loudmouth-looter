@@ -15,14 +15,10 @@ import * as TheDragon from "../../../rules/why-dragon/the-dragon.mdx";
 import * as ThrowSand from "../../../rules/why-dragon/throw-sand.mdx";
 import * as TurnToAsh from "../../../rules/why-dragon/turn-to-ash.mdx";
 
+import HunterPage from "./_HunterPage.astro";
 import { PrintMove } from "./_PrintMove";
 import dragonUrl from "./dragon.webp?url";
 import swordUrl from "./dragonsword.png?url";
-import fireUrl from "./fire.webp?url";
-import pyre1 from "./pyre-1.webp?url";
-import pyre2 from "./pyre-2.webp?url";
-import pyre3 from "./pyre-3.webp?url";
-import pyre4 from "./pyre-4.webp?url";
 
 import "../../../global-styles/base.css";
 import "./why-dragon.css";
@@ -33,13 +29,6 @@ const title = (rule: { frontmatter: Record<string, unknown> }): string => {
     throw new Error(`rule MDX is missing a title: ${JSON.stringify(rule)}`);
   return value;
 };
-
-const pyreLevels = [
-  { src: pyre1, top: 94.5, h: 48 },
-  { src: pyre2, top: 81.5, h: 48 },
-  { src: pyre3, top: 52.9, h: 62 },
-  { src: pyre4, top: 27.2, h: 65 },
-];
 ---
 
 <html lang="en">
@@ -52,300 +41,151 @@ const pyreLevels = [
   </head>
   <body>
     <div class="wd-book">
-      <div class="wd-sheet">
-        <article class="wd-page wd-verso wd-hunter">
-          <span class="wd-pageno">4 · hunter</span>
-          <h2 class="wd-full wd-hunter-title">
-            Hunter
-            <span class="wd-hunter-booktitle"
-              >Why Would You Fight a Dragon?</span
-            >
-          </h2>
-          <section class="wd-pyre wd-span-2" style="grid-row: span 4">
-            <h3 class="wd-rubric">Pyre</h3>
+      <div class="wd-booklet">
+        <div class="wd-sheet">
+          <HunterPage />
+
+          <article class="wd-page wd-recto wd-cover">
+            <span class="wd-pageno">1 · cover</span>
             <div
-              class="wd-pyre-visual"
-              role="img"
-              aria-label="Pyre track, four levels from base to tip"
+              class="wd-full"
+              style="min-height: calc(var(--wd-baseline) * 20)"
             >
-              <img class="wd-pyre-img" src={fireUrl} alt="" />
-              {
-                pyreLevels.map(({ src, top, h }) => (
-                  <>
-                    <div class="wd-pyre-tick" style={`top: ${top}%`} />
-                    <img
-                      class="wd-pyre-num"
-                      src={src}
-                      alt=""
-                      style={`top: ${top}%; block-size: ${((h / 1332) * 100).toFixed(2)}%`}
-                    />
-                  </>
-                ))
-              }
             </div>
-            <p class="wd-hint">
-              Mark circles or slide a paperclip. <br />Fill four and you're <strong
-                >consumed</strong
-              >.
+            <h1 class="sr-only">Why Would You Fight a Dragon?</h1>
+            <p class="wd-full wd-premise-zoom -mt-5! leading-none">
+              a roleplaying game of violence, change, and sacrifice
+              <br />
+              for up to 5 people, in 2–4 hours
             </p>
-          </section>
-          <section class="wd-span-4 wd-fields">
-            <div class="wd-field">
-              <span class="wd-field-name">Name</span>
-              <span class="wd-line"></span>
-              <span class="wd-examples wd-stat-desc italic">
-                e.g. Sigurd, Vanda, Skuba, Bastian, Fleur, Martha, Wulf, Maud,
-                Juro, Orm
-              </span>
-            </div>
-            <div class="wd-field">
-              <span class="wd-field-name">Class</span>
-              <span class="wd-line"></span>
-              <label class="wd-bellow">
-                <input type="checkbox" data-checkbox-marker="x" />
-                <span>Bellow</span>
-              </label>
-              <span class="wd-examples wd-stat-desc italic">
-                e.g. Knight, King, Bowman, Wizard, Maiden, Mutant, Trickster,
-                Saint
-              </span>
-            </div>
-            <div class="wd-field">
-              <span class="wd-field-name">Look</span>
-              <span class="wd-line"></span>
-              <span class="wd-examples wd-stat-desc italic">
-                e.g. radiant, fair, pale, gaunt, scarred, sooty, grim, old,
-                white hair, wild eyes
-              </span>
-            </div>
-          </section>
-          <section class="wd-span-4">
-            <h3 class="wd-rubric">Stats</h3>
-            <div class="h-[1.5mm]"></div>
-            {
-              [
-                ["Body", "physical strength and stamina"],
-                ["Wits", "mental acuity and perception"],
-                ["Soul", "arcane potency and spiritual force"],
-              ].map(([stat, meaning]) => (
-                <div class="wd-stat-row">
-                  <span class="wd-stat-name">{stat}</span>
-                  <span class="wd-stat-desc italic">({meaning})</span>
-                  <span class="wd-stat-slot" />
-                </div>
-              ))
-            }
-            <p class="wd-hint">
-              Distribute −2 to +2 so the total equals +1, or choose one from <span
-                class="font-hand tracking-tighter"
-                >(+2,0,−1), (+1,+1,−1), (+1,0,0), (+2,+1,−2)</span
-              > and swap. When it drops to −3, <strong class="font-semibold"
-                >Turn to Ash</strong
-              >.
-            </p>
-          </section>
-          <section class="wd-span-2">
-            <h3 class="wd-rubric">Goal</h3>
-            <ul class="wd-goal-list">
-              {
-                [
-                  "Glory",
-                  "Greed",
-                  "Knowledge",
-                  "Love",
-                  "Oath",
-                  "Power",
-                  "Vengeance",
-                ].map((goal) => (
-                  <li>
-                    <input type="checkbox" data-checkbox-marker="x" />
-                    <span>{goal}</span>
-                  </li>
-                ))
-              }
-              <li>
-                <input type="checkbox" data-checkbox-marker="x" />
-                <span class="wd-line"></span>
-              </li>
-            </ul>
-          </section>
-          <section class="wd-span-2 wd-notes">
-            <span class="wd-rose" aria-hidden="true">❦</span>
-            <h3 class="wd-rubric">Notes</h3>
-          </section>
-          <section class="wd-span-4">
-            <div class="wd-xp-head">
-              <h3 class="wd-rubric">XP</h3>
-              {
-                [1, 2, 3, 4].map(() => (
-                  <input type="checkbox" data-checkbox-marker="x" />
-                ))
-              }
-            </div>
-            <p class="wd-hint">
-              Mark 1 XP when you roll a 6−, or your Goal leads you into danger. <br
-              />
-              4 XP and a moment of rest: raise a stat by +1 (up to +3) or clear 1
-              Pyre.
-            </p>
-          </section>
-          <section class="wd-span-3 wd-howto">
-            <h3 class="wd-rubric">How to Play</h3>
-            <p>
-              If you do it, do it in the fiction. Describe how and what it looks
-              like.
-            </p>
-            <p>
-              If it triggers a move, the DM will call it. If it fits no move,
-              don't roll: it happens.
-            </p>
-            <p>
-              When everything's on fire and the Dragon's about to eat you,
-              action calls for <strong>Face Fury</strong>.
-            </p>
-          </section>
-          <section class="wd-span-3 wd-principles">
-            <h3 class="wd-rubric">Player Principles</h3>
-            <ul>
-              <li>Begin and end with the fiction.</li>
-              <li>Bind your story to other Hunters.</li>
-              <li>Be bold, take risks, embrace the fire.</li>
-              <li>Pay attention, ask questions, offer suggestions.</li>
-            </ul>
-          </section>
-        </article>
 
-        <article class="wd-page wd-recto wd-cover">
-          <span class="wd-pageno">1 · cover</span>
-          <div
-            class="wd-full"
-            style="min-height: calc(var(--wd-baseline) * 20)"
-          >
-          </div>
-          <h1 class="sr-only">Why Would You Fight a Dragon?</h1>
-          <p class="wd-full wd-premise-zoom -mt-5! leading-none">
-            a roleplaying game of violence, change, and sacrifice
-            <br />
-            for up to 5 people, in 2–4 hours
-          </p>
-
-          <div class="wd-premise wd-full">
-            <p>Fall fearless like <span class="wd-myth">Beowulf</span>.</p>
-            <p>
-              Let your wants change you like <span class="wd-myth">Fáfnir</span
-              >.
-            </p>
-            <p>
-              Save a princess and blackmail townsfolk like <span class="wd-myth"
-                >Saint George</span
-              >.
-            </p>
-          </div>
-
-          <p class="wd-colophon wd-full">
-            Written by Piotr Monwid-Olechnowicz. Illustrated by Rouzeris.
-            Proofread by Zack Thomson, Wafergix, Łukasz Bartoszewicz, Radek MG.
-          </p>
-          <p class="wd-colophon wd-full">
-            Based on <em>1 HP Dragon</em> by Clayton Notestine. <em
-              >Face Fury</em
-            > adapts Jeremy Strandberg's <em>Defy Danger, Restated</em>, used
-            under CC BY-SA 4.0. The ruleset is shared under CC BY-SA 4.0.
-          </p>
-          <div class="wd-marker wd-lower">
-            <span>lol.haspar.us/why-dragon</span><span>hasparus.itch.io</span>
-          </div>
-        </article>
-        <img
-          class="wd-dragon-overlay"
-          src={dragonUrl}
-          alt="Dragon perched on burning spires"
-        />
-      </div>
-
-      <div class="wd-sheet">
-        <article class="wd-page wd-verso">
-          <span class="wd-pageno">2 · moves I</span>
-
-          <PrintMove name={title(FaceFury)} span="full">
-            <FaceFury.Content />
-          </PrintMove>
-
-          <PrintMove name={title(Bellow)}>
-            <Bellow.Content />
-          </PrintMove>
-
-          <PrintMove name={title(StokeTheFire)}>
-            <StokeTheFire.Content />
-          </PrintMove>
-
-          <PrintMove name={title(RelinquishYourGoal)}>
-            <RelinquishYourGoal.Content />
-          </PrintMove>
-
-          <PrintMove name={title(Burn)}>
-            <Burn.Content />
-          </PrintMove>
-
-          <section class="wd-full wd-dm mt-4">
-            <div>
-              <h3 class="wd-rubric">DM's Agenda</h3>
-              <ul>
-                <li><span>Make the Dragon vast and terrible.</span></li>
-                <li><span>Learn what they're willing to burn.</span></li>
-                <li><span>See what's left when the smoke clears.</span></li>
-              </ul>
-            </div>
-            <div>
-              <h3 class="wd-rubric">DM Moves</h3>
+            <div class="wd-premise wd-full">
+              <p>Fall fearless like <span class="wd-myth">Beowulf</span>.</p>
               <p>
-                Hurt, Raze, Capture, Separate,<br />Reveal, Bargain, Soar,
-                Threaten.
+                Let your wants change you like <span class="wd-myth"
+                  >Fáfnir</span
+                >.
+              </p>
+              <p>
+                Save a princess and blackmail townsfolk like <span
+                  class="wd-myth">Saint George</span
+                >.
               </p>
             </div>
-          </section>
 
-          <section class="wd-full wd-dragon-box mt-4">
-            <h3 class="wd-rubric">The Dragon</h3>
-            <TheDragon.Content />
-          </section>
-        </article>
+            <p class="wd-colophon wd-full">
+              Written by Piotr Monwid-Olechnowicz. Illustrated by Rouzeris.
+              Proofread by Zack Thomson, Wafergix, Łukasz Bartoszewicz, Radek
+              MG.
+            </p>
+            <p class="wd-colophon wd-full">
+              Based on <em>1 HP Dragon</em> by Clayton Notestine. <em
+                >Face Fury</em
+              > adapts Jeremy Strandberg's <em>Defy Danger, Restated</em>, used
+              under CC BY-SA 4.0. The ruleset is shared under CC BY-SA 4.0.
+            </p>
+            <div class="wd-marker wd-lower">
+              <span>lol.haspar.us/why-dragon</span><span>hasparus.itch.io</span>
+            </div>
+          </article>
+          <img
+            class="wd-dragon-overlay"
+            src={dragonUrl}
+            alt="Dragon perched on burning spires"
+          />
+        </div>
 
-        <article class="wd-page wd-recto wd-flow">
-          <span class="wd-pageno">3 · moves II</span>
+        <div class="wd-sheet">
+          <article class="wd-page wd-verso">
+            <span class="wd-pageno">2 · moves I</span>
 
-          <PrintMove name={title(JumpIntoFlames)}>
-            <JumpIntoFlames.Content />
-          </PrintMove>
+            <PrintMove name={title(FaceFury)} span="full">
+              <FaceFury.Content />
+            </PrintMove>
 
-          <PrintMove name={title(ThrowSand)}>
-            <ThrowSand.Content />
-          </PrintMove>
+            <PrintMove name={title(Bellow)}>
+              <Bellow.Content />
+            </PrintMove>
 
-          <PrintMove name={title(TurnToAsh)}>
-            <TurnToAsh.Content />
-          </PrintMove>
+            <PrintMove name={title(StokeTheFire)}>
+              <StokeTheFire.Content />
+            </PrintMove>
 
-          <PrintMove name={title(LevelUp)}>
-            <LevelUp.Content />
-          </PrintMove>
+            <PrintMove name={title(RelinquishYourGoal)}>
+              <RelinquishYourGoal.Content />
+            </PrintMove>
 
-          <PrintMove
-            name={title(Aftermath)}
-            class="wd-break break-before-column"
-          >
-            <Aftermath.Content />
-          </PrintMove>
+            <PrintMove name={title(Burn)}>
+              <Burn.Content />
+            </PrintMove>
 
-          <PrintMove name={title(RaiseAToast)}>
-            <RaiseAToast.Content />
-          </PrintMove>
-        </article>
-        <img
-          class="wd-sword-overlay"
-          src={swordUrl}
-          alt="Dragon sword"
-        />
+            <section class="wd-full wd-dm mt-4">
+              <div>
+                <h3 class="wd-rubric">DM's Agenda</h3>
+                <ul>
+                  <li><span>Make the Dragon vast and terrible.</span></li>
+                  <li><span>Learn what they're willing to burn.</span></li>
+                  <li><span>See what's left when the smoke clears.</span></li>
+                </ul>
+              </div>
+              <div>
+                <h3 class="wd-rubric">DM Moves</h3>
+                <p>
+                  Hurt, Raze, Capture, Separate,<br />Reveal, Bargain, Soar,
+                  Threaten.
+                </p>
+              </div>
+            </section>
+
+            <section class="wd-full wd-dragon-box mt-4">
+              <h3 class="wd-rubric">The Dragon</h3>
+              <TheDragon.Content />
+            </section>
+          </article>
+
+          <article class="wd-page wd-recto wd-flow">
+            <span class="wd-pageno">3 · moves II</span>
+
+            <PrintMove name={title(JumpIntoFlames)}>
+              <JumpIntoFlames.Content />
+            </PrintMove>
+
+            <PrintMove name={title(ThrowSand)}>
+              <ThrowSand.Content />
+            </PrintMove>
+
+            <PrintMove name={title(TurnToAsh)}>
+              <TurnToAsh.Content />
+            </PrintMove>
+
+            <PrintMove name={title(LevelUp)}>
+              <LevelUp.Content />
+            </PrintMove>
+
+            <PrintMove
+              name={title(Aftermath)}
+              class="wd-break break-before-column"
+            >
+              <Aftermath.Content />
+            </PrintMove>
+
+            <PrintMove name={title(RaiseAToast)}>
+              <RaiseAToast.Content />
+            </PrintMove>
+          </article>
+          <img class="wd-sword-overlay" src={swordUrl} alt="Dragon sword" />
+        </div>
+      </div>
+
+      <div class="wd-hunters">
+        {
+          [0, 1].map(() => (
+            <div class="wd-sheet">
+              <HunterPage />
+              <HunterPage />
+            </div>
+          ))
+        }
       </div>
 
       <aside
@@ -358,7 +198,31 @@ const pyreLevels = [
           <span class="wd-grid-off">[grid off]</span>
           <span class="wd-grid-on">[grid on]</span>
         </label>
-        <span class="px-1">fold on short edge</span>
+        <label
+          class="text-neu-500 hover:bg-neu-200/70 hover:text-neu-900 has-[:checked]:text-neu-900 dark:text-neu-400 dark:hover:bg-neu-800 dark:hover:text-neu-50 dark:has-[:checked]:text-neu-50 flex cursor-pointer items-center justify-center px-1 py-0.5 font-mono text-xs transition hover:duration-0"
+        >
+          <input
+            type="radio"
+            name="wd-print"
+            id="wd-print-booklet"
+            class="sr-only"
+            checked
+          />
+          <span>[booklet]</span>
+        </label>
+        <label
+          class="text-neu-500 hover:bg-neu-200/70 hover:text-neu-900 has-[:checked]:text-neu-900 dark:text-neu-400 dark:hover:bg-neu-800 dark:hover:text-neu-50 dark:has-[:checked]:text-neu-50 flex cursor-pointer items-center justify-center px-1 py-0.5 font-mono text-xs transition hover:duration-0"
+        >
+          <input
+            type="radio"
+            name="wd-print"
+            id="wd-print-hunters"
+            class="sr-only"
+          />
+          <span>[4 hunters]</span>
+        </label>
+        <span class="wd-print-note-booklet px-1">fold on short edge</span>
+        <span class="wd-print-note-hunters px-1">cut in half</span>
       </aside>
     </div>
     <script>
