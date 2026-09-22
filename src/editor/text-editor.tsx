@@ -330,6 +330,21 @@ export function TextEditor() {
     const editor = editorEl;
     if (!editor) return;
 
+    if (
+      event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.shiftKey &&
+      event.code === "KeyM"
+    ) {
+      event.preventDefault();
+      void import("../lib/write-music")
+        .then((m) => m.toggleWriteMusic())
+        // eslint-disable-next-line no-console
+        .catch(console.error);
+      return;
+    }
+
     if ((event.metaKey || event.ctrlKey) && file.supported) {
       const key = event.key.toLowerCase();
       if (key === "s") {
