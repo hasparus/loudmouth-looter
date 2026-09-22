@@ -7,7 +7,8 @@ import "./write-music.css";
 
 const HUES = [60, 60, 60, 300, 300, 0, 0, 120, 120, 120, 120, 120, 120, 180];
 
-const BLOCKS = ":is(.zaduma-prose, [contenteditable]) :is(p, li)";
+const BLOCK_ELEMENTS = "p, li, h1, h2";
+const BLOCKS = `:is(.zaduma-prose, [contenteditable]) :is(${BLOCK_ELEMENTS})`;
 
 const SENTENCES = new Intl.Segmenter("en", { granularity: "sentence" });
 const WORDS = new Intl.Segmenter("en", { granularity: "word" });
@@ -77,12 +78,14 @@ export function toggleWriteMusic(): void {
   if (lit) {
     lit = false;
     document.removeEventListener("input", schedule);
+    document.removeEventListener("paste", schedule);
     return;
   }
 
   paint();
   lit = true;
   document.addEventListener("input", schedule);
+  document.addEventListener("paste", schedule);
 }
 
 /** Ranges survive typing, but not a paste or a new paragraph. */
@@ -105,7 +108,7 @@ function paint(): void {
   for (const block of document.querySelectorAll(BLOCKS)) {
     const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, {
       acceptNode: (node) =>
-        node.parentElement?.closest("p, li") === block
+        node.parentElement?.closest(BLOCK_ELEMENTS) === block
           ? NodeFilter.FILTER_ACCEPT
           : NodeFilter.FILTER_REJECT,
     });
@@ -115,7 +118,7 @@ function paint(): void {
     for (let node; (node = walker.nextNode() as Text | null); ) {
       texts.push({ node, start: text.length });
       text += node.parentElement?.closest("code")
-        ? "x".repeat(node.data.length)
+        ? " ".repeat(node.data.length)
         : node.data.replaceAll(/\s/g, " ");
     }
 

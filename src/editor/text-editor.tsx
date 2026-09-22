@@ -330,7 +330,13 @@ export function TextEditor() {
     const editor = editorEl;
     if (!editor) return;
 
-    if (event.altKey && event.code === "KeyM") {
+    if (
+      event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.shiftKey &&
+      event.code === "KeyM"
+    ) {
       event.preventDefault();
       void import("../lib/write-music")
         .then((m) => m.toggleWriteMusic())
