@@ -1,0 +1,31 @@
+::highlight(write-music-60) {
+  background-color: hsl(60 93% 70% / 0.6);
+}
+::highlight(write-music-300) {
+  background-color: hsl(300 93% 70% / 0.6);
+}
+::highlight(write-music-0) {
+  background-color: hsl(0 93% 70% / 0.6);
+}
+::highlight(write-music-120) {
+  background-color: hsl(120 93% 70% / 0.6);
+}
+::highlight(write-music-180) {
+  background-color: hsl(180 93% 70% / 0.6);
+}
+
+html.dark ::highlight(write-music-60) {
+  background-color: hsl(60 75% 40% / 0.55);
+}
+html.dark ::highlight(write-music-300) {
+  background-color: hsl(300 75% 40% / 0.55);
+}
+html.dark ::highlight(write-music-0) {
+  background-color: hsl(0 75% 40% / 0.55);
+}
+html.dark ::highlight(write-music-120) {
+  background-color: hsl(120 75% 40% / 0.55);
+}
+html.dark ::highlight(write-music-180) {
+  background-color: hsl(180 75% 40% / 0.55);
+}

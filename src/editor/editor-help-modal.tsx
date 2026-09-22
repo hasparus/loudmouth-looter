@@ -152,6 +152,12 @@ export function EditorHelpModal() {
               <p class="te-chevron m-0">A quieter line, set aside.</p>
             </Row>
           </Section>
+
+          <Section title="Revising">
+            <Row code="alt+m">
+              Colors every sentence by length, so you can see the rhythm
+            </Row>
+          </Section>
         </div>
       </dialog>
     </>
