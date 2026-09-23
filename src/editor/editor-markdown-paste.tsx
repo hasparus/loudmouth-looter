@@ -1,39 +1,53 @@
-import type { Nodes, Root } from "mdast";
-import remarkGfm from "remark-gfm";
-import remarkParse from "remark-parse";
-import { unified } from "unified";
+import type { Nodes } from "mdast";
 
-const detector = unified().use(remarkParse).use(remarkGfm);
-const THIN_WRAPPER_TAGS = new Set(["BR", "DIV", "P", "SPAN"]);
+import { sanitizeImageSrc, sanitizeUrl } from "./editor-sanitize";
+import { editorMdxTreeToHtml, parseEditorMdx } from "./editor-mdx";
 
-const UNSUPPORTED_BLOCK_TYPES = new Set([
-  "blockquote",
-  "code",
-  "table",
-  "thematicBreak",
-]);
-
-function sourceFor(node: Nodes, source: string) {
+function sourceFor(node: Nodes, source: string): string {
   const start = node.position?.start.offset;
   const end = node.position?.end.offset;
   return start == null || end == null ? "" : source.slice(start, end);
 }
 
-function childrenOf(node: Nodes): Nodes[] {
-  return "children" in node ? (node.children as Nodes[]) : [];
+function supported(node: Nodes): boolean {
+  switch (node.type) {
+    case "root":
+    case "paragraph":
+    case "emphasis":
+    case "strong":
+      return node.children.every(supported);
+    case "heading":
+      return node.depth <= 2 && node.children.every(supported);
+    case "list":
+      return (
+        (!node.ordered || node.start == null || node.start === 1) &&
+        node.children.every(supported)
+      );
+    case "listItem":
+      return (
+        node.children.length === 1 &&
+        node.children[0]?.type === "paragraph" &&
+        supported(node.children[0])
+      );
+    case "link":
+      return !!sanitizeUrl(node.url) && node.children.every(supported);
+    case "image":
+      return !!sanitizeImageSrc(node.url);
+    case "text":
+      return !node.value.includes("\n");
+    case "break":
+      return true;
+    default:
+      return false;
+  }
 }
 
-function containsUnsupportedBlock(node: Nodes): boolean {
-  if (UNSUPPORTED_BLOCK_TYPES.has(node.type)) return true;
-  return childrenOf(node).some(containsUnsupportedBlock);
-}
-
-function containsMarkdownSyntax(node: Nodes, source: string): boolean {
+function containsSyntax(node: Nodes, source: string): boolean {
   switch (node.type) {
     case "heading":
-      return node.depth <= 2;
-    case "strong":
+    case "list":
     case "emphasis":
+    case "strong":
     case "image":
     case "break":
       return true;
@@ -41,44 +55,53 @@ function containsMarkdownSyntax(node: Nodes, source: string): boolean {
       const raw = sourceFor(node, source).trimStart();
       return raw.startsWith("[") || raw.startsWith("<");
     }
-    case "list":
-      return node.children.length > 0;
     default:
-      return childrenOf(node).some((child) =>
-        containsMarkdownSyntax(child, source),
-      );
+      return "children" in node
+        ? node.children.some((child) => containsSyntax(child, source))
+        : false;
   }
 }
 
-/**
- * Whether plain text contains Markdown syntax the editor can preserve.
- *
- * Markdown accepts ordinary prose, so parsing successfully is not enough.
- * We inspect the parsed tree for deliberate formatting and reject block types
- * that the editor would currently flatten or discard.
- */
-export function looksLikeSupportedMarkdown(source: string): boolean {
-  if (!source.trim()) return false;
-
-  let tree: Root;
+export function markdownPasteHtml(
+  source: string,
+  explicit = false,
+): { html: string; inline: boolean } | null {
+  if (!source.trim()) return null;
   try {
-    tree = detector.parse(source);
+    const tree = parseEditorMdx(source);
+    if (!supported(tree) || (!explicit && !containsSyntax(tree, source)))
+      return null;
+    return {
+      html: editorMdxTreeToHtml(tree, source),
+      inline:
+        tree.children.length === 1 && tree.children[0]?.type === "paragraph",
+    };
   } catch {
-    return false;
+    return null;
   }
-
-  if (containsUnsupportedBlock(tree)) return false;
-  return containsMarkdownSyntax(tree, source);
 }
 
-function normalizedText(text: string) {
-  return text.replaceAll(/\s/g, "");
+const THIN_WRAPPER_TAGS = new Set(["BR", "DIV", "P", "SPAN"]);
+
+function wrapperText(parent: ParentNode): string {
+  let text = "";
+  for (const child of parent.childNodes) {
+    if (child.nodeType === Node.TEXT_NODE) {
+      text += child.textContent;
+    } else if (child instanceof Element) {
+      if (child.tagName === "BR") {
+        text += "\n";
+      } else if (child.tagName === "DIV" || child.tagName === "P") {
+        const inside = wrapperText(child);
+        text += (inside === "\n" ? "" : inside) + "\n";
+      } else {
+        text += wrapperText(child);
+      }
+    }
+  }
+  return text;
 }
 
-/**
- * Rich HTML should retain its formatting. Some clipboard producers, however,
- * put Markdown source in text/html wrapped only in layout spans and divs.
- */
 export function htmlIsThinTextWrapper(html: string, text: string): boolean {
   if (!html) return true;
 
@@ -93,11 +116,7 @@ export function htmlIsThinTextWrapper(html: string, text: string): boolean {
     }
   }
 
-  return (
-    normalizedText(template.content.textContent ?? "") === normalizedText(text)
-  );
-}
-
-export function shouldPasteAsMarkdown(text: string, html: string): boolean {
-  return looksLikeSupportedMarkdown(text) && htmlIsThinTextWrapper(html, text);
+  const normalize = (value: string) =>
+    value.replaceAll(/\r\n?/g, "\n").replaceAll(/\n+$/g, "");
+  return normalize(wrapperText(template.content)) === normalize(text);
 }

@@ -280,12 +280,13 @@ export function TextEditor() {
     persist(editor);
   }
 
-  function handlePaste(event: ClipboardEvent) {
+  async function handlePaste(event: ClipboardEvent) {
     const editor = editorEl;
     if (!editor) return;
     event.preventDefault();
     pendingUndo = null;
-    if (event.clipboardData) handleEditorPaste(editor, event.clipboardData);
+    if (event.clipboardData)
+      await handleEditorPaste(editor, event.clipboardData);
     syncDocumentTitle(editor);
     persist(editor);
   }
@@ -428,7 +429,7 @@ export function TextEditor() {
           onInput={handleInput}
           onKeyDown={handleKeyDown}
           onMouseDown={handleMouseDown}
-          onPaste={handlePaste}
+          onPaste={(event) => void handlePaste(event)}
           ref={editorEl}
           role="textbox"
           spellcheck={spellcheck()}

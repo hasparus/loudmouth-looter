@@ -2,6 +2,24 @@ import { expect, test } from "@playwright/test";
 
 const EDITOR = { name: "Editor" } as const;
 
+async function pasteData(
+  editor: import("@playwright/test").Locator,
+  formats: Record<string, string>,
+) {
+  await editor.evaluate((element, payload) => {
+    const data = new DataTransfer();
+    for (const [format, value] of Object.entries(payload))
+      data.setData(format, value);
+    element.dispatchEvent(
+      new ClipboardEvent("paste", {
+        clipboardData: data,
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+  }, formats);
+}
+
 async function clearEditor(page: import("@playwright/test").Page) {
   const editor = page.getByRole("textbox", EDITOR);
   await editor.click();
@@ -220,6 +238,73 @@ test.describe("editor", () => {
       editor.getByRole("heading", { name: "Explicit Markdown" }),
     ).toBeVisible();
     await expect(editor).not.toContainText("fallback text");
+  });
+
+  test("pastes inline Markdown at the caret without splitting the paragraph", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>beforeafter</p>";
+      const text = element.firstChild!.firstChild!;
+      const range = document.createRange();
+      range.setStart(text, 6);
+      range.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+    });
+
+    await pasteData(editor, { "text/plain": "**bold**" });
+    await expect(editor.locator("p")).toHaveCount(1);
+    await expect(editor.locator("p")).toHaveText("beforeboldafter");
+    await expect(editor.locator("strong")).toHaveText("bold");
+    await page.reload();
+    await expect(editor.locator("strong")).toHaveText("bold");
+  });
+
+  test("leaves mixed unsupported Markdown intact", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    const source = "## Good\n\n### Important\n\n| A | B |\n| - | - |";
+
+    await pasteData(editor, { "text/plain": source });
+    await expect(editor).toContainText("### Important");
+    await expect(editor).toContainText("| A | B |");
+    await expect(editor.getByRole("heading", { name: "Good" })).toHaveCount(0);
+  });
+
+  test("rejects lossy explicit Markdown and keeps the plain-text fallback", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, {
+      "text/markdown": "# Heading\n\n| A | B |\n| - | - |",
+      "text/plain": "Intact fallback",
+    });
+
+    await expect(editor).toContainText("Intact fallback");
+    await expect(editor.getByRole("heading", { name: "Heading" })).toHaveCount(
+      0,
+    );
+  });
+
+  test("prefers semantic HTML over competing explicit Markdown", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, {
+      "text/markdown": "# Incomplete",
+      "text/plain": "Complete rich copy",
+      "text/html": "<p><strong>Complete rich copy</strong></p>",
+    });
+
+    await expect(editor.locator("strong")).toHaveText("Complete rich copy");
+    await expect(
+      editor.getByRole("heading", { name: "Incomplete" }),
+    ).toHaveCount(0);
   });
 
   test("preserves semantic rich HTML that resembles Markdown", async ({

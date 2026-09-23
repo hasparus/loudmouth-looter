@@ -13,8 +13,6 @@ import {
   sanitizeUrl,
   unescapeHtml,
 } from "./editor-sanitize";
-import { shouldPasteAsMarkdown } from "./editor-markdown-paste";
-import { mdxToHtml } from "./editor-mdx";
 
 export const STORAGE_KEY = "text-editor-document";
 const STORAGE_LEGACY_KEYS: string[] = [];
@@ -697,7 +695,7 @@ function insertImageFile(editor: HTMLElement, file: File) {
   reader.readAsDataURL(file);
 }
 
-export function handleEditorPaste(
+export async function handleEditorPaste(
   editor: HTMLElement,
   clipboard: DataTransfer,
 ) {
@@ -709,32 +707,47 @@ export function handleEditorPaste(
     return;
   }
 
+  const range = editorRange(editor)?.cloneRange();
+  if (!range) return;
+  const currentBlock = getCurrentBlock(editor);
+
   const html = clipboard.getData("text/html");
   const text = clipboard.getData("text/plain");
-  const explicitMarkdown = clipboard.getData("text/markdown");
-  const markdown = explicitMarkdown.trim()
-    ? explicitMarkdown
-    : shouldPasteAsMarkdown(text, html)
-      ? text
-      : null;
+  const explicitMarkdown = clipboard.getData("text/markdown").trim();
+  let cleanHtml = html
+    ? sanitizeHtml(html)
+    : plainTextToHtml(text || explicitMarkdown);
+  let inlineMarkdown = false;
 
-  let cleanHtml = html ? sanitizeHtml(html) : plainTextToHtml(text);
-  if (markdown) {
-    try {
-      cleanHtml = sanitizeHtml(mdxToHtml(markdown));
-    } catch {
-      cleanHtml = html ? sanitizeHtml(html) : plainTextToHtml(text);
+  if (text || explicitMarkdown) {
+    const { htmlIsThinTextWrapper, markdownPasteHtml } =
+      await import("./editor-markdown-paste");
+    const markdown = explicitMarkdown || text;
+    if (htmlIsThinTextWrapper(html, markdown)) {
+      const parsed = markdownPasteHtml(markdown, !!explicitMarkdown);
+      if (parsed) {
+        cleanHtml = sanitizeHtml(parsed.html);
+        inlineMarkdown = parsed.inline;
+      }
     }
   }
 
-  const range = editorRange(editor);
-  if (!range) return;
-
+  if (!editor.isConnected) return;
   range.deleteContents();
 
   const template = document.createElement("template");
   template.innerHTML = cleanHtml;
   const content = template.content;
+  if (
+    inlineMarkdown &&
+    currentBlock &&
+    currentBlock.contains(range.startContainer) &&
+    currentBlock.contains(range.endContainer) &&
+    content.childElementCount === 1 &&
+    content.firstElementChild?.tagName === "P"
+  ) {
+    content.replaceChildren(...content.firstElementChild.childNodes);
+  }
   const hasBlockChild = [...content.childNodes].some(
     (n) => n instanceof Element && BLOCK_TAGS.has(n.tagName),
   );
@@ -754,7 +767,6 @@ export function handleEditorPaste(
     return;
   }
 
-  const currentBlock = getCurrentBlock(editor);
   if (!currentBlock) {
     editor.append(content);
     normalizeEmptyBlocks(editor);
