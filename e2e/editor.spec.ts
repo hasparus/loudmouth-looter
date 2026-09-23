@@ -163,4 +163,85 @@ test.describe("editor", () => {
       await expect(editor).toContainText(word);
     }
   });
+
+  test("detects and formats Markdown from thin clipboard wrappers", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    const markdown =
+      "## Pasted notes\n\nA **bold** intro.\n\n- first\n- second";
+
+    await editor.evaluate((el, source) => {
+      const data = new DataTransfer();
+      data.setData("text/plain", source);
+      data.setData(
+        "text/html",
+        "<div>## Pasted notes</div><div><br></div>" +
+          "<div>A **bold** intro.</div><div><br></div>" +
+          "<div>- first</div><div>- second</div>",
+      );
+      el.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    }, markdown);
+
+    await expect(
+      editor.getByRole("heading", { name: "Pasted notes" }),
+    ).toBeVisible();
+    await expect(editor.locator("strong")).toHaveText("bold");
+    await expect(editor.locator("ul > li")).toHaveCount(2);
+  });
+
+  test("honors an explicit text/markdown clipboard payload", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+
+    await editor.evaluate((el) => {
+      const data = new DataTransfer();
+      data.setData("text/plain", "fallback text");
+      data.setData("text/markdown", "# Explicit Markdown");
+      el.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+
+    await expect(
+      editor.getByRole("heading", { name: "Explicit Markdown" }),
+    ).toBeVisible();
+    await expect(editor).not.toContainText("fallback text");
+  });
+
+  test("preserves semantic rich HTML that resembles Markdown", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+
+    await editor.evaluate((el) => {
+      const data = new DataTransfer();
+      data.setData("text/plain", "**literal markers**");
+      data.setData("text/html", "<p><i>**literal markers**</i></p>");
+      el.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+
+    await expect(editor.locator("i")).toHaveText("**literal markers**");
+    await expect(editor.locator("strong")).toHaveCount(0);
+  });
 });

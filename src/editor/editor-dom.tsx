@@ -13,6 +13,8 @@ import {
   sanitizeUrl,
   unescapeHtml,
 } from "./editor-sanitize";
+import { shouldPasteAsMarkdown } from "./editor-markdown-paste";
+import { mdxToHtml } from "./editor-mdx";
 
 export const STORAGE_KEY = "text-editor-document";
 const STORAGE_LEGACY_KEYS: string[] = [];
@@ -709,7 +711,21 @@ export function handleEditorPaste(
 
   const html = clipboard.getData("text/html");
   const text = clipboard.getData("text/plain");
-  const cleanHtml = html ? sanitizeHtml(html) : plainTextToHtml(text);
+  const explicitMarkdown = clipboard.getData("text/markdown");
+  const markdown = explicitMarkdown.trim()
+    ? explicitMarkdown
+    : shouldPasteAsMarkdown(text, html)
+      ? text
+      : null;
+
+  let cleanHtml = html ? sanitizeHtml(html) : plainTextToHtml(text);
+  if (markdown) {
+    try {
+      cleanHtml = sanitizeHtml(mdxToHtml(markdown));
+    } catch {
+      cleanHtml = html ? sanitizeHtml(html) : plainTextToHtml(text);
+    }
+  }
 
   const range = editorRange(editor);
   if (!range) return;
