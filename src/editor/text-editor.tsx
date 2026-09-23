@@ -66,6 +66,14 @@ export function TextEditor() {
   let editorEl: HTMLDivElement | undefined;
   let pendingUndo: UndoSnapshot | null = null;
   let pasteQueue: Promise<void> = Promise.resolve();
+  let queuedPastes = 0;
+  let lastPastePosition: {
+    startNode: Node;
+    startOffset: number;
+    endNode: Node;
+    endOffset: number;
+  } | null = null;
+  let lastPasteCaret: Range | null = null;
   const [spellcheck, setSpellcheck] = createSignal(
     localStorage.getItem(SPELLCHECK_KEY) !== "false",
   );
@@ -288,15 +296,41 @@ export function TextEditor() {
     event.preventDefault();
     pendingUndo = null;
     if (!event.clipboardData) return;
-    const clipboard = readEditorClipboard(event.clipboardData);
+    const clipboard = readEditorClipboard(editor, event.clipboardData);
+    if (!clipboard) return;
+    const {
+      startContainer: startNode,
+      startOffset,
+      endContainer: endNode,
+      endOffset,
+    } = clipboard.range;
+    const followsPrevious =
+      queuedPastes > 0 &&
+      lastPastePosition?.startNode === startNode &&
+      lastPastePosition.startOffset === startOffset &&
+      lastPastePosition.endNode === endNode &&
+      lastPastePosition.endOffset === endOffset;
+    lastPastePosition = { startNode, startOffset, endNode, endOffset };
+    queuedPastes++;
     pasteQueue = pasteQueue
       .then(async () => {
-        await handleEditorPaste(editor, clipboard);
+        if (followsPrevious && lastPasteCaret) {
+          clipboard.range = lastPasteCaret.cloneRange();
+          clipboard.block = getCurrentBlock(
+            editor,
+            clipboard.range.startContainer,
+          );
+        }
+        lastPasteCaret = await handleEditorPaste(editor, clipboard);
         persist(editor);
       })
       .catch((error: unknown) => {
+        lastPasteCaret = null;
         // eslint-disable-next-line no-console -- Surface unexpected paste failures.
         console.error("Unable to paste into the editor", error);
+      })
+      .finally(() => {
+        queuedPastes--;
       });
   }
 

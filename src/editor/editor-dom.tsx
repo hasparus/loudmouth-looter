@@ -71,12 +71,13 @@ function normalizeEditableText(text: string) {
   return text.replaceAll("\u200B", "").replaceAll("\u00A0", " ");
 }
 
-export function getCurrentBlock(root: HTMLElement) {
-  const selection = globalThis.getSelection();
-  if (!selection || selection.rangeCount === 0) return null;
-  if (!root.contains(selection.anchorNode)) return null;
+export function getCurrentBlock(
+  root: HTMLElement,
+  anchor: Node | null = globalThis.getSelection()?.anchorNode ?? null,
+) {
+  if (!anchor || !root.contains(anchor)) return null;
 
-  let node: Node | null = selection.anchorNode;
+  let node: Node | null = anchor;
   while (node && node !== root) {
     if (
       node instanceof HTMLElement &&
@@ -670,47 +671,50 @@ function editorRange(editor: HTMLElement): Range | null {
   return selection.getRangeAt(0);
 }
 
-function isActiveEditorRange(editor: HTMLElement, range: Range): boolean {
-  const active = editorRange(editor);
+function isAttachedEditorRange(editor: HTMLElement, range: Range): boolean {
   return (
     editor.isConnected &&
     editor.contains(range.startContainer) &&
-    editor.contains(range.endContainer) &&
-    !!active &&
-    active.startContainer === range.startContainer &&
-    active.startOffset === range.startOffset &&
-    active.endContainer === range.endContainer &&
-    active.endOffset === range.endOffset
+    editor.contains(range.endContainer)
   );
 }
 
-function insertImageFile(editor: HTMLElement, file: File) {
-  const range = editorRange(editor)?.cloneRange();
-  if (!range) return;
-
-  const reader = new FileReader();
-  reader.addEventListener("load", () => {
-    if (typeof reader.result !== "string") return;
-    const src = sanitizeImageSrc(reader.result);
-    if (!src) return;
-    const img = document.createElement("img");
-    img.setAttribute("src", src);
-
-    range.deleteContents();
-    range.insertNode(img);
-    range.setStartAfter(img);
-    range.collapse(true);
-
-    const selection = globalThis.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-    flushSave(editor);
+async function insertImageFile(editor: HTMLElement, file: File, range: Range) {
+  const src = await new Promise<string | null>((resolve) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () =>
+      resolve(typeof reader.result === "string" ? reader.result : null),
+    );
+    reader.addEventListener("error", () => resolve(null));
+    reader.readAsDataURL(file);
   });
-  reader.readAsDataURL(file);
+  if (!src || !isAttachedEditorRange(editor, range)) return null;
+  const safeSrc = sanitizeImageSrc(src);
+  if (!safeSrc) return null;
+  const img = document.createElement("img");
+  img.setAttribute("src", safeSrc);
+
+  range.deleteContents();
+  range.insertNode(img);
+  range.setStartAfter(img);
+  range.collapse(true);
+
+  const selection = globalThis.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+  flushSave(editor);
+  return range.cloneRange();
 }
 
-export function readEditorClipboard(clipboard: DataTransfer) {
+export function readEditorClipboard(
+  editor: HTMLElement,
+  clipboard: DataTransfer,
+) {
+  const range = editorRange(editor)?.cloneRange();
+  if (!range) return null;
   return {
+    range,
+    block: getCurrentBlock(editor, range.startContainer),
     imageFile: [...clipboard.files].find((file) =>
       file.type.startsWith("image/"),
     ),
@@ -720,35 +724,29 @@ export function readEditorClipboard(clipboard: DataTransfer) {
   };
 }
 
-type EditorClipboard = ReturnType<typeof readEditorClipboard>;
+type EditorClipboard = NonNullable<ReturnType<typeof readEditorClipboard>>;
 
 export async function handleEditorPaste(
   editor: HTMLElement,
   clipboard: EditorClipboard,
 ) {
-  if (clipboard.imageFile) {
-    insertImageFile(editor, clipboard.imageFile);
-    return;
-  }
+  const { range, block: currentBlock, html, text } = clipboard;
+  if (clipboard.imageFile)
+    return insertImageFile(editor, clipboard.imageFile, range);
 
-  const range = editorRange(editor)?.cloneRange();
-  if (!range) return;
-  const currentBlock = getCurrentBlock(editor);
-
-  const { html, text } = clipboard;
-  const explicitMarkdown = clipboard.markdown.trim();
+  const explicitMarkdown = clipboard.markdown;
   let cleanHtml = html
     ? sanitizeHtml(html)
     : plainTextToHtml(text || explicitMarkdown);
   let inlineMarkdown = false;
 
-  if (text || explicitMarkdown) {
+  if (text || explicitMarkdown.trim()) {
     try {
       const { htmlIsThinTextWrapper, markdownPasteHtml } =
         await import("./editor-markdown-paste");
-      const markdown = explicitMarkdown || text;
+      const markdown = explicitMarkdown.trim() ? explicitMarkdown : text;
       if (htmlIsThinTextWrapper(html, markdown)) {
-        const parsed = markdownPasteHtml(markdown, !!explicitMarkdown);
+        const parsed = markdownPasteHtml(markdown, !!explicitMarkdown.trim());
         if (parsed) {
           cleanHtml = sanitizeHtml(parsed.html);
           inlineMarkdown = parsed.inline;
@@ -761,7 +759,7 @@ export async function handleEditorPaste(
     }
   }
 
-  if (!isActiveEditorRange(editor, range)) return;
+  if (!isAttachedEditorRange(editor, range)) return null;
   range.deleteContents();
 
   const template = document.createElement("template");
@@ -793,14 +791,16 @@ export async function handleEditorPaste(
     }
     normalizeEmptyBlocks(editor);
     flushSave(editor);
-    return;
+    return range.cloneRange();
   }
 
   if (!currentBlock) {
+    const lastNode = content.lastChild;
     editor.append(content);
+    if (lastNode instanceof HTMLElement) placeCaretAtEnd(lastNode);
     normalizeEmptyBlocks(editor);
     flushSave(editor);
-    return;
+    return editorRange(editor)?.cloneRange() ?? null;
   }
 
   const list = currentBlock.closest("ul, ol");
@@ -838,4 +838,5 @@ export async function handleEditorPaste(
   if (previous instanceof HTMLElement) placeCaretAtEnd(previous);
   normalizeEmptyBlocks(editor);
   flushSave(editor);
+  return editorRange(editor)?.cloneRange() ?? null;
 }

@@ -195,9 +195,7 @@ test.describe("editor", () => {
       data.setData("text/plain", source);
       data.setData(
         "text/html",
-        "<div>## Pasted notes</div><div><br></div>" +
-          "<div>A **bold** intro.</div><div><br></div>" +
-          "<div>- first</div><div>- second</div>",
+        "<div>## Pasted notes\n\nA **bold** intro.\n\n- first\n- second</div>",
       );
       el.dispatchEvent(
         new ClipboardEvent("paste", {
@@ -307,6 +305,39 @@ test.describe("editor", () => {
     ).toHaveCount(0);
   });
 
+  test("pastes at each captured caret when the user moves between rapid pastes", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>abcdef</p>";
+      const text = element.firstChild!.firstChild!;
+      for (const [offset, word] of [
+        [1, "ONE"],
+        [5, "TWO"],
+      ] as const) {
+        const range = document.createRange();
+        range.setStart(text, offset);
+        range.collapse(true);
+        getSelection()?.removeAllRanges();
+        getSelection()?.addRange(range);
+        const data = new DataTransfer();
+        data.setData("text/plain", `**${word}**`);
+        element.dispatchEvent(
+          new ClipboardEvent("paste", {
+            clipboardData: data,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      }
+    });
+
+    await expect(editor.locator("p")).toHaveText("aONEbcdeTWOf");
+    await expect(editor.locator("strong")).toHaveText(["ONE", "TWO"]);
+  });
+
   test("keeps both rapid clipboard pastes in order", async ({ page }) => {
     await page.goto("/editor/");
     const editor = await clearEditor(page);
@@ -328,6 +359,18 @@ test.describe("editor", () => {
     await expect(editor.locator("strong")).toHaveText(["ONE", "TWO"]);
   });
 
+  test("does not trim a Markdown-only clipboard payload", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, { "text/markdown": "  **bold**\n\n" });
+
+    await expect(editor.locator("strong")).toHaveCount(0);
+    await expect(editor).toContainText("**bold**");
+    await expect
+      .poll(() => editor.evaluate((element) => element.innerHTML))
+      .toContain("  **bold**<br><br>");
+  });
+
   test("preserves trailing blank lines when Markdown looks inline", async ({
     page,
   }) => {
@@ -340,6 +383,48 @@ test.describe("editor", () => {
     await expect(
       editor.locator("p").filter({ hasText: "**bold**" }).locator("br"),
     ).toHaveCount(3);
+  });
+
+  test("serializes image reading with later clipboard pastes", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      const NativeReader = window.FileReader;
+      let reads = 0;
+      window.FileReader = class extends NativeReader {
+        override readAsDataURL(blob: Blob) {
+          const delay = ++reads === 1 ? 40 : 0;
+          setTimeout(() => super.readAsDataURL(blob), delay);
+        }
+      };
+      for (const byte of [1, 2]) {
+        const data = new DataTransfer();
+        data.items.add(
+          new File([new Uint8Array([byte])], `${byte}.png`, {
+            type: "image/png",
+          }),
+        );
+        element.dispatchEvent(
+          new ClipboardEvent("paste", {
+            clipboardData: data,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      }
+    });
+
+    await expect(editor.locator("img")).toHaveCount(2);
+    await expect(editor.locator("img").first()).toHaveAttribute(
+      "src",
+      "data:image/png;base64,AQ==",
+    );
+    await expect(editor.locator("img").last()).toHaveAttribute(
+      "src",
+      "data:image/png;base64,Ag==",
+    );
   });
 
   test("does not paste into a detached block after loading Markdown", async ({
@@ -374,6 +459,20 @@ test.describe("editor", () => {
 
     await expect(editor).toContainText("**bold**");
     await expect(editor.locator("strong")).toHaveCount(0);
+  });
+
+  test("retains rich HTML's interior blank block", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, {
+      "text/plain": "**bold**\n\nTRAIL",
+      "text/html": "<p>**bold**</p><p><br></p><p>TRAIL</p>",
+    });
+
+    await expect(editor.locator("strong")).toHaveCount(0);
+    await expect(
+      editor.locator('p:has-text("**bold**") + p:has(> br)'),
+    ).toHaveCount(1);
   });
 
   test("retains rich HTML's trailing blank block", async ({ page }) => {

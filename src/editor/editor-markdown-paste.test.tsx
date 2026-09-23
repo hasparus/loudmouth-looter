@@ -84,7 +84,7 @@ describe("htmlIsThinTextWrapper", () => {
     ).toBe(true);
     expect(
       htmlIsThinTextWrapper(
-        "<div>## Heading</div><div><br></div><div>**bold**</div>",
+        "<div>## Heading\n\n**bold**</div>",
         "## Heading\n\n**bold**",
       ),
     ).toBe(true);
@@ -108,6 +108,7 @@ describe("htmlIsThinTextWrapper", () => {
     ["<span>**a b**</span>", "**ab**"],
     ["<p>**bold**</p><p><br></p>", "**bold**"],
     ["<p>**bold**</p><p><br></p>", "**bold**\n"],
+    ["<p>**bold**</p><p><br></p><p>TRAIL</p>", "**bold**\n\nTRAIL"],
   ])("rejects a wrapper whose source differs: %s", (html, source) => {
     expect(htmlIsThinTextWrapper(html, source)).toBe(false);
   });

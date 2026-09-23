@@ -120,6 +120,11 @@ export function htmlIsThinTextWrapper(html: string, text: string): boolean {
 
   for (const element of template.content.querySelectorAll("*")) {
     if (!THIN_WRAPPER_TAGS.has(element.tagName)) return false;
+    if (
+      (element.tagName === "P" || element.tagName === "DIV") &&
+      !element.textContent?.trim()
+    )
+      return false;
     for (const attribute of element.attributes) {
       if (attribute.name !== "class" && attribute.name !== "style")
         return false;
@@ -128,12 +133,5 @@ export function htmlIsThinTextWrapper(html: string, text: string): boolean {
 
   const htmlText = wrapperText(template.content).replaceAll(/\r\n?/g, "\n");
   const plainText = text.replaceAll(/\r\n?/g, "\n");
-  const lastBlock = template.content.lastElementChild;
-  const endsInEmptyBlock =
-    lastBlock &&
-    (lastBlock.tagName === "P" || lastBlock.tagName === "DIV") &&
-    !lastBlock.textContent?.trim();
-  return (
-    (endsInEmptyBlock ? htmlText : htmlText.replace(/\n$/, "")) === plainText
-  );
+  return htmlText.replace(/\n$/, "") === plainText;
 }
