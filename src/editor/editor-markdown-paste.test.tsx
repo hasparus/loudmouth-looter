@@ -52,6 +52,9 @@ describe("markdownPasteHtml", () => {
     "10. tenth\n11. eleventh",
     "**bold** ~~deleted~~",
     "**bold** `inline code`",
+    "**bold**\n\n",
+    " **bold**",
+    "**bold**  ",
     '[example](https://example.com "important tooltip")',
     '![image](https://example.com/x.png "caption")',
     "- first\n\n- second",
@@ -104,6 +107,7 @@ describe("htmlIsThinTextWrapper", () => {
     ["<div>## First</div><div>## Second</div>", "## First## Second"],
     ["<span>**a b**</span>", "**ab**"],
     ["<p>**bold**</p><p><br></p>", "**bold**"],
+    ["<p>**bold**</p><p><br></p>", "**bold**\n"],
   ])("rejects a wrapper whose source differs: %s", (html, source) => {
     expect(htmlIsThinTextWrapper(html, source)).toBe(false);
   });

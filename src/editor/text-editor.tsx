@@ -23,6 +23,7 @@ import {
   migrateStorage,
   normalizeEmptyBlocks,
   normalizeTrackTabindexes,
+  readEditorClipboard,
   readSlashState,
   restoreSelection,
   save,
@@ -64,6 +65,7 @@ function handleMouseDown(event: MouseEvent) {
 export function TextEditor() {
   let editorEl: HTMLDivElement | undefined;
   let pendingUndo: UndoSnapshot | null = null;
+  let pasteQueue: Promise<void> = Promise.resolve();
   const [spellcheck, setSpellcheck] = createSignal(
     localStorage.getItem(SPELLCHECK_KEY) !== "false",
   );
@@ -280,15 +282,22 @@ export function TextEditor() {
     persist(editor);
   }
 
-  async function handlePaste(event: ClipboardEvent) {
+  function handlePaste(event: ClipboardEvent) {
     const editor = editorEl;
     if (!editor) return;
     event.preventDefault();
     pendingUndo = null;
-    if (event.clipboardData)
-      await handleEditorPaste(editor, event.clipboardData);
-    syncDocumentTitle(editor);
-    persist(editor);
+    if (!event.clipboardData) return;
+    const clipboard = readEditorClipboard(event.clipboardData);
+    pasteQueue = pasteQueue
+      .then(async () => {
+        await handleEditorPaste(editor, clipboard);
+        persist(editor);
+      })
+      .catch((error: unknown) => {
+        // eslint-disable-next-line no-console -- Surface unexpected paste failures.
+        console.error("Unable to paste into the editor", error);
+      });
   }
 
   function handleSlashKey(event: KeyboardEvent): boolean {
@@ -429,7 +438,7 @@ export function TextEditor() {
           onInput={handleInput}
           onKeyDown={handleKeyDown}
           onMouseDown={handleMouseDown}
-          onPaste={(event) => void handlePaste(event)}
+          onPaste={handlePaste}
           ref={editorEl}
           role="textbox"
           spellcheck={spellcheck()}

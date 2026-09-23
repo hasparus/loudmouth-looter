@@ -709,15 +709,25 @@ function insertImageFile(editor: HTMLElement, file: File) {
   reader.readAsDataURL(file);
 }
 
+export function readEditorClipboard(clipboard: DataTransfer) {
+  return {
+    imageFile: [...clipboard.files].find((file) =>
+      file.type.startsWith("image/"),
+    ),
+    html: clipboard.getData("text/html"),
+    text: clipboard.getData("text/plain"),
+    markdown: clipboard.getData("text/markdown"),
+  };
+}
+
+type EditorClipboard = ReturnType<typeof readEditorClipboard>;
+
 export async function handleEditorPaste(
   editor: HTMLElement,
-  clipboard: DataTransfer,
+  clipboard: EditorClipboard,
 ) {
-  const imageFile = [...clipboard.files].find((f) =>
-    f.type.startsWith("image/"),
-  );
-  if (imageFile) {
-    insertImageFile(editor, imageFile);
+  if (clipboard.imageFile) {
+    insertImageFile(editor, clipboard.imageFile);
     return;
   }
 
@@ -725,9 +735,8 @@ export async function handleEditorPaste(
   if (!range) return;
   const currentBlock = getCurrentBlock(editor);
 
-  const html = clipboard.getData("text/html");
-  const text = clipboard.getData("text/plain");
-  const explicitMarkdown = clipboard.getData("text/markdown").trim();
+  const { html, text } = clipboard;
+  const explicitMarkdown = clipboard.markdown.trim();
   let cleanHtml = html
     ? sanitizeHtml(html)
     : plainTextToHtml(text || explicitMarkdown);

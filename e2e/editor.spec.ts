@@ -307,6 +307,41 @@ test.describe("editor", () => {
     ).toHaveCount(0);
   });
 
+  test("keeps both rapid clipboard pastes in order", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      for (const word of ["ONE", "TWO"]) {
+        const data = new DataTransfer();
+        data.setData("text/plain", `**${word}**`);
+        element.dispatchEvent(
+          new ClipboardEvent("paste", {
+            clipboardData: data,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      }
+    });
+
+    await expect(editor.locator("strong")).toHaveCount(2);
+    await expect(editor.locator("strong")).toHaveText(["ONE", "TWO"]);
+  });
+
+  test("preserves trailing blank lines when Markdown looks inline", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, { "text/plain": "**bold**\n\n" });
+
+    await expect(editor).toContainText("**bold**");
+    await expect(editor.locator("strong")).toHaveCount(0);
+    await expect(
+      editor.locator("p").filter({ hasText: "**bold**" }).locator("br"),
+    ).toHaveCount(3);
+  });
+
   test("does not paste into a detached block after loading Markdown", async ({
     page,
   }) => {
@@ -345,12 +380,15 @@ test.describe("editor", () => {
     await page.goto("/editor/");
     const editor = await clearEditor(page);
     await pasteData(editor, {
-      "text/plain": "**bold**",
+      "text/plain": "**bold**\n",
       "text/html": "<p>**bold**</p><p><br></p>",
     });
 
     await expect(editor).toContainText("**bold**");
     await expect(editor.locator("strong")).toHaveCount(0);
+    await expect(
+      editor.locator('p:has-text("**bold**") + p:has(> br)'),
+    ).toHaveCount(1);
   });
 
   test("preserves semantic rich HTML that resembles Markdown", async ({

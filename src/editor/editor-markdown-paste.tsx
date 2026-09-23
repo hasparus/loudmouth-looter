@@ -70,7 +70,13 @@ export function markdownPasteHtml(
   source: string,
   explicit = false,
 ): { html: string; inline: boolean } | null {
-  if (!source.trim()) return null;
+  const trailingLine = source.replace(/\r?\n$/, "");
+  if (
+    !source.trim() ||
+    source !== source.trimStart() ||
+    trailingLine !== trailingLine.trimEnd()
+  )
+    return null;
   try {
     const tree = parseEditorMdx(source);
     if (!supported(tree) || (!explicit && !containsSyntax(tree, source)))
@@ -122,5 +128,12 @@ export function htmlIsThinTextWrapper(html: string, text: string): boolean {
 
   const htmlText = wrapperText(template.content).replaceAll(/\r\n?/g, "\n");
   const plainText = text.replaceAll(/\r\n?/g, "\n");
-  return htmlText.replace(/\n$/, "") === plainText;
+  const lastBlock = template.content.lastElementChild;
+  const endsInEmptyBlock =
+    lastBlock &&
+    (lastBlock.tagName === "P" || lastBlock.tagName === "DIV") &&
+    !lastBlock.textContent?.trim();
+  return (
+    (endsInEmptyBlock ? htmlText : htmlText.replace(/\n$/, "")) === plainText
+  );
 }
