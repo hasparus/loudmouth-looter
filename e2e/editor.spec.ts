@@ -305,6 +305,71 @@ test.describe("editor", () => {
     ).toHaveCount(0);
   });
 
+  test("does not move a changed selection after asynchronous Markdown paste", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>first</p><p>second</p>";
+      const [first, second] = element.querySelectorAll("p");
+      const range = document.createRange();
+      range.setStart(first!.firstChild!, 2);
+      range.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      const data = new DataTransfer();
+      data.setData("text/plain", "**BOLD**");
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      range.setStart(second!.firstChild!, 3);
+      range.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+    });
+
+    await expect(editor.locator("strong")).toHaveText("BOLD");
+    await expect
+      .poll(() =>
+        editor.evaluate(
+          () => getSelection()?.anchorNode?.parentElement?.textContent,
+        ),
+      )
+      .toBe("second");
+  });
+
+  test("replaces a root-level block selection at its original position", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>first</p><p>second</p><p>third</p>";
+      const range = document.createRange();
+      range.setStart(element, 0);
+      range.setEnd(element, 1);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+    });
+    await pasteData(editor, { "text/plain": "# Replacement" });
+
+    await expect(
+      editor.getByRole("heading", { name: "Replacement" }),
+    ).toBeVisible();
+    await expect
+      .poll(() =>
+        editor.evaluate((element) =>
+          [...element.children].map((child) => child.textContent),
+        ),
+      )
+      .toEqual(["Replacement", "second", "third"]);
+  });
+
   test("pastes at each captured caret when the user moves between rapid pastes", async ({
     page,
   }) => {
@@ -383,6 +448,46 @@ test.describe("editor", () => {
     await expect(
       editor.locator("p").filter({ hasText: "**bold**" }).locator("br"),
     ).toHaveCount(3);
+  });
+
+  test("does not move a changed selection after asynchronous image paste", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>first</p><p>second</p>";
+      const [first, second] = element.querySelectorAll("p");
+      const range = document.createRange();
+      range.setStart(first!.firstChild!, 2);
+      range.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      const data = new DataTransfer();
+      data.items.add(
+        new File([new Uint8Array([1])], "1.png", { type: "image/png" }),
+      );
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      range.setStart(second!.firstChild!, 3);
+      range.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+    });
+
+    await expect(editor.locator("img")).toHaveCount(1);
+    await expect
+      .poll(() =>
+        editor.evaluate(
+          () => getSelection()?.anchorNode?.parentElement?.textContent,
+        ),
+      )
+      .toBe("second");
   });
 
   test("serializes image reading with later clipboard pastes", async ({

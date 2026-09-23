@@ -679,6 +679,24 @@ function isAttachedEditorRange(editor: HTMLElement, range: Range): boolean {
   );
 }
 
+function isSelectedEditorRange(editor: HTMLElement, range: Range): boolean {
+  const selected = editorRange(editor);
+  return (
+    !!selected &&
+    selected.startContainer === range.startContainer &&
+    selected.startOffset === range.startOffset &&
+    selected.endContainer === range.endContainer &&
+    selected.endOffset === range.endOffset
+  );
+}
+
+function selectPasteCaret(range: Range, shouldSelect: boolean) {
+  if (!shouldSelect) return;
+  const selection = globalThis.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+}
+
 async function insertImageFile(editor: HTMLElement, file: File, range: Range) {
   const src = await new Promise<string | null>((resolve) => {
     const reader = new FileReader();
@@ -694,15 +712,13 @@ async function insertImageFile(editor: HTMLElement, file: File, range: Range) {
   const img = document.createElement("img");
   img.setAttribute("src", safeSrc);
 
+  const shouldSelect = isSelectedEditorRange(editor, range);
   range.deleteContents();
   range.insertNode(img);
   range.setStartAfter(img);
   range.collapse(true);
 
-  const selection = globalThis.getSelection();
-  selection?.removeAllRanges();
-  selection?.addRange(range);
-  flushSave(editor);
+  selectPasteCaret(range, shouldSelect);
   return range.cloneRange();
 }
 
@@ -760,6 +776,7 @@ export async function handleEditorPaste(
   }
 
   if (!isAttachedEditorRange(editor, range)) return null;
+  const shouldSelect = isSelectedEditorRange(editor, range);
   range.deleteContents();
 
   const template = document.createElement("template");
@@ -785,22 +802,22 @@ export async function handleEditorPaste(
     if (lastNode) {
       range.setStartAfter(lastNode);
       range.collapse(true);
-      const selection = globalThis.getSelection();
-      selection?.removeAllRanges();
-      selection?.addRange(range);
     }
+    selectPasteCaret(range, shouldSelect);
     normalizeEmptyBlocks(editor);
-    flushSave(editor);
     return range.cloneRange();
   }
 
   if (!currentBlock) {
     const lastNode = content.lastChild;
-    editor.append(content);
-    if (lastNode instanceof HTMLElement) placeCaretAtEnd(lastNode);
+    range.insertNode(content);
+    if (lastNode) {
+      range.setStartAfter(lastNode);
+      range.collapse(true);
+    }
+    selectPasteCaret(range, shouldSelect);
     normalizeEmptyBlocks(editor);
-    flushSave(editor);
-    return editorRange(editor)?.cloneRange() ?? null;
+    return range.cloneRange();
   }
 
   const list = currentBlock.closest("ul, ol");
@@ -835,8 +852,11 @@ export async function handleEditorPaste(
     previous.after(tailBlock);
   }
 
-  if (previous instanceof HTMLElement) placeCaretAtEnd(previous);
+  if (previous instanceof HTMLElement) {
+    range.selectNodeContents(previous);
+    range.collapse(false);
+  }
+  selectPasteCaret(range, shouldSelect);
   normalizeEmptyBlocks(editor);
-  flushSave(editor);
-  return editorRange(editor)?.cloneRange() ?? null;
+  return range.cloneRange();
 }

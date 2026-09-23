@@ -322,7 +322,11 @@ export function TextEditor() {
           );
         }
         lastPasteCaret = await handleEditorPaste(editor, clipboard);
-        persist(editor);
+        if (lastPasteCaret) {
+          flushSave(editor);
+          syncDocumentTitle(editor);
+          file.queue(serializeDocument(editor));
+        }
       })
       .catch((error: unknown) => {
         lastPasteCaret = null;
