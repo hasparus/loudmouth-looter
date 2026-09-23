@@ -307,6 +307,52 @@ test.describe("editor", () => {
     ).toHaveCount(0);
   });
 
+  test("does not paste into a detached block after loading Markdown", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      const data = new DataTransfer();
+      data.setData("text/plain", "**bold**");
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      element.innerHTML = "<p>replacement</p>";
+    });
+
+    await expect(editor).toHaveText("replacement");
+    await expect(editor.locator("strong")).toHaveCount(0);
+  });
+
+  test("uses plain text if the Markdown chunk fails to load", async ({
+    page,
+  }) => {
+    await page.route("**/editor-markdown-paste.*.js", (route) => route.abort());
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, { "text/plain": "**bold**" });
+
+    await expect(editor).toContainText("**bold**");
+    await expect(editor.locator("strong")).toHaveCount(0);
+  });
+
+  test("retains rich HTML's trailing blank block", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, {
+      "text/plain": "**bold**",
+      "text/html": "<p>**bold**</p><p><br></p>",
+    });
+
+    await expect(editor).toContainText("**bold**");
+    await expect(editor.locator("strong")).toHaveCount(0);
+  });
+
   test("preserves semantic rich HTML that resembles Markdown", async ({
     page,
   }) => {

@@ -20,19 +20,23 @@ function supported(node: Nodes): boolean {
       return node.depth <= 2 && node.children.every(supported);
     case "list":
       return (
+        !node.spread &&
         (!node.ordered || node.start == null || node.start === 1) &&
         node.children.every(supported)
       );
     case "listItem":
       return (
+        !node.spread &&
         node.children.length === 1 &&
         node.children[0]?.type === "paragraph" &&
         supported(node.children[0])
       );
     case "link":
-      return !!sanitizeUrl(node.url) && node.children.every(supported);
+      return (
+        !node.title && !!sanitizeUrl(node.url) && node.children.every(supported)
+      );
     case "image":
-      return !!sanitizeImageSrc(node.url);
+      return !node.title && !!sanitizeImageSrc(node.url);
     case "text":
       return !node.value.includes("\n");
     case "break":
@@ -116,7 +120,7 @@ export function htmlIsThinTextWrapper(html: string, text: string): boolean {
     }
   }
 
-  const normalize = (value: string) =>
-    value.replaceAll(/\r\n?/g, "\n").replaceAll(/\n+$/g, "");
-  return normalize(wrapperText(template.content)) === normalize(text);
+  const htmlText = wrapperText(template.content).replaceAll(/\r\n?/g, "\n");
+  const plainText = text.replaceAll(/\r\n?/g, "\n");
+  return htmlText.replace(/\n$/, "") === plainText;
 }

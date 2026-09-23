@@ -670,6 +670,20 @@ function editorRange(editor: HTMLElement): Range | null {
   return selection.getRangeAt(0);
 }
 
+function isActiveEditorRange(editor: HTMLElement, range: Range): boolean {
+  const active = editorRange(editor);
+  return (
+    editor.isConnected &&
+    editor.contains(range.startContainer) &&
+    editor.contains(range.endContainer) &&
+    !!active &&
+    active.startContainer === range.startContainer &&
+    active.startOffset === range.startOffset &&
+    active.endContainer === range.endContainer &&
+    active.endOffset === range.endOffset
+  );
+}
+
 function insertImageFile(editor: HTMLElement, file: File) {
   const range = editorRange(editor)?.cloneRange();
   if (!range) return;
@@ -720,19 +734,25 @@ export async function handleEditorPaste(
   let inlineMarkdown = false;
 
   if (text || explicitMarkdown) {
-    const { htmlIsThinTextWrapper, markdownPasteHtml } =
-      await import("./editor-markdown-paste");
-    const markdown = explicitMarkdown || text;
-    if (htmlIsThinTextWrapper(html, markdown)) {
-      const parsed = markdownPasteHtml(markdown, !!explicitMarkdown);
-      if (parsed) {
-        cleanHtml = sanitizeHtml(parsed.html);
-        inlineMarkdown = parsed.inline;
+    try {
+      const { htmlIsThinTextWrapper, markdownPasteHtml } =
+        await import("./editor-markdown-paste");
+      const markdown = explicitMarkdown || text;
+      if (htmlIsThinTextWrapper(html, markdown)) {
+        const parsed = markdownPasteHtml(markdown, !!explicitMarkdown);
+        if (parsed) {
+          cleanHtml = sanitizeHtml(parsed.html);
+          inlineMarkdown = parsed.inline;
+        }
       }
+    } catch {
+      cleanHtml = html
+        ? sanitizeHtml(html)
+        : plainTextToHtml(text || explicitMarkdown);
     }
   }
 
-  if (!editor.isConnected) return;
+  if (!isActiveEditorRange(editor, range)) return;
   range.deleteContents();
 
   const template = document.createElement("template");

@@ -52,6 +52,9 @@ describe("markdownPasteHtml", () => {
     "10. tenth\n11. eleventh",
     "**bold** ~~deleted~~",
     "**bold** `inline code`",
+    '[example](https://example.com "important tooltip")',
+    '![image](https://example.com/x.png "caption")',
+    "- first\n\n- second",
     "**bold**\n\na | b\n--- | ---\n1 | 2",
   ])("rejects plain or lossy Markdown: %s", (source) => {
     expect(markdownPasteHtml(source)).toBeNull();
@@ -100,6 +103,7 @@ describe("htmlIsThinTextWrapper", () => {
     ["<p>different</p>", "# Heading"],
     ["<div>## First</div><div>## Second</div>", "## First## Second"],
     ["<span>**a b**</span>", "**ab**"],
+    ["<p>**bold**</p><p><br></p>", "**bold**"],
   ])("rejects a wrapper whose source differs: %s", (html, source) => {
     expect(htmlIsThinTextWrapper(html, source)).toBe(false);
   });
