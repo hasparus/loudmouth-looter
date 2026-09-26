@@ -36,6 +36,7 @@ import {
   syncDocumentTitle,
   trackBeforeCaret,
   type UndoSnapshot,
+  updateSnapshotImage,
 } from "./editor-dom";
 import { EditorHelpModal } from "./editor-help-modal";
 import { sanitizeHtml } from "./editor-sanitize";
@@ -285,9 +286,14 @@ export function TextEditor() {
     if (!editor) return;
     event.preventDefault();
     pendingUndo = null;
-    if (event.clipboardData) handleEditorPaste(editor, event.clipboardData);
-    syncDocumentTitle(editor);
-    persist(editor);
+    if (!event.clipboardData) return;
+    handleEditorPaste(editor, event.clipboardData, (image) => {
+      if (image && pendingUndo)
+        pendingUndo = updateSnapshotImage(pendingUndo, image);
+      flushSave(editor);
+      syncDocumentTitle(editor);
+      file.queue(serializeDocument(editor));
+    });
   }
 
   function handleSlashKey(event: KeyboardEvent): boolean {

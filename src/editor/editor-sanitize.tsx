@@ -28,9 +28,16 @@ export function plainTextToHtml(text: string) {
 
 export function sanitizeUrl(url: string): string {
   const trimmed = url.trim();
-  if (/^(https?:|mailto:)/i.test(trimmed)) return trimmed;
-  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return "";
-  return trimmed;
+  // eslint-disable-next-line no-control-regex -- Reject protocol-smuggling control characters.
+  if (!trimmed || /[\u0000-\u001F\u007F]/.test(trimmed)) return "";
+  try {
+    const resolved = new URL(trimmed, "https://editor.invalid/");
+    return ["http:", "https:", "mailto:"].includes(resolved.protocol)
+      ? trimmed
+      : "";
+  } catch {
+    return "";
+  }
 }
 
 export function sanitizeImageSrc(src: string): string {

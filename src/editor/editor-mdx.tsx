@@ -288,12 +288,17 @@ function phrasingSource(node: PhrasingContent): string {
   );
 }
 
-export function mdxToHtml(mdx: string): string {
-  const frontmatter = FRONTMATTER_RE.exec(mdx)?.[0] ?? "";
-  const body = mdx.slice(frontmatter.length);
-  mdxSource = body;
+export function parseEditorMdx(source: string): Root {
+  return processor.parse(source);
+}
+
+export function editorMdxTreeToHtml(
+  tree: Root,
+  source: string,
+  frontmatter = "",
+): string {
+  mdxSource = source;
   try {
-    const tree = processor.parse(body);
     const container = document.createElement("div");
     if (frontmatter) container.append(buildJsxElement(frontmatter.trimEnd()));
     for (const node of tree.children) {
@@ -304,6 +309,12 @@ export function mdxToHtml(mdx: string): string {
   } finally {
     mdxSource = "";
   }
+}
+
+export function mdxToHtml(mdx: string): string {
+  const frontmatter = FRONTMATTER_RE.exec(mdx)?.[0] ?? "";
+  const body = mdx.slice(frontmatter.length);
+  return editorMdxTreeToHtml(parseEditorMdx(body), body, frontmatter);
 }
 
 function blockToDom(node: RootContent): HTMLElement | null {
