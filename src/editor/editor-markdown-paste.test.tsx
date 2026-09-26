@@ -52,6 +52,7 @@ describe("markdownPasteHtml", () => {
     "10. tenth\n11. eleventh",
     "**bold** ~~deleted~~",
     "**bold** `inline code`",
+    "[click](<java\tscript:alert(1)>)",
     "**bold**\n\n",
     " **bold**",
     "**bold**  ",

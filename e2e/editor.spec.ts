@@ -288,6 +288,17 @@ test.describe("editor", () => {
     );
   });
 
+  test("keeps an unsafe Markdown link literal", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, {
+      "text/plain": "[click](<java\tscript:alert(1)>)",
+    });
+
+    await expect(editor).toContainText("click");
+    await expect(editor.getByRole("link", { name: "click" })).toHaveCount(0);
+  });
+
   test("prefers semantic HTML over competing explicit Markdown", async ({
     page,
   }) => {
@@ -549,6 +560,47 @@ test.describe("editor", () => {
       await expect(editor.locator("img")).toHaveCount(1);
     });
   }
+
+  test("saving while an image loads keeps the replaced draft text", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>beforeSECRETafter</p>";
+      const range = document.createRange();
+      range.setStart(element.firstChild!.firstChild!, 6);
+      range.setEnd(element.firstChild!.firstChild!, 12);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      const NativeReader = window.FileReader;
+      window.FileReader = class extends NativeReader {
+        override readAsDataURL(blob: Blob) {
+          (window as Window & { stalledImage?: Blob }).stalledImage = blob;
+        }
+      };
+      const data = new DataTransfer();
+      data.items.add(
+        new File([new Uint8Array([1])], "1.png", { type: "image/png" }),
+      );
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+    await pasteData(editor, { "text/plain": "NEW" });
+
+    await expect
+      .poll(() =>
+        page.evaluate(() => localStorage.getItem("text-editor-document")),
+      )
+      .toContain("beforeSECRETNEWafter");
+    await page.reload();
+    await expect(editor).toContainText("beforeSECRETNEWafter");
+  });
 
   test("failed image reads restore the selection in storage", async ({
     page,

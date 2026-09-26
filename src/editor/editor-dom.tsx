@@ -276,8 +276,13 @@ export function serializeDocument(root: HTMLElement): string {
   const pending = root.querySelector("[data-pending-image]");
   if (!pending) return root.innerHTML.replaceAll("\u200B", "");
   const copy = root.cloneNode(true) as HTMLElement;
-  for (const image of copy.querySelectorAll("[data-pending-image]"))
-    image.remove();
+  for (const image of copy.querySelectorAll<HTMLElement>(
+    "[data-pending-image]",
+  )) {
+    const fallback = document.createElement("template");
+    fallback.innerHTML = image.dataset.pendingFallback ?? "";
+    image.replaceWith(fallback.content);
+  }
   return copy.innerHTML.replaceAll("\u200B", "");
 }
 
@@ -723,6 +728,7 @@ function insertImageFile(
   const img = document.createElement("img");
   img.src = preview;
   img.dataset.pendingImage = id;
+  img.dataset.pendingFallback = previousHtml;
   range.deleteContents();
   range.insertNode(img);
   range.setStartAfter(img);
@@ -755,6 +761,7 @@ function insertImageFile(
     if (!target) return;
     target.src = src;
     delete target.dataset.pendingImage;
+    delete target.dataset.pendingFallback;
     onCommit({ id, html: target.outerHTML });
   });
   reader.addEventListener("error", fail);
