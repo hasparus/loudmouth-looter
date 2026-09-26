@@ -377,11 +377,14 @@ test.describe("editor", () => {
     const editor = await clearEditor(page);
     await editor.evaluate((element) => {
       element.innerHTML = "<p>abcdef</p>";
-      const text = element.firstChild!.firstChild!;
       for (const [offset, word] of [
         [1, "ONE"],
-        [5, "TWO"],
+        [4, "TWO"],
       ] as const) {
+        const text =
+          word === "ONE"
+            ? element.firstChild!.firstChild!
+            : element.firstChild!.lastChild!;
         const range = document.createRange();
         range.setStart(text, offset);
         range.collapse(true);
@@ -401,6 +404,49 @@ test.describe("editor", () => {
 
     await expect(editor.locator("p")).toHaveText("aONEbcdeTWOf");
     await expect(editor.locator("strong")).toHaveText(["ONE", "TWO"]);
+  });
+
+  test("keeps a later bookmark in text split by a Markdown block", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>abcdef</p>";
+      const first = document.createRange();
+      first.setStart(element.firstChild!.firstChild!, 1);
+      first.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(first);
+      const heading = new DataTransfer();
+      heading.setData("text/plain", "# HEAD");
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: heading,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+
+      const second = document.createRange();
+      second.setStart(element.firstChild!.lastChild!, 4);
+      second.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(second);
+      const emphasis = new DataTransfer();
+      emphasis.setData("text/plain", "**TWO**");
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: emphasis,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+
+    await expect(editor.getByRole("heading", { name: "HEAD" })).toBeVisible();
+    await expect(editor.locator("strong")).toHaveText("TWO");
+    await expect(editor.locator("p").last()).toHaveText("bcdeTWOf");
   });
 
   test("keeps both rapid clipboard pastes in order", async ({ page }) => {
@@ -448,6 +494,45 @@ test.describe("editor", () => {
     await expect(
       editor.locator("p").filter({ hasText: "**bold**" }).locator("br"),
     ).toHaveCount(3);
+  });
+
+  test("continues queued text after an aborted image read", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>abc</p>";
+      const NativeReader = window.FileReader;
+      window.FileReader = class extends NativeReader {
+        override readAsDataURL(_blob: Blob) {
+          queueMicrotask(() => this.dispatchEvent(new ProgressEvent("abort")));
+        }
+      };
+      const image = new DataTransfer();
+      image.items.add(
+        new File([new Uint8Array([1])], "1.png", { type: "image/png" }),
+      );
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: image,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      const text = new DataTransfer();
+      text.setData("text/plain", "**BOLD**");
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: text,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+
+    await expect(editor.locator("strong")).toHaveText("BOLD");
+    await expect(editor.locator("img")).toHaveCount(0);
   });
 
   test("does not move a changed selection after asynchronous image paste", async ({

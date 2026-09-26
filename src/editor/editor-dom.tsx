@@ -249,11 +249,13 @@ export function restoreSelection(
 }
 
 export function captureSnapshot(root: HTMLElement): UndoSnapshot {
-  return { html: root.innerHTML, selection: captureSelection(root) };
+  return { html: serializeDocument(root), selection: captureSelection(root) };
 }
 
 export function serializeDocument(root: HTMLElement): string {
-  return root.innerHTML.replaceAll("\u200B", "");
+  return root.innerHTML
+    .replaceAll("<!--editor-paste-->", "")
+    .replaceAll("\u200B", "");
 }
 
 const EDITOR_FALLBACK_TITLE = "editor";
@@ -671,14 +673,6 @@ function editorRange(editor: HTMLElement): Range | null {
   return selection.getRangeAt(0);
 }
 
-function isAttachedEditorRange(editor: HTMLElement, range: Range): boolean {
-  return (
-    editor.isConnected &&
-    editor.contains(range.startContainer) &&
-    editor.contains(range.endContainer)
-  );
-}
-
 function isSelectedEditorRange(editor: HTMLElement, range: Range): boolean {
   const selected = editorRange(editor);
   return (
@@ -697,16 +691,22 @@ function selectPasteCaret(range: Range, shouldSelect: boolean) {
   selection?.addRange(range);
 }
 
-async function insertImageFile(editor: HTMLElement, file: File, range: Range) {
+async function insertImageFile(
+  editor: HTMLElement,
+  file: File,
+  bookmark: PasteBookmark,
+) {
   const src = await new Promise<string | null>((resolve) => {
     const reader = new FileReader();
     reader.addEventListener("load", () =>
       resolve(typeof reader.result === "string" ? reader.result : null),
     );
     reader.addEventListener("error", () => resolve(null));
+    reader.addEventListener("abort", () => resolve(null));
     reader.readAsDataURL(file);
   });
-  if (!src || !isAttachedEditorRange(editor, range)) return null;
+  const range = rangeFromBookmark(editor, bookmark);
+  if (!src || !range) return null;
   const safeSrc = sanitizeImageSrc(src);
   if (!safeSrc) return null;
   const img = document.createElement("img");
@@ -722,15 +722,46 @@ async function insertImageFile(editor: HTMLElement, file: File, range: Range) {
   return range.cloneRange();
 }
 
+type PasteBookmark = { start: Comment; end: Comment | null };
+
+function rangeFromBookmark(
+  editor: HTMLElement,
+  bookmark: PasteBookmark,
+): Range | null {
+  if (
+    !editor.isConnected ||
+    !editor.contains(bookmark.start) ||
+    (bookmark.end && !editor.contains(bookmark.end))
+  )
+    return null;
+  const range = document.createRange();
+  range.setStartAfter(bookmark.start);
+  if (bookmark.end) range.setEndBefore(bookmark.end);
+  else range.collapse(true);
+  return range;
+}
+
 export function readEditorClipboard(
   editor: HTMLElement,
   clipboard: DataTransfer,
 ) {
   const range = editorRange(editor)?.cloneRange();
   if (!range) return null;
+  const bookmark: PasteBookmark = {
+    start: document.createComment("editor-paste"),
+    end: range.collapsed ? null : document.createComment("editor-paste"),
+  };
+  if (bookmark.end) {
+    const atEnd = range.cloneRange();
+    atEnd.collapse(false);
+    atEnd.insertNode(bookmark.end);
+  }
+  range.collapse(true);
+  range.insertNode(bookmark.start);
+  const selected = rangeFromBookmark(editor, bookmark);
+  if (selected) selectPasteCaret(selected, true);
   return {
-    range,
-    block: getCurrentBlock(editor, range.startContainer),
+    bookmark,
     imageFile: [...clipboard.files].find((file) =>
       file.type.startsWith("image/"),
     ),
@@ -746,9 +777,21 @@ export async function handleEditorPaste(
   editor: HTMLElement,
   clipboard: EditorClipboard,
 ) {
-  const { range, block: currentBlock, html, text } = clipboard;
+  try {
+    return await applyEditorPaste(editor, clipboard);
+  } finally {
+    clipboard.bookmark.start.remove();
+    clipboard.bookmark.end?.remove();
+  }
+}
+
+async function applyEditorPaste(
+  editor: HTMLElement,
+  clipboard: EditorClipboard,
+) {
+  const { bookmark, html, text } = clipboard;
   if (clipboard.imageFile)
-    return insertImageFile(editor, clipboard.imageFile, range);
+    return insertImageFile(editor, clipboard.imageFile, bookmark);
 
   const explicitMarkdown = clipboard.markdown;
   let cleanHtml = html
@@ -775,7 +818,9 @@ export async function handleEditorPaste(
     }
   }
 
-  if (!isAttachedEditorRange(editor, range)) return null;
+  const range = rangeFromBookmark(editor, bookmark);
+  if (!range) return null;
+  const currentBlock = getCurrentBlock(editor, range.startContainer);
   const shouldSelect = isSelectedEditorRange(editor, range);
   range.deleteContents();
 
