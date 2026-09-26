@@ -253,7 +253,23 @@ export function restoreSelection(
 }
 
 export function captureSnapshot(root: HTMLElement): UndoSnapshot {
-  return { html: serializeDocument(root), selection: captureSelection(root) };
+  return { html: root.innerHTML, selection: captureSelection(root) };
+}
+
+export function updateSnapshotImage(
+  snapshot: UndoSnapshot,
+  image: { id: string; html: string },
+): UndoSnapshot {
+  const template = document.createElement("template");
+  template.innerHTML = snapshot.html;
+  const pending = template.content.querySelector(
+    `[data-pending-image="${image.id}"]`,
+  );
+  if (!pending) return snapshot;
+  const replacement = document.createElement("template");
+  replacement.innerHTML = image.html;
+  pending.replaceWith(replacement.content);
+  return { ...snapshot, html: template.innerHTML };
 }
 
 export function serializeDocument(root: HTMLElement): string {
@@ -686,30 +702,47 @@ function selectPasteCaret(range: Range) {
   selection?.addRange(range);
 }
 
+type ImageSettlement = { id: string; html: string };
+type PasteCommit = (image?: ImageSettlement) => void;
+let nextPendingImageId = 0;
+
 function insertImageFile(
   editor: HTMLElement,
   file: File,
-  onCommit: () => void,
+  onCommit: PasteCommit,
 ) {
   const range = editorRange(editor)?.cloneRange();
   if (!range || !/^image\/(png|jpeg|gif|webp|avif)$/.test(file.type)) return;
 
   const previous = range.cloneContents();
+  const container = document.createElement("div");
+  container.append(previous.cloneNode(true));
+  const previousHtml = container.innerHTML;
   const preview = URL.createObjectURL(file);
+  const id = String(++nextPendingImageId);
   const img = document.createElement("img");
   img.src = preview;
-  img.dataset.pendingImage = "";
+  img.dataset.pendingImage = id;
   range.deleteContents();
   range.insertNode(img);
   range.setStartAfter(img);
   range.collapse(true);
   selectPasteCaret(range);
 
-  const reader = new FileReader();
+  const currentImage = () =>
+    editor.isConnected
+      ? editor.querySelector<HTMLImageElement>(
+          `img[data-pending-image="${id}"]`,
+        )
+      : null;
   const fail = () => {
+    const target = currentImage();
     URL.revokeObjectURL(preview);
-    if (img.isConnected) img.replaceWith(previous);
+    if (!target) return;
+    target.replaceWith(previous);
+    onCommit({ id, html: previousHtml });
   };
+  const reader = new FileReader();
   reader.addEventListener("load", () => {
     const src =
       typeof reader.result === "string" ? sanitizeImageSrc(reader.result) : "";
@@ -717,11 +750,12 @@ function insertImageFile(
       fail();
       return;
     }
+    const target = currentImage();
     URL.revokeObjectURL(preview);
-    if (!img.isConnected) return;
-    img.src = src;
-    delete img.dataset.pendingImage;
-    onCommit();
+    if (!target) return;
+    target.src = src;
+    delete target.dataset.pendingImage;
+    onCommit({ id, html: target.outerHTML });
   });
   reader.addEventListener("error", fail);
   reader.addEventListener("abort", fail);
@@ -735,7 +769,7 @@ function insertImageFile(
 export function handleEditorPaste(
   editor: HTMLElement,
   clipboard: DataTransfer,
-  onCommit: () => void,
+  onCommit: PasteCommit,
 ) {
   const imageFile = [...clipboard.files].find((file) =>
     file.type.startsWith("image/"),

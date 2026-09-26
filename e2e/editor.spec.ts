@@ -494,6 +494,103 @@ test.describe("editor", () => {
     ).toHaveCount(3);
   });
 
+  for (const undoBeforeRead of [true, false]) {
+    test(`undo preserves an image ${undoBeforeRead ? "before" : "after"} its file loads`, async ({
+      page,
+    }) => {
+      await page.goto("/editor/");
+      const editor = await clearEditor(page);
+      await editor.evaluate((element) => {
+        element.innerHTML = "<p># Hi</p>";
+        const range = document.createRange();
+        range.selectNodeContents(element.firstChild!);
+        range.collapse(false);
+        getSelection()?.removeAllRanges();
+        getSelection()?.addRange(range);
+        const NativeReader = window.FileReader;
+        window.FileReader = class extends NativeReader {
+          override readAsDataURL(blob: Blob) {
+            (
+              window as Window & { completeImageRead?: () => void }
+            ).completeImageRead = () => super.readAsDataURL(blob);
+          }
+        };
+        const data = new DataTransfer();
+        data.items.add(
+          new File([new Uint8Array([1])], "1.png", { type: "image/png" }),
+        );
+        element.dispatchEvent(
+          new ClipboardEvent("paste", {
+            clipboardData: data,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      });
+
+      await editor.press("Enter");
+      await expect(editor.getByRole("heading", { name: "Hi" })).toBeVisible();
+      if (undoBeforeRead) await editor.press("ControlOrMeta+z");
+      await editor.evaluate(() =>
+        (
+          window as Window & { completeImageRead?: () => void }
+        ).completeImageRead?.(),
+      );
+      await expect(editor.locator("img")).toHaveAttribute(
+        "src",
+        "data:image/png;base64,AQ==",
+      );
+      if (!undoBeforeRead) await editor.press("ControlOrMeta+z");
+      await expect(editor.locator("img")).toHaveAttribute(
+        "src",
+        "data:image/png;base64,AQ==",
+      );
+      await page.reload();
+      await expect(editor.locator("img")).toHaveCount(1);
+    });
+  }
+
+  test("failed image reads restore the selection in storage", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>beforeSECRETafter</p>";
+      const range = document.createRange();
+      range.setStart(element.firstChild!.firstChild!, 6);
+      range.setEnd(element.firstChild!.firstChild!, 12);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      const NativeReader = window.FileReader;
+      window.FileReader = class extends NativeReader {
+        override readAsDataURL(_blob: Blob) {
+          (window as Window & { failImageRead?: () => void }).failImageRead =
+            () => this.dispatchEvent(new ProgressEvent("abort"));
+        }
+      };
+      const data = new DataTransfer();
+      data.items.add(
+        new File([new Uint8Array([1])], "1.png", { type: "image/png" }),
+      );
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+    await pasteData(editor, { "text/plain": "NEW" });
+    await editor.evaluate(() =>
+      (window as Window & { failImageRead?: () => void }).failImageRead?.(),
+    );
+
+    await expect(editor).toContainText("beforeSECRETNEWafter");
+    await page.reload();
+    await expect(editor).toContainText("beforeSECRETNEWafter");
+  });
+
   test("an aborted image read does not remove later text", async ({ page }) => {
     await page.goto("/editor/");
     const editor = await clearEditor(page);
