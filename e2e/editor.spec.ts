@@ -602,6 +602,58 @@ test.describe("editor", () => {
     await expect(editor).toContainText("beforeSECRETNEWafter");
   });
 
+  test("replacing a pending image retains the original draft fallback", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>beforeSECRETafter</p>";
+      const range = document.createRange();
+      range.setStart(element.firstChild!.firstChild!, 6);
+      range.setEnd(element.firstChild!.firstChild!, 12);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      const NativeReader = window.FileReader;
+      window.FileReader = class extends NativeReader {
+        override readAsDataURL(blob: Blob) {
+          (window as Window & { stalledImage?: Blob }).stalledImage = blob;
+        }
+      };
+      const pasteImage = (byte: number) => {
+        const data = new DataTransfer();
+        data.items.add(
+          new File([new Uint8Array([byte])], `${byte}.png`, {
+            type: "image/png",
+          }),
+        );
+        element.dispatchEvent(
+          new ClipboardEvent("paste", {
+            clipboardData: data,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      };
+      pasteImage(1);
+      const firstImage = element.querySelector("img")!;
+      range.selectNode(firstImage);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      pasteImage(2);
+    });
+    await pasteData(editor, { "text/plain": "NEW" });
+
+    await expect
+      .poll(() =>
+        page.evaluate(() => localStorage.getItem("text-editor-document")),
+      )
+      .toContain("beforeSECRETNEWafter");
+    await page.reload();
+    await expect(editor).toContainText("beforeSECRETNEWafter");
+    await expect(editor.locator("img")).toHaveCount(0);
+  });
+
   test("failed image reads restore the selection in storage", async ({
     page,
   }) => {

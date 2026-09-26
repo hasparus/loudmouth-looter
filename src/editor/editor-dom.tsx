@@ -272,17 +272,21 @@ export function updateSnapshotImage(
   return { ...snapshot, html: template.innerHTML };
 }
 
-export function serializeDocument(root: HTMLElement): string {
-  const pending = root.querySelector("[data-pending-image]");
-  if (!pending) return root.innerHTML.replaceAll("\u200B", "");
-  const copy = root.cloneNode(true) as HTMLElement;
-  for (const image of copy.querySelectorAll<HTMLElement>(
-    "[data-pending-image]",
-  )) {
+function restorePendingImageFallbacks(parent: ParentNode) {
+  let image = parent.querySelector<HTMLElement>("[data-pending-image]");
+  while (image) {
     const fallback = document.createElement("template");
     fallback.innerHTML = image.dataset.pendingFallback ?? "";
     image.replaceWith(fallback.content);
+    image = parent.querySelector<HTMLElement>("[data-pending-image]");
   }
+}
+
+export function serializeDocument(root: HTMLElement): string {
+  if (!root.querySelector("[data-pending-image]"))
+    return root.innerHTML.replaceAll("\u200B", "");
+  const copy = root.cloneNode(true) as HTMLElement;
+  restorePendingImageFallbacks(copy);
   return copy.innerHTML.replaceAll("\u200B", "");
 }
 
@@ -720,6 +724,7 @@ function insertImageFile(
   if (!range || !/^image\/(png|jpeg|gif|webp|avif)$/.test(file.type)) return;
 
   const previous = range.cloneContents();
+  restorePendingImageFallbacks(previous);
   const container = document.createElement("div");
   container.append(previous.cloneNode(true));
   const previousHtml = container.innerHTML;
