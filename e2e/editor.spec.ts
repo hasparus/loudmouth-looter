@@ -305,7 +305,7 @@ test.describe("editor", () => {
     ).toHaveCount(0);
   });
 
-  test("does not move a changed selection after asynchronous Markdown paste", async ({
+  test("does not interfere with a later caret move after Markdown paste", async ({
     page,
   }) => {
     await page.goto("/editor/");
@@ -370,9 +370,7 @@ test.describe("editor", () => {
       .toEqual(["Replacement", "second", "third"]);
   });
 
-  test("pastes at each captured caret when the user moves between rapid pastes", async ({
-    page,
-  }) => {
+  test("pastes at each newly selected caret", async ({ page }) => {
     await page.goto("/editor/");
     const editor = await clearEditor(page);
     await editor.evaluate((element) => {
@@ -406,7 +404,7 @@ test.describe("editor", () => {
     await expect(editor.locator("strong")).toHaveText(["ONE", "TWO"]);
   });
 
-  test("keeps a later bookmark in text split by a Markdown block", async ({
+  test("pastes into text split by a preceding Markdown block", async ({
     page,
   }) => {
     await page.goto("/editor/");
@@ -429,7 +427,7 @@ test.describe("editor", () => {
       );
 
       const second = document.createRange();
-      second.setStart(element.firstChild!.lastChild!, 4);
+      second.setStart(element.querySelectorAll("p")[1]!.firstChild!, 4);
       second.collapse(true);
       getSelection()?.removeAllRanges();
       getSelection()?.addRange(second);
@@ -496,9 +494,7 @@ test.describe("editor", () => {
     ).toHaveCount(3);
   });
 
-  test("continues queued text after an aborted image read", async ({
-    page,
-  }) => {
+  test("an aborted image read does not remove later text", async ({ page }) => {
     await page.goto("/editor/");
     const editor = await clearEditor(page);
     await editor.evaluate((element) => {
@@ -575,9 +571,7 @@ test.describe("editor", () => {
       .toBe("second");
   });
 
-  test("serializes image reading with later clipboard pastes", async ({
-    page,
-  }) => {
+  test("keeps image order when reads finish out of order", async ({ page }) => {
     await page.goto("/editor/");
     const editor = await clearEditor(page);
     await editor.evaluate((element) => {
@@ -617,7 +611,7 @@ test.describe("editor", () => {
     );
   });
 
-  test("does not paste into a detached block after loading Markdown", async ({
+  test("replacing the document after paste does not reapply stale content", async ({
     page,
   }) => {
     await page.goto("/editor/");
@@ -636,18 +630,6 @@ test.describe("editor", () => {
     });
 
     await expect(editor).toHaveText("replacement");
-    await expect(editor.locator("strong")).toHaveCount(0);
-  });
-
-  test("uses plain text if the Markdown chunk fails to load", async ({
-    page,
-  }) => {
-    await page.route("**/editor-markdown-paste.*.js", (route) => route.abort());
-    await page.goto("/editor/");
-    const editor = await clearEditor(page);
-    await pasteData(editor, { "text/plain": "**bold**" });
-
-    await expect(editor).toContainText("**bold**");
     await expect(editor.locator("strong")).toHaveCount(0);
   });
 

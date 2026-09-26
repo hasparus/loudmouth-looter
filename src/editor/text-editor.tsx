@@ -23,7 +23,6 @@ import {
   migrateStorage,
   normalizeEmptyBlocks,
   normalizeTrackTabindexes,
-  readEditorClipboard,
   readSlashState,
   restoreSelection,
   save,
@@ -65,7 +64,6 @@ function handleMouseDown(event: MouseEvent) {
 export function TextEditor() {
   let editorEl: HTMLDivElement | undefined;
   let pendingUndo: UndoSnapshot | null = null;
-  let pasteQueue: Promise<void> = Promise.resolve();
   const [spellcheck, setSpellcheck] = createSignal(
     localStorage.getItem(SPELLCHECK_KEY) !== "false",
   );
@@ -288,21 +286,11 @@ export function TextEditor() {
     event.preventDefault();
     pendingUndo = null;
     if (!event.clipboardData) return;
-    const clipboard = readEditorClipboard(editor, event.clipboardData);
-    if (!clipboard) return;
-    pasteQueue = pasteQueue
-      .then(async () => {
-        const inserted = await handleEditorPaste(editor, clipboard);
-        if (inserted) {
-          flushSave(editor);
-          syncDocumentTitle(editor);
-          file.queue(serializeDocument(editor));
-        }
-      })
-      .catch((error: unknown) => {
-        // eslint-disable-next-line no-console -- Surface unexpected paste failures.
-        console.error("Unable to paste into the editor", error);
-      });
+    handleEditorPaste(editor, event.clipboardData, () => {
+      flushSave(editor);
+      syncDocumentTitle(editor);
+      file.queue(serializeDocument(editor));
+    });
   }
 
   function handleSlashKey(event: KeyboardEvent): boolean {

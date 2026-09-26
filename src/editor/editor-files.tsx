@@ -1,3 +1,5 @@
+import { htmlToMdx, mdxToHtml } from "./editor-mdx";
+
 const ACCEPT: FilePickerAcceptType[] = [
   { accept: { "text/markdown": [".mdx", ".md"] }, description: "MDX document" },
 ];
@@ -43,10 +45,7 @@ export async function pickFileToCreate(
 export async function readDocument(
   handle: FileSystemFileHandle,
 ): Promise<string> {
-  const [{ mdxToHtml }, file] = await Promise.all([
-    import("./editor-mdx"),
-    handle.getFile(),
-  ]);
+  const file = await handle.getFile();
   return mdxToHtml(await file.text());
 }
 
@@ -54,10 +53,7 @@ export async function writeDocument(
   handle: FileSystemFileHandle,
   html: string,
 ): Promise<void> {
-  const [{ htmlToMdx }, writable] = await Promise.all([
-    import("./editor-mdx"),
-    handle.createWritable(),
-  ]);
+  const writable = await handle.createWritable();
   let closed = false;
   try {
     await writable.write(htmlToMdx(html));

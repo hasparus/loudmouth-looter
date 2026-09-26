@@ -13,6 +13,10 @@ import {
   sanitizeUrl,
   unescapeHtml,
 } from "./editor-sanitize";
+import {
+  htmlIsThinTextWrapper,
+  markdownPasteHtml,
+} from "./editor-markdown-paste";
 
 export const STORAGE_KEY = "text-editor-document";
 const STORAGE_LEGACY_KEYS: string[] = [];
@@ -253,9 +257,12 @@ export function captureSnapshot(root: HTMLElement): UndoSnapshot {
 }
 
 export function serializeDocument(root: HTMLElement): string {
-  return root.innerHTML
-    .replaceAll("<!--editor-paste-->", "")
-    .replaceAll("\u200B", "");
+  const pending = root.querySelector("[data-pending-image]");
+  if (!pending) return root.innerHTML.replaceAll("\u200B", "");
+  const copy = root.cloneNode(true) as HTMLElement;
+  for (const image of copy.querySelectorAll("[data-pending-image]"))
+    image.remove();
+  return copy.innerHTML.replaceAll("\u200B", "");
 }
 
 const EDITOR_FALLBACK_TITLE = "editor";
@@ -673,155 +680,91 @@ function editorRange(editor: HTMLElement): Range | null {
   return selection.getRangeAt(0);
 }
 
-function isSelectedEditorRange(editor: HTMLElement, range: Range): boolean {
-  const selected = editorRange(editor);
-  return (
-    !!selected &&
-    selected.startContainer === range.startContainer &&
-    selected.startOffset === range.startOffset &&
-    selected.endContainer === range.endContainer &&
-    selected.endOffset === range.endOffset
-  );
-}
-
-function selectPasteCaret(range: Range, shouldSelect: boolean) {
-  if (!shouldSelect) return;
+function selectPasteCaret(range: Range) {
   const selection = globalThis.getSelection();
   selection?.removeAllRanges();
   selection?.addRange(range);
 }
 
-async function insertImageFile(
+function insertImageFile(
   editor: HTMLElement,
   file: File,
-  bookmark: PasteBookmark,
+  onCommit: () => void,
 ) {
-  const src = await new Promise<string | null>((resolve) => {
-    const reader = new FileReader();
-    reader.addEventListener("load", () =>
-      resolve(typeof reader.result === "string" ? reader.result : null),
-    );
-    reader.addEventListener("error", () => resolve(null));
-    reader.addEventListener("abort", () => resolve(null));
-    reader.readAsDataURL(file);
-  });
-  const range = rangeFromBookmark(editor, bookmark);
-  if (!src || !range) return null;
-  const safeSrc = sanitizeImageSrc(src);
-  if (!safeSrc) return null;
-  const img = document.createElement("img");
-  img.setAttribute("src", safeSrc);
+  const range = editorRange(editor)?.cloneRange();
+  if (!range || !/^image\/(png|jpeg|gif|webp|avif)$/.test(file.type)) return;
 
-  const shouldSelect = isSelectedEditorRange(editor, range);
+  const previous = range.cloneContents();
+  const preview = URL.createObjectURL(file);
+  const img = document.createElement("img");
+  img.src = preview;
+  img.dataset.pendingImage = "";
   range.deleteContents();
   range.insertNode(img);
   range.setStartAfter(img);
   range.collapse(true);
+  selectPasteCaret(range);
 
-  selectPasteCaret(range, shouldSelect);
-  return range.cloneRange();
+  const reader = new FileReader();
+  const fail = () => {
+    URL.revokeObjectURL(preview);
+    if (img.isConnected) img.replaceWith(previous);
+  };
+  reader.addEventListener("load", () => {
+    const src =
+      typeof reader.result === "string" ? sanitizeImageSrc(reader.result) : "";
+    if (!src) {
+      fail();
+      return;
+    }
+    URL.revokeObjectURL(preview);
+    if (!img.isConnected) return;
+    img.src = src;
+    delete img.dataset.pendingImage;
+    onCommit();
+  });
+  reader.addEventListener("error", fail);
+  reader.addEventListener("abort", fail);
+  try {
+    reader.readAsDataURL(file);
+  } catch {
+    fail();
+  }
 }
 
-type PasteBookmark = { start: Comment; end: Comment | null };
-
-function rangeFromBookmark(
-  editor: HTMLElement,
-  bookmark: PasteBookmark,
-): Range | null {
-  if (
-    !editor.isConnected ||
-    !editor.contains(bookmark.start) ||
-    (bookmark.end && !editor.contains(bookmark.end))
-  )
-    return null;
-  const range = document.createRange();
-  range.setStartAfter(bookmark.start);
-  if (bookmark.end) range.setEndBefore(bookmark.end);
-  else range.collapse(true);
-  return range;
-}
-
-export function readEditorClipboard(
+export function handleEditorPaste(
   editor: HTMLElement,
   clipboard: DataTransfer,
+  onCommit: () => void,
 ) {
+  const imageFile = [...clipboard.files].find((file) =>
+    file.type.startsWith("image/"),
+  );
+  if (imageFile) {
+    insertImageFile(editor, imageFile, onCommit);
+    return;
+  }
+
   const range = editorRange(editor)?.cloneRange();
-  if (!range) return null;
-  const bookmark: PasteBookmark = {
-    start: document.createComment("editor-paste"),
-    end: range.collapsed ? null : document.createComment("editor-paste"),
-  };
-  if (bookmark.end) {
-    const atEnd = range.cloneRange();
-    atEnd.collapse(false);
-    atEnd.insertNode(bookmark.end);
-  }
-  range.collapse(true);
-  range.insertNode(bookmark.start);
-  const selected = rangeFromBookmark(editor, bookmark);
-  if (selected) selectPasteCaret(selected, true);
-  return {
-    bookmark,
-    imageFile: [...clipboard.files].find((file) =>
-      file.type.startsWith("image/"),
-    ),
-    html: clipboard.getData("text/html"),
-    text: clipboard.getData("text/plain"),
-    markdown: clipboard.getData("text/markdown"),
-  };
-}
-
-type EditorClipboard = NonNullable<ReturnType<typeof readEditorClipboard>>;
-
-export async function handleEditorPaste(
-  editor: HTMLElement,
-  clipboard: EditorClipboard,
-) {
-  try {
-    return await applyEditorPaste(editor, clipboard);
-  } finally {
-    clipboard.bookmark.start.remove();
-    clipboard.bookmark.end?.remove();
-  }
-}
-
-async function applyEditorPaste(
-  editor: HTMLElement,
-  clipboard: EditorClipboard,
-) {
-  const { bookmark, html, text } = clipboard;
-  if (clipboard.imageFile)
-    return insertImageFile(editor, clipboard.imageFile, bookmark);
-
-  const explicitMarkdown = clipboard.markdown;
+  if (!range) return;
+  const currentBlock = getCurrentBlock(editor, range.startContainer);
+  const html = clipboard.getData("text/html");
+  const text = clipboard.getData("text/plain");
+  const explicitMarkdown = clipboard.getData("text/markdown");
   let cleanHtml = html
     ? sanitizeHtml(html)
     : plainTextToHtml(text || explicitMarkdown);
   let inlineMarkdown = false;
 
-  if (text || explicitMarkdown.trim()) {
-    try {
-      const { htmlIsThinTextWrapper, markdownPasteHtml } =
-        await import("./editor-markdown-paste");
-      const markdown = explicitMarkdown.trim() ? explicitMarkdown : text;
-      if (htmlIsThinTextWrapper(html, markdown)) {
-        const parsed = markdownPasteHtml(markdown, !!explicitMarkdown.trim());
-        if (parsed) {
-          cleanHtml = sanitizeHtml(parsed.html);
-          inlineMarkdown = parsed.inline;
-        }
-      }
-    } catch {
-      cleanHtml = html
-        ? sanitizeHtml(html)
-        : plainTextToHtml(text || explicitMarkdown);
+  const markdown = explicitMarkdown.trim() ? explicitMarkdown : text;
+  if (markdown && htmlIsThinTextWrapper(html, markdown)) {
+    const parsed = markdownPasteHtml(markdown, !!explicitMarkdown.trim());
+    if (parsed) {
+      cleanHtml = sanitizeHtml(parsed.html);
+      inlineMarkdown = parsed.inline;
     }
   }
 
-  const range = rangeFromBookmark(editor, bookmark);
-  if (!range) return null;
-  const currentBlock = getCurrentBlock(editor, range.startContainer);
-  const shouldSelect = isSelectedEditorRange(editor, range);
   range.deleteContents();
 
   const template = document.createElement("template");
@@ -841,28 +784,17 @@ async function applyEditorPaste(
     (n) => n instanceof Element && BLOCK_TAGS.has(n.tagName),
   );
 
-  if (!hasBlockChild) {
+  if (!hasBlockChild || !currentBlock) {
     const lastNode = content.lastChild;
     range.insertNode(content);
     if (lastNode) {
       range.setStartAfter(lastNode);
       range.collapse(true);
     }
-    selectPasteCaret(range, shouldSelect);
+    selectPasteCaret(range);
     normalizeEmptyBlocks(editor);
-    return range.cloneRange();
-  }
-
-  if (!currentBlock) {
-    const lastNode = content.lastChild;
-    range.insertNode(content);
-    if (lastNode) {
-      range.setStartAfter(lastNode);
-      range.collapse(true);
-    }
-    selectPasteCaret(range, shouldSelect);
-    normalizeEmptyBlocks(editor);
-    return range.cloneRange();
+    onCommit();
+    return;
   }
 
   const list = currentBlock.closest("ul, ol");
@@ -901,7 +833,7 @@ async function applyEditorPaste(
     range.selectNodeContents(previous);
     range.collapse(false);
   }
-  selectPasteCaret(range, shouldSelect);
+  selectPasteCaret(range);
   normalizeEmptyBlocks(editor);
-  return range.cloneRange();
+  onCommit();
 }
