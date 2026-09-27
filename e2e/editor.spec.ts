@@ -2,6 +2,24 @@ import { expect, test } from "@playwright/test";
 
 const EDITOR = { name: "Editor" } as const;
 
+async function pasteData(
+  editor: import("@playwright/test").Locator,
+  formats: Record<string, string>,
+) {
+  await editor.evaluate((element, payload) => {
+    const data = new DataTransfer();
+    for (const [format, value] of Object.entries(payload))
+      data.setData(format, value);
+    element.dispatchEvent(
+      new ClipboardEvent("paste", {
+        clipboardData: data,
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+  }, formats);
+}
+
 async function clearEditor(page: import("@playwright/test").Page) {
   const editor = page.getByRole("textbox", EDITOR);
   await editor.click();
@@ -162,5 +180,709 @@ test.describe("editor", () => {
     for (const word of words) {
       await expect(editor).toContainText(word);
     }
+  });
+
+  test("detects and formats Markdown from thin clipboard wrappers", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    const markdown =
+      "## Pasted notes\n\nA **bold** intro.\n\n- first\n- second";
+
+    await editor.evaluate((el, source) => {
+      const data = new DataTransfer();
+      data.setData("text/plain", source);
+      data.setData(
+        "text/html",
+        "<div>## Pasted notes\n\nA **bold** intro.\n\n- first\n- second</div>",
+      );
+      el.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    }, markdown);
+
+    await expect(
+      editor.getByRole("heading", { name: "Pasted notes" }),
+    ).toBeVisible();
+    await expect(editor.locator("strong")).toHaveText("bold");
+    await expect(editor.locator("ul > li")).toHaveCount(2);
+  });
+
+  test("honors an explicit text/markdown clipboard payload", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+
+    await editor.evaluate((el) => {
+      const data = new DataTransfer();
+      data.setData("text/plain", "fallback text");
+      data.setData("text/markdown", "# Explicit Markdown");
+      el.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+
+    await expect(
+      editor.getByRole("heading", { name: "Explicit Markdown" }),
+    ).toBeVisible();
+    await expect(editor).not.toContainText("fallback text");
+  });
+
+  test("pastes inline Markdown at the caret without splitting the paragraph", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>beforeafter</p>";
+      const text = element.firstChild!.firstChild!;
+      const range = document.createRange();
+      range.setStart(text, 6);
+      range.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+    });
+
+    await pasteData(editor, { "text/plain": "**bold**" });
+    await expect(editor.locator("p")).toHaveCount(1);
+    await expect(editor.locator("p")).toHaveText("beforeboldafter");
+    await expect(editor.locator("strong")).toHaveText("bold");
+    await page.reload();
+    await expect(editor.locator("strong")).toHaveText("bold");
+  });
+
+  test("leaves mixed unsupported Markdown intact", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    const source = "## Good\n\n### Important\n\n| A | B |\n| - | - |";
+
+    await pasteData(editor, { "text/plain": source });
+    await expect(editor).toContainText("### Important");
+    await expect(editor).toContainText("| A | B |");
+    await expect(editor.getByRole("heading", { name: "Good" })).toHaveCount(0);
+  });
+
+  test("rejects lossy explicit Markdown and keeps the plain-text fallback", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, {
+      "text/markdown": "# Heading\n\n| A | B |\n| - | - |",
+      "text/plain": "Intact fallback",
+    });
+
+    await expect(editor).toContainText("Intact fallback");
+    await expect(editor.getByRole("heading", { name: "Heading" })).toHaveCount(
+      0,
+    );
+  });
+
+  test("keeps an unsafe Markdown link literal", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, {
+      "text/plain": "[click](<java\tscript:alert(1)>)",
+    });
+
+    await expect(editor).toContainText("click");
+    await expect(editor.getByRole("link", { name: "click" })).toHaveCount(0);
+  });
+
+  test("prefers semantic HTML over competing explicit Markdown", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, {
+      "text/markdown": "# Incomplete",
+      "text/plain": "Complete rich copy",
+      "text/html": "<p><strong>Complete rich copy</strong></p>",
+    });
+
+    await expect(editor.locator("strong")).toHaveText("Complete rich copy");
+    await expect(
+      editor.getByRole("heading", { name: "Incomplete" }),
+    ).toHaveCount(0);
+  });
+
+  test("does not interfere with a later caret move after Markdown paste", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>first</p><p>second</p>";
+      const [first, second] = element.querySelectorAll("p");
+      const range = document.createRange();
+      range.setStart(first!.firstChild!, 2);
+      range.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      const data = new DataTransfer();
+      data.setData("text/plain", "**BOLD**");
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      range.setStart(second!.firstChild!, 3);
+      range.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+    });
+
+    await expect(editor.locator("strong")).toHaveText("BOLD");
+    await expect
+      .poll(() =>
+        editor.evaluate(
+          () => getSelection()?.anchorNode?.parentElement?.textContent,
+        ),
+      )
+      .toBe("second");
+  });
+
+  test("replaces a root-level block selection at its original position", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>first</p><p>second</p><p>third</p>";
+      const range = document.createRange();
+      range.setStart(element, 0);
+      range.setEnd(element, 1);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+    });
+    await pasteData(editor, { "text/plain": "# Replacement" });
+
+    await expect(
+      editor.getByRole("heading", { name: "Replacement" }),
+    ).toBeVisible();
+    await expect
+      .poll(() =>
+        editor.evaluate((element) =>
+          [...element.children].map((child) => child.textContent),
+        ),
+      )
+      .toEqual(["Replacement", "second", "third"]);
+  });
+
+  test("pastes at each newly selected caret", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>abcdef</p>";
+      for (const [offset, word] of [
+        [1, "ONE"],
+        [4, "TWO"],
+      ] as const) {
+        const text =
+          word === "ONE"
+            ? element.firstChild!.firstChild!
+            : element.firstChild!.lastChild!;
+        const range = document.createRange();
+        range.setStart(text, offset);
+        range.collapse(true);
+        getSelection()?.removeAllRanges();
+        getSelection()?.addRange(range);
+        const data = new DataTransfer();
+        data.setData("text/plain", `**${word}**`);
+        element.dispatchEvent(
+          new ClipboardEvent("paste", {
+            clipboardData: data,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      }
+    });
+
+    await expect(editor.locator("p")).toHaveText("aONEbcdeTWOf");
+    await expect(editor.locator("strong")).toHaveText(["ONE", "TWO"]);
+  });
+
+  test("pastes into text split by a preceding Markdown block", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>abcdef</p>";
+      const first = document.createRange();
+      first.setStart(element.firstChild!.firstChild!, 1);
+      first.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(first);
+      const heading = new DataTransfer();
+      heading.setData("text/plain", "# HEAD");
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: heading,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+
+      const second = document.createRange();
+      second.setStart(element.querySelectorAll("p")[1]!.firstChild!, 4);
+      second.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(second);
+      const emphasis = new DataTransfer();
+      emphasis.setData("text/plain", "**TWO**");
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: emphasis,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+
+    await expect(editor.getByRole("heading", { name: "HEAD" })).toBeVisible();
+    await expect(editor.locator("strong")).toHaveText("TWO");
+    await expect(editor.locator("p").last()).toHaveText("bcdeTWOf");
+  });
+
+  test("keeps both rapid clipboard pastes in order", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      for (const word of ["ONE", "TWO"]) {
+        const data = new DataTransfer();
+        data.setData("text/plain", `**${word}**`);
+        element.dispatchEvent(
+          new ClipboardEvent("paste", {
+            clipboardData: data,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      }
+    });
+
+    await expect(editor.locator("strong")).toHaveCount(2);
+    await expect(editor.locator("strong")).toHaveText(["ONE", "TWO"]);
+  });
+
+  test("does not trim a Markdown-only clipboard payload", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, { "text/markdown": "  **bold**\n\n" });
+
+    await expect(editor.locator("strong")).toHaveCount(0);
+    await expect(editor).toContainText("**bold**");
+    await expect
+      .poll(() => editor.evaluate((element) => element.innerHTML))
+      .toContain("  **bold**<br><br>");
+  });
+
+  test("preserves trailing blank lines when Markdown looks inline", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, { "text/plain": "**bold**\n\n" });
+
+    await expect(editor).toContainText("**bold**");
+    await expect(editor.locator("strong")).toHaveCount(0);
+    await expect(
+      editor.locator("p").filter({ hasText: "**bold**" }).locator("br"),
+    ).toHaveCount(3);
+  });
+
+  for (const undoBeforeRead of [true, false]) {
+    test(`undo preserves an image ${undoBeforeRead ? "before" : "after"} its file loads`, async ({
+      page,
+    }) => {
+      await page.goto("/editor/");
+      const editor = await clearEditor(page);
+      await editor.evaluate((element) => {
+        element.innerHTML = "<p># Hi</p>";
+        const range = document.createRange();
+        range.selectNodeContents(element.firstChild!);
+        range.collapse(false);
+        getSelection()?.removeAllRanges();
+        getSelection()?.addRange(range);
+        const NativeReader = window.FileReader;
+        window.FileReader = class extends NativeReader {
+          override readAsDataURL(blob: Blob) {
+            (
+              window as Window & { completeImageRead?: () => void }
+            ).completeImageRead = () => super.readAsDataURL(blob);
+          }
+        };
+        const data = new DataTransfer();
+        data.items.add(
+          new File([new Uint8Array([1])], "1.png", { type: "image/png" }),
+        );
+        element.dispatchEvent(
+          new ClipboardEvent("paste", {
+            clipboardData: data,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      });
+
+      await editor.press("Enter");
+      await expect(editor.getByRole("heading", { name: "Hi" })).toBeVisible();
+      if (undoBeforeRead) await editor.press("ControlOrMeta+z");
+      await editor.evaluate(() =>
+        (
+          window as Window & { completeImageRead?: () => void }
+        ).completeImageRead?.(),
+      );
+      await expect(editor.locator("img")).toHaveAttribute(
+        "src",
+        "data:image/png;base64,AQ==",
+      );
+      if (!undoBeforeRead) await editor.press("ControlOrMeta+z");
+      await expect(editor.locator("img")).toHaveAttribute(
+        "src",
+        "data:image/png;base64,AQ==",
+      );
+      await page.reload();
+      await expect(editor.locator("img")).toHaveCount(1);
+    });
+  }
+
+  test("saving while an image loads keeps the replaced draft text", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>beforeSECRETafter</p>";
+      const range = document.createRange();
+      range.setStart(element.firstChild!.firstChild!, 6);
+      range.setEnd(element.firstChild!.firstChild!, 12);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      const NativeReader = window.FileReader;
+      window.FileReader = class extends NativeReader {
+        override readAsDataURL(blob: Blob) {
+          (window as Window & { stalledImage?: Blob }).stalledImage = blob;
+        }
+      };
+      const data = new DataTransfer();
+      data.items.add(
+        new File([new Uint8Array([1])], "1.png", { type: "image/png" }),
+      );
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+    await pasteData(editor, { "text/plain": "NEW" });
+
+    await expect
+      .poll(() =>
+        page.evaluate(() => localStorage.getItem("text-editor-document")),
+      )
+      .toContain("beforeSECRETNEWafter");
+    await page.reload();
+    await expect(editor).toContainText("beforeSECRETNEWafter");
+  });
+
+  test("replacing a pending image retains the original draft fallback", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>beforeSECRETafter</p>";
+      const range = document.createRange();
+      range.setStart(element.firstChild!.firstChild!, 6);
+      range.setEnd(element.firstChild!.firstChild!, 12);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      const NativeReader = window.FileReader;
+      window.FileReader = class extends NativeReader {
+        override readAsDataURL(blob: Blob) {
+          (window as Window & { stalledImage?: Blob }).stalledImage = blob;
+        }
+      };
+      const pasteImage = (byte: number) => {
+        const data = new DataTransfer();
+        data.items.add(
+          new File([new Uint8Array([byte])], `${byte}.png`, {
+            type: "image/png",
+          }),
+        );
+        element.dispatchEvent(
+          new ClipboardEvent("paste", {
+            clipboardData: data,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      };
+      pasteImage(1);
+      const firstImage = element.querySelector("img")!;
+      range.selectNode(firstImage);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      pasteImage(2);
+    });
+    await pasteData(editor, { "text/plain": "NEW" });
+
+    await expect
+      .poll(() =>
+        page.evaluate(() => localStorage.getItem("text-editor-document")),
+      )
+      .toContain("beforeSECRETNEWafter");
+    await page.reload();
+    await expect(editor).toContainText("beforeSECRETNEWafter");
+    await expect(editor.locator("img")).toHaveCount(0);
+  });
+
+  test("failed image reads restore the selection in storage", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>beforeSECRETafter</p>";
+      const range = document.createRange();
+      range.setStart(element.firstChild!.firstChild!, 6);
+      range.setEnd(element.firstChild!.firstChild!, 12);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      const NativeReader = window.FileReader;
+      window.FileReader = class extends NativeReader {
+        override readAsDataURL(_blob: Blob) {
+          (window as Window & { failImageRead?: () => void }).failImageRead =
+            () => this.dispatchEvent(new ProgressEvent("abort"));
+        }
+      };
+      const data = new DataTransfer();
+      data.items.add(
+        new File([new Uint8Array([1])], "1.png", { type: "image/png" }),
+      );
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+    await pasteData(editor, { "text/plain": "NEW" });
+    await editor.evaluate(() =>
+      (window as Window & { failImageRead?: () => void }).failImageRead?.(),
+    );
+
+    await expect(editor).toContainText("beforeSECRETNEWafter");
+    await page.reload();
+    await expect(editor).toContainText("beforeSECRETNEWafter");
+  });
+
+  test("an aborted image read does not remove later text", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>abc</p>";
+      const NativeReader = window.FileReader;
+      window.FileReader = class extends NativeReader {
+        override readAsDataURL(_blob: Blob) {
+          queueMicrotask(() => this.dispatchEvent(new ProgressEvent("abort")));
+        }
+      };
+      const image = new DataTransfer();
+      image.items.add(
+        new File([new Uint8Array([1])], "1.png", { type: "image/png" }),
+      );
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: image,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      const text = new DataTransfer();
+      text.setData("text/plain", "**BOLD**");
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: text,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+
+    await expect(editor.locator("strong")).toHaveText("BOLD");
+    await expect(editor.locator("img")).toHaveCount(0);
+  });
+
+  test("does not move a changed selection after asynchronous image paste", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      element.innerHTML = "<p>first</p><p>second</p>";
+      const [first, second] = element.querySelectorAll("p");
+      const range = document.createRange();
+      range.setStart(first!.firstChild!, 2);
+      range.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      const data = new DataTransfer();
+      data.items.add(
+        new File([new Uint8Array([1])], "1.png", { type: "image/png" }),
+      );
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      range.setStart(second!.firstChild!, 3);
+      range.collapse(true);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+    });
+
+    await expect(editor.locator("img")).toHaveCount(1);
+    await expect
+      .poll(() =>
+        editor.evaluate(
+          () => getSelection()?.anchorNode?.parentElement?.textContent,
+        ),
+      )
+      .toBe("second");
+  });
+
+  test("keeps image order when reads finish out of order", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      const NativeReader = window.FileReader;
+      let reads = 0;
+      window.FileReader = class extends NativeReader {
+        override readAsDataURL(blob: Blob) {
+          const delay = ++reads === 1 ? 40 : 0;
+          setTimeout(() => super.readAsDataURL(blob), delay);
+        }
+      };
+      for (const byte of [1, 2]) {
+        const data = new DataTransfer();
+        data.items.add(
+          new File([new Uint8Array([byte])], `${byte}.png`, {
+            type: "image/png",
+          }),
+        );
+        element.dispatchEvent(
+          new ClipboardEvent("paste", {
+            clipboardData: data,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      }
+    });
+
+    await expect(editor.locator("img")).toHaveCount(2);
+    await expect(editor.locator("img").first()).toHaveAttribute(
+      "src",
+      "data:image/png;base64,AQ==",
+    );
+    await expect(editor.locator("img").last()).toHaveAttribute(
+      "src",
+      "data:image/png;base64,Ag==",
+    );
+  });
+
+  test("replacing the document after paste does not reapply stale content", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await editor.evaluate((element) => {
+      const data = new DataTransfer();
+      data.setData("text/plain", "**bold**");
+      element.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      element.innerHTML = "<p>replacement</p>";
+    });
+
+    await expect(editor).toHaveText("replacement");
+    await expect(editor.locator("strong")).toHaveCount(0);
+  });
+
+  test("retains rich HTML's interior blank block", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, {
+      "text/plain": "**bold**\n\nTRAIL",
+      "text/html": "<p>**bold**</p><p><br></p><p>TRAIL</p>",
+    });
+
+    await expect(editor.locator("strong")).toHaveCount(0);
+    await expect(
+      editor.locator('p:has-text("**bold**") + p:has(> br)'),
+    ).toHaveCount(1);
+  });
+
+  test("retains rich HTML's trailing blank block", async ({ page }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+    await pasteData(editor, {
+      "text/plain": "**bold**\n",
+      "text/html": "<p>**bold**</p><p><br></p>",
+    });
+
+    await expect(editor).toContainText("**bold**");
+    await expect(editor.locator("strong")).toHaveCount(0);
+    await expect(
+      editor.locator('p:has-text("**bold**") + p:has(> br)'),
+    ).toHaveCount(1);
+  });
+
+  test("preserves semantic rich HTML that resembles Markdown", async ({
+    page,
+  }) => {
+    await page.goto("/editor/");
+    const editor = await clearEditor(page);
+
+    await editor.evaluate((el) => {
+      const data = new DataTransfer();
+      data.setData("text/plain", "**literal markers**");
+      data.setData("text/html", "<p><i>**literal markers**</i></p>");
+      el.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+
+    await expect(editor.locator("i")).toHaveText("**literal markers**");
+    await expect(editor.locator("strong")).toHaveCount(0);
   });
 });

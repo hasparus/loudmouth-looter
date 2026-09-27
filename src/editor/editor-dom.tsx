@@ -13,6 +13,10 @@ import {
   sanitizeUrl,
   unescapeHtml,
 } from "./editor-sanitize";
+import {
+  htmlIsThinTextWrapper,
+  markdownPasteHtml,
+} from "./editor-markdown-paste";
 
 export const STORAGE_KEY = "text-editor-document";
 const STORAGE_LEGACY_KEYS: string[] = [];
@@ -71,12 +75,13 @@ function normalizeEditableText(text: string) {
   return text.replaceAll("\u200B", "").replaceAll("\u00A0", " ");
 }
 
-export function getCurrentBlock(root: HTMLElement) {
-  const selection = globalThis.getSelection();
-  if (!selection || selection.rangeCount === 0) return null;
-  if (!root.contains(selection.anchorNode)) return null;
+export function getCurrentBlock(
+  root: HTMLElement,
+  anchor: Node | null = globalThis.getSelection()?.anchorNode ?? null,
+) {
+  if (!anchor || !root.contains(anchor)) return null;
 
-  let node: Node | null = selection.anchorNode;
+  let node: Node | null = anchor;
   while (node && node !== root) {
     if (
       node instanceof HTMLElement &&
@@ -251,8 +256,38 @@ export function captureSnapshot(root: HTMLElement): UndoSnapshot {
   return { html: root.innerHTML, selection: captureSelection(root) };
 }
 
+export function updateSnapshotImage(
+  snapshot: UndoSnapshot,
+  image: { id: string; html: string },
+): UndoSnapshot {
+  const template = document.createElement("template");
+  template.innerHTML = snapshot.html;
+  const pending = template.content.querySelector(
+    `[data-pending-image="${image.id}"]`,
+  );
+  if (!pending) return snapshot;
+  const replacement = document.createElement("template");
+  replacement.innerHTML = image.html;
+  pending.replaceWith(replacement.content);
+  return { ...snapshot, html: template.innerHTML };
+}
+
+function restorePendingImageFallbacks(parent: ParentNode) {
+  let image = parent.querySelector<HTMLElement>("[data-pending-image]");
+  while (image) {
+    const fallback = document.createElement("template");
+    fallback.innerHTML = image.dataset.pendingFallback ?? "";
+    image.replaceWith(fallback.content);
+    image = parent.querySelector<HTMLElement>("[data-pending-image]");
+  }
+}
+
 export function serializeDocument(root: HTMLElement): string {
-  return root.innerHTML.replaceAll("\u200B", "");
+  if (!root.querySelector("[data-pending-image]"))
+    return root.innerHTML.replaceAll("\u200B", "");
+  const copy = root.cloneNode(true) as HTMLElement;
+  restorePendingImageFallbacks(copy);
+  return copy.innerHTML.replaceAll("\u200B", "");
 }
 
 const EDITOR_FALLBACK_TITLE = "editor";
@@ -670,79 +705,141 @@ function editorRange(editor: HTMLElement): Range | null {
   return selection.getRangeAt(0);
 }
 
-function insertImageFile(editor: HTMLElement, file: File) {
-  const range = editorRange(editor)?.cloneRange();
-  if (!range) return;
+function selectPasteCaret(range: Range) {
+  const selection = globalThis.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+}
 
+type ImageSettlement = { id: string; html: string };
+type PasteCommit = (image?: ImageSettlement) => void;
+let nextPendingImageId = 0;
+
+function insertImageFile(
+  editor: HTMLElement,
+  file: File,
+  onCommit: PasteCommit,
+) {
+  const range = editorRange(editor)?.cloneRange();
+  if (!range || !/^image\/(png|jpeg|gif|webp|avif)$/.test(file.type)) return;
+
+  const previous = range.cloneContents();
+  restorePendingImageFallbacks(previous);
+  const container = document.createElement("div");
+  container.append(previous.cloneNode(true));
+  const previousHtml = container.innerHTML;
+  const preview = URL.createObjectURL(file);
+  const id = String(++nextPendingImageId);
+  const img = document.createElement("img");
+  img.src = preview;
+  img.dataset.pendingImage = id;
+  img.dataset.pendingFallback = previousHtml;
+  range.deleteContents();
+  range.insertNode(img);
+  range.setStartAfter(img);
+  range.collapse(true);
+  selectPasteCaret(range);
+
+  const currentImage = () =>
+    editor.isConnected
+      ? editor.querySelector<HTMLImageElement>(
+          `img[data-pending-image="${id}"]`,
+        )
+      : null;
+  const fail = () => {
+    const target = currentImage();
+    URL.revokeObjectURL(preview);
+    if (!target) return;
+    target.replaceWith(previous);
+    onCommit({ id, html: previousHtml });
+  };
   const reader = new FileReader();
   reader.addEventListener("load", () => {
-    if (typeof reader.result !== "string") return;
-    const src = sanitizeImageSrc(reader.result);
-    if (!src) return;
-    const img = document.createElement("img");
-    img.setAttribute("src", src);
-
-    range.deleteContents();
-    range.insertNode(img);
-    range.setStartAfter(img);
-    range.collapse(true);
-
-    const selection = globalThis.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-    flushSave(editor);
+    const src =
+      typeof reader.result === "string" ? sanitizeImageSrc(reader.result) : "";
+    if (!src) {
+      fail();
+      return;
+    }
+    const target = currentImage();
+    URL.revokeObjectURL(preview);
+    if (!target) return;
+    target.src = src;
+    delete target.dataset.pendingImage;
+    delete target.dataset.pendingFallback;
+    onCommit({ id, html: target.outerHTML });
   });
-  reader.readAsDataURL(file);
+  reader.addEventListener("error", fail);
+  reader.addEventListener("abort", fail);
+  try {
+    reader.readAsDataURL(file);
+  } catch {
+    fail();
+  }
 }
 
 export function handleEditorPaste(
   editor: HTMLElement,
   clipboard: DataTransfer,
+  onCommit: PasteCommit,
 ) {
-  const imageFile = [...clipboard.files].find((f) =>
-    f.type.startsWith("image/"),
+  const imageFile = [...clipboard.files].find((file) =>
+    file.type.startsWith("image/"),
   );
   if (imageFile) {
-    insertImageFile(editor, imageFile);
+    insertImageFile(editor, imageFile, onCommit);
     return;
   }
 
+  const range = editorRange(editor)?.cloneRange();
+  if (!range) return;
+  const currentBlock = getCurrentBlock(editor, range.startContainer);
   const html = clipboard.getData("text/html");
   const text = clipboard.getData("text/plain");
-  const cleanHtml = html ? sanitizeHtml(html) : plainTextToHtml(text);
+  const explicitMarkdown = clipboard.getData("text/markdown");
+  let cleanHtml = html
+    ? sanitizeHtml(html)
+    : plainTextToHtml(text || explicitMarkdown);
+  let inlineMarkdown = false;
 
-  const range = editorRange(editor);
-  if (!range) return;
+  const markdown = explicitMarkdown.trim() ? explicitMarkdown : text;
+  if (markdown && htmlIsThinTextWrapper(html, markdown)) {
+    const parsed = markdownPasteHtml(markdown, !!explicitMarkdown.trim());
+    if (parsed) {
+      cleanHtml = sanitizeHtml(parsed.html);
+      inlineMarkdown = parsed.inline;
+    }
+  }
 
   range.deleteContents();
 
   const template = document.createElement("template");
   template.innerHTML = cleanHtml;
   const content = template.content;
+  if (
+    inlineMarkdown &&
+    currentBlock &&
+    currentBlock.contains(range.startContainer) &&
+    currentBlock.contains(range.endContainer) &&
+    content.childElementCount === 1 &&
+    content.firstElementChild?.tagName === "P"
+  ) {
+    content.replaceChildren(...content.firstElementChild.childNodes);
+  }
   const hasBlockChild = [...content.childNodes].some(
     (n) => n instanceof Element && BLOCK_TAGS.has(n.tagName),
   );
 
-  if (!hasBlockChild) {
+  if (!hasBlockChild || !currentBlock) {
     const lastNode = content.lastChild;
     range.insertNode(content);
     if (lastNode) {
       range.setStartAfter(lastNode);
       range.collapse(true);
-      const selection = globalThis.getSelection();
-      selection?.removeAllRanges();
-      selection?.addRange(range);
     }
+    selectPasteCaret(range);
     normalizeEmptyBlocks(editor);
-    flushSave(editor);
-    return;
-  }
-
-  const currentBlock = getCurrentBlock(editor);
-  if (!currentBlock) {
-    editor.append(content);
-    normalizeEmptyBlocks(editor);
-    flushSave(editor);
+    onCommit();
     return;
   }
 
@@ -778,7 +875,11 @@ export function handleEditorPaste(
     previous.after(tailBlock);
   }
 
-  if (previous instanceof HTMLElement) placeCaretAtEnd(previous);
+  if (previous instanceof HTMLElement) {
+    range.selectNodeContents(previous);
+    range.collapse(false);
+  }
+  selectPasteCaret(range);
   normalizeEmptyBlocks(editor);
-  flushSave(editor);
+  onCommit();
 }
