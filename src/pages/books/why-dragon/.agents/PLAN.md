@@ -31,15 +31,20 @@ Anti-references: [Honey Heist](https://gshowitt.itch.io/honey-heist), [Cairn](ht
 
 ### 2. Theme
 
-- [x] BG `#991B1A` (red frame), BG2 black column, text `#F2EBE7`, IM Fell English.
-- [ ] Link/button color: default `#fa5c5c` reads pinkish next to the red frame — try a warmer red or bone white.
+- [x] BG + BG2 `#300703`, text `#F2EBE7`, IM Fell English.
+- [x] Links/buttons `#12A17F` (lighter `#0A5B48`, 5.6:1 on bg).
 
 Fonts: blackletter-ish header only if itch list has one; body serif (current is fine).
 
-### 3. Banner
+### 3. Hero (waiting on Rouzeris)
 
-- [ ] ~960×300 PNG: dragon from cover + red blackletter title, transparent or matching bg.
-- [ ] Tick "hide title".
+2400's hero = two layers: a **background image** (the orb, no-repeat, top-center, bleeds past the column) + a **banner** (title lettering, transparent PNG, sits in the column). Tick "hide title".
+
+Ask Rouzeris for:
+
+- [ ] Background: dragon art, ~2000px wide, fades/crops into `#300703` at the bottom and edges so it doesn't look boxed.
+- [ ] Banner: "Why Would You Fight a Dragon?" blackletter, transparent PNG, ≤960px wide, red that reads on `#300703`.
+- [ ] Layered source (PSD/PNG layers) so we can recompose later.
 
 ### 4. Screenshot column
 
