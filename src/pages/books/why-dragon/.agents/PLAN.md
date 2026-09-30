@@ -26,7 +26,8 @@ Anti-references: [Honey Heist](https://gshowitt.itch.io/honey-heist), [Cairn](ht
 
 - [ ] Edit game → Pricing → Paid, **$5.00**, "Let people pay more".
 - [ ] More → Rewards → "Community Copies", $0, quantity **73**.
-- [ ] Reward text: "Not sure you can afford it? Grab a copy free. All gone? Email me at EMAIL or ping me on Discord (DISCORD) and I'll send you one."
+- [ ] Reward text: "Not sure you can afford it? Grab a copy free. All gone? Email me at piotr@zagrajmy.net or ping me on Discord (@hasparus) and I'll send you one."
+- [ ] Before publishing: verify piotr@zagrajmy.net receives mail from an outside address (Gmail) and replies don't land in spam. Domain has OVH MX + `p=none` DMARC but **no SPF record** — add `v=spf1 include:mx.ovh.com ~all` if replies go from OVH.
 - [ ] Optional $10+ tier crediting Rouzeris.
 
 ### 2. Theme
@@ -78,6 +79,5 @@ Top to bottom:
 ## Open questions
 
 - Paper or ink theme?
-- Contact email + Discord handle for the community copies text?
 - Web version stays fully free?
 - Pull quote — who?
