@@ -24,18 +24,15 @@ Anti-references: [Honey Heist](https://gshowitt.itch.io/honey-heist), [Cairn](ht
 
 ### 1. Pricing
 
-- [ ] Edit game → Pricing → Paid, **$5.00**, "Let people pay more".
-- [ ] More → Rewards → "Community Copies", $0, quantity **73**.
-- [ ] Reward text: "Not sure you can afford it? Grab a copy free. All gone? Email me at piotr@zagrajmy.net or ping me on Discord (@hasparus) and I'll send you one."
+- [x] Edit game → Pricing → Paid, **$5.00**, "Let people pay more".
+- [x] More → Rewards → "Community Copies", $0, quantity **47**.
+- [x] Reward text: "Not sure you can afford it? Grab a copy free. All gone? Email me at piotr@zagrajmy.net or ping me on Discord (@hasparus) and I'll send you one."
 - [ ] Before publishing: verify piotr@zagrajmy.net receives mail from an outside address (Gmail) and replies don't land in spam. Domain has OVH MX + `p=none` DMARC but **no SPF record** — add `v=spf1 include:mx.ovh.com ~all` if replies go from OVH.
-- [ ] Optional $10+ tier crediting Rouzeris.
 
 ### 2. Theme
 
-Pick one:
-
-- **Paper** (recommended): off-white/parchment bg (tiled, e.g. `public/pattern.webp`), black ink text, crimson `#b3121b` links + button. Matches cover, PDF and lol.haspar.us.
-- **Ink**: keep black, but white text, crimson accents, stark b/w banner à la FIST.
+- [x] BG `#991B1A` (red frame), BG2 black column, text `#F2EBE7`, IM Fell English.
+- [ ] Link/button color: default `#fa5c5c` reads pinkish next to the red frame — try a warmer red or bone white.
 
 Fonts: blackletter-ish header only if itch list has one; body serif (current is fine).
 
@@ -78,6 +75,5 @@ Top to bottom:
 
 ## Open questions
 
-- Paper or ink theme?
 - Web version stays fully free?
 - Pull quote — who?
