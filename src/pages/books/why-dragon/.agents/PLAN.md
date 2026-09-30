@@ -32,7 +32,7 @@ Anti-references: [Honey Heist](https://gshowitt.itch.io/honey-heist), [Cairn](ht
 ### 2. Theme
 
 - [x] BG + BG2 `#300703`, text `#F2EBE7`, IM Fell English.
-- [x] Links `#0fcea0`. Buttons `#981B1C` (white text 8.4:1).
+- [x] Links `#0fcea0`. Buttons `#084B3A` (white text 10:1).
 
 Fonts: blackletter-ish header only if itch list has one; body serif (current is fine).
 
