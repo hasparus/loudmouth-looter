@@ -26,7 +26,7 @@ Anti-references: [Honey Heist](https://gshowitt.itch.io/honey-heist), [Cairn](ht
 
 - [x] Edit game → Pricing → Paid, **$5.00**, "Let people pay more".
 - [x] More → Rewards → "Community Copies", $0, quantity **47**.
-- [x] Reward text: "Not sure you can afford it? Grab a copy free. All gone? Email me at piotr@zagrajmy.net or ping me on Discord (@hasparus) and I'll send you one."
+- [x] Reward text: "Not sure you can afford it? Grab a free copy. All gone? Email me at piotr@zagrajmy.net or ping me on Discord (@hasparus) and I'll send you one."
 - [ ] Before publishing: verify piotr@zagrajmy.net receives mail from an outside address (Gmail) and replies don't land in spam. Domain has OVH MX + `p=none` DMARC but **no SPF record** — add `v=spf1 include:mx.ovh.com ~all` if replies go from OVH.
 
 ### 2. Theme
