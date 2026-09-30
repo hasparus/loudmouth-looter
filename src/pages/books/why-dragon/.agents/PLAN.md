@@ -25,8 +25,8 @@ Anti-references: [Honey Heist](https://gshowitt.itch.io/honey-heist), [Cairn](ht
 ### 1. Pricing
 
 - [ ] Edit game → Pricing → Paid, **$5.00**, "Let people pay more".
-- [ ] More → Rewards → "Community Copies", $0, quantity 50. Refill as they go.
-- [ ] Reward text: "Not sure you can afford it? Grab a copy free."
+- [ ] More → Rewards → "Community Copies", $0, quantity **73**.
+- [ ] Reward text: "Not sure you can afford it? Grab a copy free. All gone? Email me at EMAIL or ping me on Discord (DISCORD) and I'll send you one."
 - [ ] Optional $10+ tier crediting Rouzeris.
 
 ### 2. Theme
@@ -66,7 +66,7 @@ Top to bottom:
    - **Hunters** — …
    - **The Dragon** — …
    - **One-shot** — 2–4 hours, 2–5 players
-5. "Can't afford it? Grab a community copy below. The full text is also free to read at lol.haspar.us/books/why-dragon."
+5. "Not sure you can afford it? Grab a community copy below. The full text is also free to read at lol.haspar.us/books/why-dragon."
 6. Credits + licence (keep, move below the fold into "More information" if it crowds).
 
 ### 6. Later
@@ -78,6 +78,6 @@ Top to bottom:
 ## Open questions
 
 - Paper or ink theme?
-- Community copy count?
+- Contact email + Discord handle for the community copies text?
 - Web version stays fully free?
 - Pull quote — who?
