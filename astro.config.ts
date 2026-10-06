@@ -2,11 +2,14 @@ import { unified } from "@astrojs/markdown-remark";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import solidJs from "@astrojs/solid-js";
-import { transformerTwoslash } from "@shikijs/twoslash";
+import { createTransformerFactory, rendererRich } from "@shikijs/twoslash";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, envField } from "astro/config";
 import { dirname, resolve } from "node:path";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
+import { createTwoslasher } from "twoslash";
+import ts from "typescript-js";
 
 import { rehypePlugins, remarkPlugins } from "./src/build-time";
 import { recmaMdxExcerpt } from "./src/build-time/excerptPlugin";
@@ -15,6 +18,22 @@ import { getHiddenPostPaths } from "./src/build-time/hiddenPostPaths";
 const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = dirname(__filename);
+
+const tsJsLibDirectory = dirname(
+  createRequire(import.meta.url).resolve("typescript-js/package.json"),
+) + "/lib";
+
+// TS 7 is the native port and has no JS compiler API (ts.sys is undefined), so
+// twoslash runs on an aliased TS 6. @shikijs/twoslash doesn't forward
+// tsLibDirectory, hence the manual factory.
+const twoslashTransformer = createTransformerFactory(
+  createTwoslasher({
+    compilerOptions: { moduleResolution: 100 },
+    tsLibDirectory: tsJsLibDirectory,
+    tsModule: ts,
+  }),
+  rendererRich(),
+);
 
 const hostname = "lol.haspar.us";
 const site = `https://${hostname}/`;
@@ -44,7 +63,7 @@ export default defineConfig({
         dark: "github-dark",
       },
       transformers: [
-        transformerTwoslash({
+        twoslashTransformer({
           explicitTrigger: true,
           twoslashOptions: {
             compilerOptions: {
