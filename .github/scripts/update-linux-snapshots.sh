@@ -26,9 +26,9 @@ docker run --rm -v "${repo_root}":/src "${image}" bash -lc "
   mkdir -p /work
   tar -C /src --exclude=./node_modules --exclude=./dist --exclude=./.git -cf - . | tar -C /work -xf -
   cd /work
-  npm i -g bun >/dev/null 2>&1
+  npm i -g bun@1.3.14 >/dev/null 2>&1
   bun install --frozen-lockfile
-  bun run build
+  OG_IMAGE_SECRET=snapshots bun run build
   CI=true bunx playwright test ${passthrough} --update-snapshots
   cp -v /work/e2e/visual-regression.spec.ts-snapshots/*-linux.png /src/e2e/visual-regression.spec.ts-snapshots/
 "
