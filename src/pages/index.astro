@@ -4,8 +4,13 @@ import DialogueIntro from "../lib/DialogueIntro.astro";
 import PostCard from "../lib/PostCard.astro";
 import { getPosts } from "../lib/posts";
 import { SITE_BLURB, SITE_NAME } from "../lib/siteMeta";
+import { talks } from "../talks/talks";
 
-const posts = getPosts();
+const entries = [...getPosts(), ...talks].sort(
+  (a, b) =>
+    new Date(b.frontmatter.date).getTime() -
+    new Date(a.frontmatter.date).getTime(),
+);
 ---
 
 <BaseLayout title={SITE_NAME} description={SITE_BLURB}>
@@ -22,9 +27,9 @@ const posts = getPosts();
 
   <ul class="-my-4">
     {
-      posts.map((post) => (
+      entries.map((entry) => (
         <li>
-          <PostCard post={post} class="-mx-4 p-4 pt-2" />
+          <PostCard post={entry} class="-mx-4 p-4 pt-2" />
         </li>
       ))
     }

@@ -22,7 +22,7 @@ const { href, class: className } = Astro.props;
     className,
   ]}
 >
-  <span>read more</span>
+  <span><slot>read more</slot></span>
   <span class="rm-arrow translate-y-0.5"></span>
 </a>
 
