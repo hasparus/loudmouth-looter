@@ -36,15 +36,11 @@ Anti-references: [Honey Heist](https://gshowitt.itch.io/honey-heist), [Cairn](ht
 
 Fonts: blackletter-ish header only if itch list has one; body serif (current is fine).
 
-### 3. Hero (waiting on Rouzeris)
+### 3. Hero
 
-2400's hero = two layers: a **background image** (the orb, no-repeat, top-center, bleeds past the column) + a **banner** (title lettering, transparent PNG, sits in the column). Tick "hide title".
-
-Ask Rouzeris for:
-
-- [ ] Background: dragon art, ~2000px wide, fades/crops into `#300703` at the bottom and edges so it doesn't look boxed.
-- [ ] Banner: "Why Would You Fight a Dragon?" blackletter, transparent PNG, ≤960px wide, red that reads on `#300703`.
-- [ ] Layered source (PSD/PNG layers) so we can recompose later.
+- [x] Banner: one transparent 1024×520 PNG (2400 does the same at 1024×500), centred. Title left, moon + spires + black dragon with bone outline right. Built from Rouzeris's layered PSD.
+- [ ] Cover image: pick A/B/C, upload via Edit game → Cover image (630×500).
+- [ ] Screenshot column still shows the old cover art; replace with spreads/character sheet.
 
 ### 4. Screenshot column
 
