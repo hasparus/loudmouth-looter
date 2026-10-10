@@ -15,7 +15,8 @@ export const talks: TalkEntry[] = [
     flag: "🇵🇱",
     frontmatter: {
       title: "West Marches",
-      description: "How to run campaigns the calendar can't kill.",
+      description:
+        "How to run campaigns the calendar can't kill. I gave it at Kapitularz 2026.",
       date: "2026-09-06",
       path: "/talks/west-marches",
       tags: ["west marches", "gm-ing"],
@@ -27,7 +28,7 @@ export const talks: TalkEntry[] = [
     frontmatter: {
       title: "Never Quest",
       description:
-        'If I hear "questgiver" one more time, I\'m throwing someone overboard. How I prep sandboxes around threats and factions instead of quests.',
+        'If I hear "questgiver" one more time, I\'m throwing someone overboard. How I prep sandboxes around threats and factions instead of quests. I gave it at Kapitularz 2026.',
       date: "2026-09-06",
       path: "/talks/neverquest",
       tags: ["sandbox", "pbta", "gm-ing"],
