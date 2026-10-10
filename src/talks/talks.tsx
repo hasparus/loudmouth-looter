@@ -1,16 +1,8 @@
-import type { PostFrontmatter } from "../types";
+import type { Entry } from "../lib/posts";
 
-export interface TalkEntry {
-  talk: true;
-  frontmatter: Pick<
-    PostFrontmatter,
-    "title" | "description" | "date" | "path" | "tags"
-  >;
-}
-
-export const talks: TalkEntry[] = [
+export const talks: Entry[] = [
   {
-    talk: true,
+    linkLabel: "see slides",
     frontmatter: {
       title: "West Marches Talk",
       description: "How to run campaigns the calendar can't kill.",
@@ -20,7 +12,7 @@ export const talks: TalkEntry[] = [
     },
   },
   {
-    talk: true,
+    linkLabel: "see slides",
     frontmatter: {
       title: '"Never Quest" Rant',
       description:

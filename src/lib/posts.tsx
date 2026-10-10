@@ -1,4 +1,4 @@
-import { type TalkEntry, talks } from "../talks/talks";
+import { talks } from "../talks/talks";
 import type { PostFrontmatter } from "../types";
 
 import { isPostVisible } from "./isPostVisible";
@@ -51,23 +51,24 @@ export function getPosts(): PostEntry[] {
   return entries;
 }
 
+/** Anything listed as a card: a post, or a talk with only frontmatter. */
+export interface Entry {
+  frontmatter: Pick<
+    PostFrontmatter,
+    "title" | "description" | "date" | "path" | "tags"
+  > &
+    Partial<Pick<PostFrontmatter, "readingTime">>;
+  Excerpt?: ExcerptComponent | undefined;
+  sigil?: string | undefined;
+  /** Text of the card's link; "read more" when absent. */
+  linkLabel?: string;
+}
+
 /** Visible posts and talks, newest first. */
-export function getEntries(): (PostEntry | TalkEntry)[] {
+export function getEntries(): Entry[] {
   return [...getPosts(), ...talks].sort(
     (a, b) =>
       new Date(b.frontmatter.date).getTime() -
       new Date(a.frontmatter.date).getTime(),
   );
-}
-
-/** URL-safe slug for a tag, used by /tags/[tag]. */
-export function tagSlug(tag: string): string {
-  return tag
-    .replaceAll(/[\u{1F1E6}-\u{1F1FF}]/gu, (c) =>
-      String.fromCodePoint(c.codePointAt(0)! - 0x1F1E6 + 97),
-    )
-    .toLowerCase()
-    .trim()
-    .replaceAll(/\s+/g, "-")
-    .replaceAll(/[^a-z0-9-]/g, "");
 }

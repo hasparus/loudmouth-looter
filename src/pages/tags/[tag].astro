@@ -2,15 +2,12 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { Link } from "../../lib/Link";
 import PostCard from "../../lib/PostCard.astro";
-import { getEntries, type PostEntry, tagSlug } from "../../lib/posts";
-import type { TalkEntry } from "../../talks/talks";
+import { type Entry, getEntries } from "../../lib/posts";
+import { tagSlug } from "../../lib/tagSlug";
 import { SITE_NAME } from "../../lib/siteMeta";
 
 export async function getStaticPaths() {
-  const bySlug = new Map<
-    string,
-    { label: string; posts: (PostEntry | TalkEntry)[] }
-  >();
+  const bySlug = new Map<string, { label: string; posts: Entry[] }>();
   for (const post of getEntries()) {
     for (const tag of post.frontmatter.tags ?? []) {
       const slug = tagSlug(tag);
@@ -29,15 +26,16 @@ export async function getStaticPaths() {
 
 interface Props {
   label: string;
-  posts: (PostEntry | TalkEntry)[];
+  posts: Entry[];
 }
 
 const { label, posts } = Astro.props;
+const count = `${posts.length} ${posts.length === 1 ? "entry" : "entries"}`;
 ---
 
 <BaseLayout
   title={`§ ${label} — ${SITE_NAME}`}
-  description={`Posts tagged ${label}.`}
+  description={`Entries tagged ${label}.`}
 >
   <h1
     slot="header-content"
@@ -50,9 +48,7 @@ const { label, posts } = Astro.props;
 
   <div class="zaduma-prose py-10">
     <p>
-      {`${posts.length} ${posts.length === 1 ? "entry" : "entries"} tagged `}<em
-        >{label}</em
-      >.
+      {count} tagged <em>{label}</em>.
     </p>
   </div>
 
