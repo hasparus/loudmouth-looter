@@ -1,3 +1,4 @@
+import { type TalkEntry, talks } from "../talks/talks";
 import type { PostFrontmatter } from "../types";
 
 import { isPostVisible } from "./isPostVisible";
@@ -48,6 +49,15 @@ export function getPosts(): PostEntry[] {
 
   cache = entries;
   return entries;
+}
+
+/** Visible posts and talks, newest first. */
+export function getEntries(): (PostEntry | TalkEntry)[] {
+  return [...getPosts(), ...talks].sort(
+    (a, b) =>
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime(),
+  );
 }
 
 /** URL-safe slug for a tag, used by /tags/[tag]. */

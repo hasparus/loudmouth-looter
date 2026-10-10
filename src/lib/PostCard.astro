@@ -15,12 +15,11 @@ interface Props {
 
 const { post, class: className } = Astro.props;
 const { frontmatter } = post;
-const talk = "talk" in post;
-const entry = talk ? undefined : post;
+const talk = "talk" in post ? post : undefined;
+const entry = "talk" in post ? undefined : post;
 const Excerpt = entry?.Excerpt;
 const sigil = entry?.sigil;
 const readingTime = entry?.frontmatter.readingTime;
-const tags = entry?.frontmatter.tags;
 const date = new Date(frontmatter.date);
 ---
 
@@ -57,12 +56,14 @@ const date = new Date(frontmatter.date);
 
     <div class="flex items-center gap-4">
       {
-        talk || (readingTime && readingTime.minutes > 1) || tags?.length ? (
+        talk ||
+        (readingTime && readingTime.minutes > 1) ||
+        frontmatter.tags?.length ? (
           <ul class="flex flex-wrap items-center gap-x-4 gap-y-1">
             {talk && (
               <li>
                 <span class="font-text text-neu-600 dark:text-neu-400 -mx-2 p-2 text-base tracking-wide lowercase italic">
-                  talk
+                  talk {talk.flag}
                 </span>
               </li>
             )}
@@ -73,7 +74,7 @@ const date = new Date(frontmatter.date);
                 </span>
               </li>
             )}
-            {tags?.map((tag) => (
+            {frontmatter.tags?.map((tag) => (
               <li>
                 <Link
                   href={`/tags/${tagSlug(tag)}`}
