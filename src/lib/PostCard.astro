@@ -56,17 +56,8 @@ const date = new Date(frontmatter.date);
 
     <div class="flex items-center gap-4">
       {
-        talk ||
-        (readingTime && readingTime.minutes > 1) ||
-        frontmatter.tags?.length ? (
+        (readingTime && readingTime.minutes > 1) || frontmatter.tags?.length ? (
           <ul class="flex flex-wrap items-center gap-x-4 gap-y-1">
-            {talk && (
-              <li>
-                <span class="font-text text-neu-600 dark:text-neu-400 -mx-2 p-2 text-base tracking-wide lowercase italic">
-                  talk {talk.flag}
-                </span>
-              </li>
-            )}
             {readingTime && readingTime.minutes > 1 && (
               <li>
                 <span class="font-text text-neu-600 dark:text-neu-400 -mx-2 p-2 text-base tracking-wide lowercase italic">

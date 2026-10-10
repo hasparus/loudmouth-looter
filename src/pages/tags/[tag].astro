@@ -41,7 +41,7 @@ const { label, posts } = Astro.props;
 >
   <h1
     slot="header-content"
-    class="text-neu-600 dark:text-neu-400 font-serif font-bold"
+    class="text-neu-600 dark:text-neu-400 flex items-baseline gap-2 font-serif font-bold"
   >
     <Link href="/" noUnderline class="text-neu-400 dark:text-neu-600">←</Link>
     <span class="text-neu-400 dark:text-neu-200">§</span>
@@ -50,16 +50,17 @@ const { label, posts } = Astro.props;
 
   <div class="zaduma-prose py-10">
     <p>
-      {posts.length}
-      {posts.length === 1 ? "entry" : "entries"} tagged <em>{label}</em>.
+      {`${posts.length} ${posts.length === 1 ? "entry" : "entries"} tagged `}<em
+        >{label}</em
+      >.
     </p>
   </div>
 
-  <ul>
+  <ul class="-my-4">
     {
       posts.map((post) => (
         <li>
-          <PostCard post={post} />
+          <PostCard post={post} class="-mx-4 p-4 pt-2" />
         </li>
       ))
     }

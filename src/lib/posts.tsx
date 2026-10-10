@@ -63,6 +63,9 @@ export function getEntries(): (PostEntry | TalkEntry)[] {
 /** URL-safe slug for a tag, used by /tags/[tag]. */
 export function tagSlug(tag: string): string {
   return tag
+    .replaceAll(/[\u{1F1E6}-\u{1F1FF}]/gu, (c) =>
+      String.fromCodePoint(c.codePointAt(0)! - 0x1F1E6 + 97),
+    )
     .toLowerCase()
     .trim()
     .replaceAll(/\s+/g, "-")
