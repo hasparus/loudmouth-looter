@@ -38,8 +38,11 @@ Fonts: blackletter-ish header only if itch list has one; body serif (current is 
 
 ### 3. Hero
 
-- [x] Banner: one transparent 1024×520 PNG (2400 does the same at 1024×500), centred. Title left, moon + spires + black dragon with bone outline right. Built from Rouzeris's layered PSD.
-- [ ] Cover image: pick A/B/C, upload via Edit game → Cover image (630×500).
+itch caps the banner at the 960px column, so the full-width hero is two layers:
+
+- [x] Banner 1920×1200 (shown at 960×600): moon, spires, dragon perched on the title, Rouzeris's original layout.
+- [x] Background 2560×600, no-repeat, centred: spires tiled (mirrored) out to both edges, wash strengthened. BG2 alpha 0 so it shows behind the column.
+- [ ] Cover image: pick C1/C2/C3, upload via Edit game → Cover image (630×500).
 - [ ] Screenshot column still shows the old cover art; replace with spreads/character sheet.
 
 ### 4. Screenshot column
