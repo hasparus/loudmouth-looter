@@ -448,6 +448,7 @@ export function TextEditor() {
           tabindex={0}
           onBlur={handleBlur}
           onClick={handleClick}
+          onCompositionEnd={refreshSlash}
           onFocus={handleFocus}
           onInput={handleInput}
           onKeyDown={handleKeyDown}
