@@ -62,9 +62,19 @@ function handleMouseDown(event: MouseEvent) {
   if (toggle) event.preventDefault();
 }
 
+function caretOf(selection: Selection | null): unknown[] {
+  return [
+    selection?.anchorNode,
+    selection?.anchorOffset,
+    selection?.focusNode,
+    selection?.focusOffset,
+  ];
+}
+
 export function TextEditor() {
   let editorEl: HTMLDivElement | undefined;
   let pendingUndo: UndoSnapshot | null = null;
+  let slashCaret: unknown[] = [];
   const [spellcheck, setSpellcheck] = createSignal(
     localStorage.getItem(SPELLCHECK_KEY) !== "false",
   );
@@ -86,6 +96,7 @@ export function TextEditor() {
   function refreshSlash() {
     const editor = editorEl;
     if (!editor) return;
+    slashCaret = caretOf(globalThis.getSelection());
     const next = readSlashState(editor);
     setSlash(next && matchSlashCommands(next).length > 0 ? next : null);
     setSlashIndex(0);
@@ -204,8 +215,13 @@ export function TextEditor() {
       scheduled = requestAnimationFrame(() => {
         scheduled = 0;
         const editor = editorEl;
-        const anchor = globalThis.getSelection()?.anchorNode ?? null;
-        if (editor && anchor && editor.contains(anchor)) refreshSlash();
+        const selection = globalThis.getSelection();
+        const anchor = selection?.anchorNode ?? null;
+        const moved = caretOf(selection).some(
+          (value, index) => value !== slashCaret[index],
+        );
+        if (editor && anchor && editor.contains(anchor) && moved)
+          refreshSlash();
       });
     };
     document.addEventListener("selectionchange", handler);
