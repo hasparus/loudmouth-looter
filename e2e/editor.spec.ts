@@ -93,6 +93,13 @@ test.describe("editor", () => {
     page,
   }) => {
     await page.goto("/editor/");
+    const flushFrames = await page.evaluateHandle(() => {
+      const held: FrameRequestCallback[] = [];
+      globalThis.requestAnimationFrame = (callback) => held.push(callback);
+      return () => {
+        for (const callback of held.splice(0)) callback(performance.now());
+      };
+    });
     const editor = await clearEditor(page);
 
     await editor.pressSequentially("/");
@@ -108,6 +115,7 @@ test.describe("editor", () => {
     );
 
     await page.keyboard.press("Escape");
+    await flushFrames.evaluate((flush) => flush());
     await expect(menu).not.toBeVisible();
 
     await editor.pressSequentially("arrow");
