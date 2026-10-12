@@ -62,19 +62,21 @@ function handleMouseDown(event: MouseEvent) {
   if (toggle) event.preventDefault();
 }
 
-function caretOf(selection: Selection | null): unknown[] {
+type Caret = readonly [Node | null, number, Node | null, number];
+
+function caretOf(selection: Selection | null): Caret {
   return [
-    selection?.anchorNode,
-    selection?.anchorOffset,
-    selection?.focusNode,
-    selection?.focusOffset,
+    selection?.anchorNode ?? null,
+    selection?.anchorOffset ?? 0,
+    selection?.focusNode ?? null,
+    selection?.focusOffset ?? 0,
   ];
 }
 
 export function TextEditor() {
   let editorEl: HTMLDivElement | undefined;
   let pendingUndo: UndoSnapshot | null = null;
-  let slashCaret: unknown[] = [];
+  let slashCaret: Caret = [null, 0, null, 0];
   const [spellcheck, setSpellcheck] = createSignal(
     localStorage.getItem(SPELLCHECK_KEY) !== "false",
   );
