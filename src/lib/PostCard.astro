@@ -68,9 +68,12 @@ const date = new Date(frontmatter.date);
                 <Link
                   href={`/tags/${tagSlug(tag)}`}
                   noUnderline
-                  class="font-text text-neu-600 hover:text-neu-900 dark:text-neu-400 dark:hover:text-neu-200 dark:focus-visible:text-neu-200 focus-visible:text-neu-900 pointer-events-auto text-base tracking-wide lowercase italic"
+                  class="group/tag font-text text-neu-600 hover:text-neu-900 dark:text-neu-400 dark:hover:text-neu-200 dark:focus-visible:text-neu-200 focus-visible:text-neu-900 pointer-events-auto text-base tracking-wide lowercase italic"
                 >
-                  § {tag}
+                  §{" "}
+                  <span class="decoration-link-600 dark:decoration-link-500 underline-offset-4 group-hover/tag:underline group-focus-visible/tag:underline">
+                    {tag}
+                  </span>
                 </Link>
               </li>
             ))}
