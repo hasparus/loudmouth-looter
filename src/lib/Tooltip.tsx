@@ -1,5 +1,7 @@
 import { createUniqueId, type JSX } from "solid-js";
 
+import styles from "./Tooltip.module.css";
+
 /**
  * Inline explanatory tooltip for prose, e.g. `<Tooltip text="…">term</Tooltip>`.
  * Reveal is driven by CSS (:hover / :focus-within), so it needs no hydration
@@ -14,7 +16,7 @@ import { createUniqueId, type JSX } from "solid-js";
 export function Tooltip(props: { text: string; children: JSX.Element }) {
   const id = createUniqueId();
   return (
-    <span class="group relative inline-block">
+    <span class={`relative inline-block ${styles.trigger}`}>
       <button
         type="button"
         aria-describedby={id}
@@ -25,7 +27,7 @@ export function Tooltip(props: { text: string; children: JSX.Element }) {
       <span
         role="tooltip"
         id={id}
-        class="bg-neu-900 text-neu-50 dark:bg-neu-100 dark:text-neu-900 pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-max max-w-screen -translate-x-1/2 rounded-md px-2.5 py-1.5 text-center text-base/snug font-normal opacity-0 shadow-lg transition-opacity duration-150 ease-out group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none"
+        class={`bg-neu-900 text-neu-50 dark:bg-neu-100 dark:text-neu-900 pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-max max-w-screen -translate-x-1/2 rounded-md px-2.5 py-1.5 text-center text-base/snug font-normal shadow-lg ${styles.tip}`}
       >
         {props.text}
       </span>
