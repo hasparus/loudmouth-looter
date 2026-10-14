@@ -226,7 +226,7 @@ export function CommandsPalette(props: {
                 <CommandItem href="https://github.com/hasparus/loudmouth-looter">
                   GitHub
                 </CommandItem>
-                <CommandItem href="https://github.com/hasparus/zaduma/issues">
+                <CommandItem href="mailto:piotr@monwid-olechnowicz.com">
                   Contact
                 </CommandItem>
                 <CommandItem href="/rss.xml">RSS</CommandItem>

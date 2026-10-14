@@ -85,6 +85,9 @@ for (const colorScheme of ["light", "dark"] as const) {
     await expect(
       dialog.getByRole("option", { name: "GitHub", exact: true }),
     ).toHaveAttribute("href", "https://github.com/hasparus/loudmouth-looter");
+    await expect(
+      dialog.getByRole("option", { name: "Contact", exact: true }),
+    ).toHaveAttribute("href", "mailto:piotr@monwid-olechnowicz.com");
     const backdrop = await dialog.evaluate((element) => {
       const style = getComputedStyle(element, "::backdrop");
       const canvas = document.createElement("canvas");
