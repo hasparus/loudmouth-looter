@@ -443,7 +443,8 @@ export function TextEditor() {
           aria-label="Editor"
           autocapitalize={spellcheck() ? "sentences" : "off"}
           autocorrect={spellcheck() ? "on" : "off"}
-          class={`${styles.editor} min-h-[75vh] w-full border-0 bg-transparent text-[1.22rem] leading-normal outline-none print:min-h-0 print:text-black`}
+          class="min-h-[75vh] w-full border-0 bg-transparent text-[1.22rem] leading-normal outline-none print:min-h-0 print:text-black"
+          classList={{ [styles.editor!]: true }}
           contenteditable
           tabindex={0}
           onBlur={handleBlur}

@@ -59,7 +59,7 @@ const fonts = [
         fonts.map(([label, cls]) => (
           <div>
             <div class="text-neu-500 text-sm">{label}</div>
-            <p class={`${cls} text-3xl`}>
+            <p class:list={[cls, "text-3xl"]}>
               Sphinx of black quartz, judge my vow.
             </p>
           </div>
@@ -98,7 +98,10 @@ const fonts = [
         {
           cursors.map(([label, cls, png, native, size = "size-8"]) => (
             <li
-              class={`${cls} border-neu-300 dark:border-neu-700 bg-neu-50 dark:bg-neu-800 flex flex-col items-center gap-2 rounded border p-4`}
+              class:list={[
+                cls,
+                "border-neu-300 dark:border-neu-700 bg-neu-50 dark:bg-neu-800 flex flex-col items-center gap-2 rounded border p-4",
+              ]}
               style={
                 cls
                   ? undefined

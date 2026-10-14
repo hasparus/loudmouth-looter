@@ -78,6 +78,10 @@ for (const colorScheme of ["light", "dark"] as const) {
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveCSS("box-shadow", /0px 0px 0px 1px/);
+    await expect(dialog.getByText("esc", { exact: true })).toHaveCSS(
+      "corner-shape",
+      "superellipse(-0.33)",
+    );
     await expect(
       dialog.getByRole("option", { name: "GitHub", exact: true }),
     ).toHaveAttribute("href", "https://github.com/hasparus/loudmouth-looter");
@@ -123,15 +127,16 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       reducedMotion === "reduce" ? "0.15s" : "0.4s",
     );
     await expect(tip).toHaveCSS(
+      "transition-timing-function",
+      reducedMotion === "reduce" ? "ease-out" : /^linear\(/,
+    );
+    await expect(tip).toHaveCSS(
       "transform",
       reducedMotion === "reduce" ? "none" : "matrix(1, 0, 0, 1, 0, 0)",
     );
     await page.keyboard.press("Tab");
     await expect(tip).toHaveCSS("opacity", "0");
-    await expect(tip).toHaveCSS(
-      "transition-duration",
-      reducedMotion === "reduce" ? "0.15s" : "0.15s, 0.15s",
-    );
+    await expect(tip).toHaveCSS("transition-duration", "0.15s");
     if (testInfo.project.name !== "mobile") {
       await trigger.hover();
       await expect(tip).toHaveCSS("opacity", "1");

@@ -32,10 +32,7 @@ export function PostProgressBar(props: { children: JSX.Element }) {
     <div class="relative">
       <div class="bg-neu-400/30 dark:bg-neu-800 absolute -left-4 h-full w-[2px] overflow-hidden">
         <div
-          class={
-            "bg-neu-400 dark:bg-neu-700 absolute size-full " +
-            "-translate-y-(--y,100%) transition-transform duration-300 ease-linear"
-          }
+          class="bg-neu-400 dark:bg-neu-700 absolute size-full -translate-y-(--y,100%) transition-transform duration-300 ease-linear"
           ref={progressThumb}
         />
       </div>
