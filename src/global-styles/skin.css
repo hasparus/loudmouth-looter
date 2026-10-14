@@ -456,6 +456,10 @@
   }
 }
 
+@utility corner-superellipse-* {
+  corner-shape: superellipse(--value(number, [number]));
+}
+
 @utility all-small-caps {
   font-variant: all-small-caps;
 }

@@ -170,7 +170,7 @@ export function CommandsPalette(props: {
     <CommandCenterDialog
       onClose={() => setPage(undefined)}
       ref={(ref) => (dialog = ref)}
-      class="border-neu-300 bg-neu-50 font-text shadow-neu-950/40 backdrop:bg-neu-950/20 dark:border-neu-700 dark:bg-neu-900 max-w-container relative w-full transform flex-col overflow-hidden p-0 transition-all [[open]]:flex"
+      class="border-neu-300 bg-neu-50 font-text shadow-neu-950/40 dark:backdrop:bg-neu-950/60 dark:border-neu-700 dark:bg-neu-900 max-w-container relative w-full transform flex-col overflow-hidden p-0 ring-1 ring-black/10 transition-all backdrop:bg-white/30 backdrop:backdrop-blur-[5px] dark:ring-white/10 [[open]]:flex"
     >
       <div class="flex items-center gap-2 px-3 pt-3">
         <span
@@ -223,7 +223,7 @@ export function CommandsPalette(props: {
                 <CommandItem href="https://twitter.com/hasparus">
                   Twitter
                 </CommandItem>
-                <CommandItem href="https://github.com/hasparus/zaduma">
+                <CommandItem href="https://github.com/hasparus/loudmouth-looter">
                   GitHub
                 </CommandItem>
                 <CommandItem href="https://github.com/hasparus/zaduma/issues">

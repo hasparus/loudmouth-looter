@@ -18,6 +18,15 @@ export default [
     rules: {
       "unicorn/consistent-function-scoping": "off",
       "unicorn/no-useless-spread": "off",
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "JSXAttribute[name.name=/^(class|className)$/] > JSXExpressionContainer :matches(TemplateLiteral[expressions.length>0], BinaryExpression[operator='+'])",
+          message:
+            "Do not concatenate classes. Use cn(), Solid classList, or Astro class:list instead.",
+        },
+      ],
     },
   },
 

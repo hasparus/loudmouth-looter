@@ -17,10 +17,11 @@ export function Kbd(props: KbdProps) {
     <kbd
       ref={ref}
       {...props}
-      class={
-        "border-neu-300 bg-neu-50 dark:border-neu-700 dark:bg-neu-800 all-small-caps font-text text-neu-500 dark:text-neu-400 trim-start-alphabetic inline-block aspect-[2] min-w-4 shrink-0 rounded-sm border border-b-2 p-1 text-base leading-none font-medium tracking-wide tabular-nums [corner-shape:superellipse(-.33)] group-hover:border-b group-hover:shadow-[inset_0_1px_1px_0_rgba(0,0,0,0.025)] group-focus:outline-solid data-pressed:border-b" +
-        (props.class ? ` ${props.class}` : "")
-      }
+      class="border-neu-300 bg-neu-50 dark:border-neu-700 dark:bg-neu-800 all-small-caps font-text text-neu-500 dark:text-neu-400 trim-start-alphabetic corner-superellipse-[-0.33] inline-block aspect-[2] min-w-4 shrink-0 rounded-sm border border-b-2 p-1 text-base leading-none font-medium tracking-wide tabular-nums group-hover:border-b group-hover:shadow-[inset_0_1px_1px_0_rgba(0,0,0,0.025)] group-focus:outline-solid data-pressed:border-b"
+      classList={{
+        ...props.classList,
+        [props.class ?? ""]: Boolean(props.class),
+      }}
     />
   );
 }
