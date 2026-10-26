@@ -43,37 +43,85 @@ export const DEFAULT_HTML = [
   "<p><i>— Lord Dunsany, The King of Elfland's Daughter (1924)</i></p>",
 ].join("");
 
-const BLOCK_TAGS = new Set(["H1", "H2", "OL", "P", "UL"]);
+const BLOCK_TAGS = new Set([
+  "BLOCKQUOTE",
+  "H1",
+  "H2",
+  "H3",
+  "HR",
+  "OL",
+  "P",
+  "PRE",
+  "UL",
+]);
+
+// Elements whose text is already formatted (or must stay literal) — the
+// inline Markdown transform never reaches inside them.
+const INLINE_FORMATTED_TAGS = new Set([
+  "A",
+  "B",
+  "CODE",
+  "DEL",
+  "EM",
+  "I",
+  "S",
+  "STRIKE",
+  "STRONG",
+]);
+
+const CODE_SPAN = /`([^`]+)`/g;
+const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
+// `*x*` italics: not part of `**`, not inside a word, no inner padding — so
+// `2 * 3 * 4` and a half-typed `**bold*` stay literal.
+const STAR_ITALIC = /(?<![*\w])\*(?=[^\s*])([^*]*?[^\s*])\*(?![*\w])/g;
+const INLINE_SYNTAX = [
+  /\*\*[^*]+\*\*/,
+  /_[^_]+_/,
+  /~~[^~]+~~/,
+  /`[^`]+`/,
+  new RegExp(STAR_ITALIC.source),
+  new RegExp(LINK.source),
+];
 
 export function formatInline(text: string) {
-  const links: string[] = [];
-  const withLinks = escapeHtml(text).replaceAll(
-    /\[([^\]]+)\]\(([^)\s]+)\)/g,
+  const held: string[] = [];
+  const hold = (html: string) => `\u0000${held.push(html) - 1}\u0000`;
+  // Code spans first, so their contents stay literal (no links or emphasis).
+  const withCode = escapeHtml(text).replaceAll(CODE_SPAN, (_, code: string) =>
+    hold(`<code>${code}</code>`),
+  );
+  const withLinks = withCode.replaceAll(
+    LINK,
     (whole, label: string, url: string) => {
       const href = sanitizeUrl(unescapeHtml(url));
       if (!href) return whole;
-      links.push(
+      return hold(
         `<a href="${escapeHtml(href)}" rel="noreferrer">${formatEmphasis(label)}</a>`,
       );
-      return `\u0000${links.length - 1}\u0000`;
     },
   );
-  return formatEmphasis(withLinks).replaceAll(
-    // eslint-disable-next-line no-control-regex -- NUL is a deliberate placeholder sentinel
-    /\u0000(\d+)\u0000/g,
-    (_, index: string) => links[Number(index)] ?? "",
-  );
+  const restore = (html: string): string =>
+    html.replaceAll(
+      // eslint-disable-next-line no-control-regex -- NUL is a deliberate placeholder sentinel
+      /\u0000(\d+)\u0000/g,
+      (_, index: string) => restore(held[Number(index)] ?? ""),
+    );
+  return restore(formatEmphasis(withLinks));
 }
 
 function formatEmphasis(escaped: string) {
   return escaped
     .replaceAll(/\*\*([^*]+)\*\*([.,!?])?/g, "<strong>$1$2</strong>")
-    .replaceAll(/_([^_]+)_([.,!?])?/g, "<i>$1$2</i>");
+    .replaceAll(STAR_ITALIC, "<i>$1</i>")
+    .replaceAll(/_([^_]+)_([.,!?])?/g, "<i>$1$2</i>")
+    .replaceAll(/~~([^~]+)~~/g, "<s>$1</s>");
 }
 
 function normalizeEditableText(text: string) {
   return text.replaceAll("\u200B", "").replaceAll("\u00A0", " ");
 }
+
+const CARET_BLOCK_TAGS = new Set(["H1", "H2", "H3", "LI", "P", "PRE"]);
 
 export function getCurrentBlock(
   root: HTMLElement,
@@ -83,10 +131,9 @@ export function getCurrentBlock(
 
   let node: Node | null = anchor;
   while (node && node !== root) {
-    if (
-      node instanceof HTMLElement &&
-      ["H1", "H2", "LI", "P"].includes(node.tagName)
-    ) {
+    if (node instanceof HTMLElement && CARET_BLOCK_TAGS.has(node.tagName)) {
+      // A Move card's title row is laid out by the card, not edited as prose.
+      if (node.tagName === "H3" && node.closest(".te-move")) return null;
       return node;
     }
     node = node.parentNode;
@@ -95,7 +142,7 @@ export function getCurrentBlock(
   return null;
 }
 
-function placeCaretAtEnd(element: HTMLElement) {
+export function placeCaretAtEnd(element: HTMLElement) {
   const selection = globalThis.getSelection();
   if (!selection) return;
 
@@ -106,7 +153,7 @@ function placeCaretAtEnd(element: HTMLElement) {
   selection.addRange(range);
 }
 
-function placeCaretAtStart(element: HTMLElement) {
+export function placeCaretAtStart(element: HTMLElement) {
   const selection = globalThis.getSelection();
   if (!selection) return;
 
@@ -290,6 +337,36 @@ export function serializeDocument(root: HTMLElement): string {
   return copy.innerHTML.replaceAll("\u200B", "");
 }
 
+const wordSegmenter = new Intl.Segmenter(undefined, { granularity: "word" });
+
+// Prose words only: block MDX atoms show source previews, not writing. Block
+// boundaries count as spaces so adjacent paragraphs don't fuse into one word.
+export function countWords(root: HTMLElement): number {
+  let text = "";
+  const walker = document.createTreeWalker(
+    root,
+    NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
+    {
+      acceptNode: (node) =>
+        node instanceof HTMLElement && node.classList.contains("te-jsx")
+          ? NodeFilter.FILTER_REJECT
+          : NodeFilter.FILTER_ACCEPT,
+    },
+  );
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (node instanceof Text) text += node.data;
+    else if (
+      node instanceof Element &&
+      !INLINE_FORMATTED_TAGS.has(node.tagName)
+    )
+      text += " ";
+  }
+  let count = 0;
+  for (const segment of wordSegmenter.segment(text))
+    if (segment.isWordLike) count++;
+  return count;
+}
+
 const EDITOR_FALLBACK_TITLE = "editor";
 
 export function readDocumentTitle(root: HTMLElement): string {
@@ -367,8 +444,7 @@ function transformInlineTextNodes(node: Node): boolean {
 
   if (node instanceof Text) {
     const raw = normalizeEditableText(node.textContent);
-    if (!raw.includes("**") && !raw.includes("_") && !raw.includes("]("))
-      return false;
+    if (!INLINE_SYNTAX.some((syntax) => syntax.test(raw))) return false;
 
     const wrapper = document.createElement("span");
     wrapper.innerHTML = formatInline(raw);
@@ -382,8 +458,7 @@ function transformInlineTextNodes(node: Node): boolean {
 
   if (!(node instanceof HTMLElement)) return false;
   if (node.dataset.caretMarker === "true") return false;
-  if (node.tagName === "STRONG" || node.tagName === "I" || node.tagName === "A")
-    return false;
+  if (INLINE_FORMATTED_TAGS.has(node.tagName)) return false;
 
   for (const child of [...node.childNodes]) {
     changed = transformInlineTextNodes(child) || changed;
@@ -415,28 +490,34 @@ function absorbTrailingPunctuation(block: HTMLElement) {
 }
 
 export function normalizeEmptyBlocks(root: HTMLElement) {
-  for (const tag of ["p", "h1", "h2", "li"]) {
+  for (const tag of ["p", "h1", "h2", "h3", "li"]) {
     for (const el of root.querySelectorAll(tag)) {
       if (el.childNodes.length === 0) {
         el.append(document.createElement("br"));
       }
     }
   }
+  for (const pre of root.querySelectorAll("pre")) {
+    pre.textContent ||= "\n";
+  }
+  for (const quote of root.querySelectorAll("blockquote")) {
+    if (quote.childNodes.length === 0) quote.innerHTML = "<p><br></p>";
+  }
 }
 
 export function applyInlineTransform(root: HTMLElement) {
   const block = getCurrentBlock(root);
-  if (!block || (block.tagName === "LI" && block.closest("ul, ol") === null))
+  if (
+    !block ||
+    block.tagName === "PRE" ||
+    (block.tagName === "LI" && block.closest("ul, ol") === null)
+  )
     return;
 
   const raw = normalizeEditableText(block.textContent);
   let changed = false;
 
-  if (
-    /\*\*[^*]+\*\*/.test(raw) ||
-    /_[^_]+_/.test(raw) ||
-    /\[[^\]]+\]\([^)\s]+\)/.test(raw)
-  ) {
+  if (INLINE_SYNTAX.some((syntax) => syntax.test(raw))) {
     const marker = insertCaretMarker(root);
     changed = transformInlineTextNodes(block);
 
@@ -543,6 +624,7 @@ export function readSlashState(root: HTMLElement): SlashState | null {
   const range = selection.getRangeAt(0);
   if (!range.collapsed || !(range.startContainer instanceof Text)) return null;
   if (!root.contains(range.startContainer)) return null;
+  if (closestWithin(range.startContainer, "code", root)) return null;
 
   const localMatch = SLASH_QUERY.exec(
     range.startContainer.data.slice(0, range.startOffset),
@@ -575,6 +657,7 @@ export function readSlashState(root: HTMLElement): SlashState | null {
 }
 
 export function matchSlashCommands(state: SlashState): SlashCommand[] {
+  if (state.blockTag === "PRE") return [];
   return SLASH_COMMANDS.filter(
     (command) =>
       command.name.startsWith(state.query) &&
@@ -587,14 +670,44 @@ export function handleEnter(root: HTMLElement) {
   const block = getCurrentBlock(root);
   if (!block) return false;
 
+  if (block.tagName === "PRE") return handleCodeEnter(block);
+
   const rawText = normalizeEditableText(block.textContent);
 
-  if (
-    block.tagName === "P" &&
-    (rawText.startsWith("## ") || rawText.startsWith("# "))
-  ) {
-    const prefix = rawText.startsWith("## ") ? "## " : "# ";
-    const tag = prefix === "## " ? "h2" : "h1";
+  if (block.tagName === "P" && !block.className) {
+    if (/^(?:-{3,}|\*{3,}|_{3,})$/.test(rawText.trim()))
+      return replaceWithRule(block);
+
+    const fence = /^```([\w+#.-]*)$/.exec(rawText.trim());
+    if (fence) return replaceWithCodeBlock(block, fence[1] ?? "");
+
+    if (rawText.startsWith("> ")) {
+      const quote = document.createElement("blockquote");
+      const first = document.createElement("p");
+      first.append(extractBeforeCaret(block, "> "));
+      const next = document.createElement("p");
+      const hasAfter = block.hasChildNodes();
+      if (hasAfter) moveChildrenInto(block, next);
+      else next.innerHTML = "<br>";
+      quote.append(first, next);
+      block.replaceWith(quote);
+      if (hasAfter) placeCaretAtStart(next);
+      else placeCaretAtEnd(next);
+      return true;
+    }
+
+    // An empty line inside a quote ends the quote, like an empty list item.
+    if (!rawText.trim() && block.parentElement?.tagName === "BLOCKQUOTE") {
+      liftOutOfQuote(block);
+      placeCaretAtStart(block);
+      return true;
+    }
+  }
+
+  const headingPrefix = /^#{1,3} /.exec(rawText)?.[0];
+  if (block.tagName === "P" && headingPrefix) {
+    const prefix = headingPrefix;
+    const tag = `h${prefix.length - 1}`;
     const heading = document.createElement(tag);
     heading.append(extractBeforeCaret(block, prefix));
 
@@ -683,7 +796,11 @@ export function handleEnter(root: HTMLElement) {
     return true;
   }
 
-  if (block.tagName === "H1" || block.tagName === "H2") {
+  if (
+    block.tagName === "H1" ||
+    block.tagName === "H2" ||
+    block.tagName === "H3"
+  ) {
     const paragraph = document.createElement("p");
     paragraph.innerHTML = "<br>";
     block.after(paragraph);
@@ -694,7 +811,105 @@ export function handleEnter(root: HTMLElement) {
   return false;
 }
 
-function editorRange(editor: HTMLElement): Range | null {
+function replaceWithRule(block: HTMLElement) {
+  const rule = document.createElement("hr");
+  const paragraph = document.createElement("p");
+  paragraph.innerHTML = "<br>";
+  block.replaceWith(rule, paragraph);
+  placeCaretAtStart(paragraph);
+  return true;
+}
+
+export function replaceWithCodeBlock(block: HTMLElement, lang: string) {
+  const pre = document.createElement("pre");
+  if (lang) pre.dataset.lang = lang;
+  pre.textContent = "\n";
+  block.replaceWith(pre);
+  if (!pre.nextElementSibling) {
+    const paragraph = document.createElement("p");
+    paragraph.innerHTML = "<br>";
+    pre.after(paragraph);
+  }
+  placeCaretAtStart(pre);
+  return true;
+}
+
+// Moves `block` out of its <blockquote>, splitting the quote around it so the
+// blocks before and after stay quoted.
+export function liftOutOfQuote(block: HTMLElement) {
+  const quote = block.parentElement;
+  if (!quote || quote.tagName !== "BLOCKQUOTE") return;
+  const after = document.createElement("blockquote");
+  while (block.nextSibling) after.append(block.nextSibling);
+  quote.after(block);
+  if (after.hasChildNodes()) block.after(after);
+  if (!quote.hasChildNodes()) quote.remove();
+}
+
+// Code blocks keep a trailing "\n" sentinel so an empty last line has height
+// (the MDX serializer drops it). Enter inserts a newline; Enter on an empty
+// last line leaves the block.
+function handleCodeEnter(pre: HTMLElement) {
+  const split = splitCodeAtCaret(pre);
+  if (!split) return false;
+  const { head, tail } = split;
+
+  if (head.endsWith("\n") && (tail === "" || tail === "\n")) {
+    if (head.length > 0) pre.textContent = head;
+    const paragraph = document.createElement("p");
+    paragraph.innerHTML = "<br>";
+    pre.after(paragraph);
+    placeCaretAtStart(paragraph);
+    return true;
+  }
+
+  insertCodeText(pre, "\n");
+  return true;
+}
+
+function splitCodeAtCaret(pre: HTMLElement) {
+  const selection = globalThis.getSelection();
+  if (!selection || selection.rangeCount === 0) return null;
+  const range = selection.getRangeAt(0);
+  if (!pre.contains(range.startContainer)) return null;
+  range.deleteContents();
+  const before = document.createRange();
+  before.selectNodeContents(pre);
+  before.setEnd(range.startContainer, range.startOffset);
+  const head = before.toString();
+  return { head, tail: (pre.textContent ?? "").slice(head.length) };
+}
+
+// Code blocks hold a single text node; edits rewrite it and put the caret
+// back by offset.
+export function insertCodeText(pre: HTMLElement, text: string) {
+  const split = splitCodeAtCaret(pre);
+  if (!split) return;
+  let next = split.head + text + split.tail;
+  if (!next.endsWith("\n")) next += "\n";
+  pre.textContent = next;
+  const node = pre.firstChild;
+  const selection = globalThis.getSelection();
+  if (!node || !selection) return;
+  const caret = document.createRange();
+  caret.setStart(node, split.head.length + text.length);
+  caret.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(caret);
+}
+
+export function closestWithin(
+  node: Node | null,
+  selector: string,
+  root: HTMLElement,
+): HTMLElement | null {
+  const element =
+    node instanceof Element ? node : (node?.parentElement ?? null);
+  const match = element?.closest<HTMLElement>(selector) ?? null;
+  return match && root.contains(match) && match !== root ? match : null;
+}
+
+export function editorRange(editor: HTMLElement): Range | null {
   const selection = globalThis.getSelection();
   if (
     !selection ||
@@ -796,6 +1011,44 @@ export function handleEditorPaste(
   const currentBlock = getCurrentBlock(editor, range.startContainer);
   const html = clipboard.getData("text/html");
   const text = clipboard.getData("text/plain");
+
+  // Code is literal: paste the plain text, never markup.
+  if (currentBlock?.tagName === "PRE") {
+    insertCodeText(currentBlock, text.replaceAll(/\r\n?/g, "\n"));
+    onCommit();
+    return;
+  }
+  const inlineCode = closestWithin(range.startContainer, "code", editor);
+  if (inlineCode) {
+    range.deleteContents();
+    const node = document.createTextNode(text.replaceAll(/\s+/g, " "));
+    range.insertNode(node);
+    range.setStartAfter(node);
+    range.collapse(true);
+    selectPasteCaret(range);
+    onCommit();
+    return;
+  }
+
+  // A URL pasted over selected prose links the selection.
+  const url = text.trim();
+  if (
+    !range.collapsed &&
+    currentBlock?.contains(range.endContainer) &&
+    /^(?:https?:\/\/|mailto:)\S+$/.test(url) &&
+    sanitizeUrl(url) &&
+    !closestWithin(range.commonAncestorContainer, "a", editor)
+  ) {
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("rel", "noreferrer");
+    link.append(range.extractContents());
+    range.insertNode(link);
+    range.selectNodeContents(link);
+    selectPasteCaret(range);
+    onCommit();
+    return;
+  }
   const explicitMarkdown = clipboard.getData("text/markdown");
   let cleanHtml = html
     ? sanitizeHtml(html)

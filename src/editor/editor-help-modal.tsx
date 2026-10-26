@@ -104,20 +104,48 @@ export function EditorHelpModal() {
               /
             </code>{" "}
             for the command menu. Click any square, circle or rhomb to fill it
-            in.
+            in. Shortcuts use Ctrl in place of ⌘ off a Mac.
           </p>
 
           <Section title="Text">
             <Row code="# ">Heading</Row>
             <Row code="## ">Subheading</Row>
+            <Row code="### ">Small heading</Row>
             <Row code="- ">Bullet list</Row>
             <Row code="1. ">Numbered list</Row>
+            <Row code="> ">Quote — an empty line ends it</Row>
+            <Row code="```">
+              Code block — Enter twice on a blank line to leave
+            </Row>
+            <Row code="---">Divider</Row>
             <Row code="**bold**">
               Turns a word <strong>bold</strong>
             </Row>
-            <Row code="_italic_">
+            <Row code="_italic_ *italic*">
               Turns a word <i>italic</i>
             </Row>
+            <Row code="`code`">
+              Inline <code class="font-mono text-[0.85em]">code</code>
+            </Row>
+            <Row code="~~strike~~">
+              Strikes a word <s>through</s>
+            </Row>
+            <Row code="[text](url)">
+              Link — or paste a URL over selected text
+            </Row>
+            <Row code="--">En dash –, a third hyphen makes an em dash —</Row>
+          </Section>
+
+          <Section title="Shortcuts">
+            <Row code="⌘B ⌘I ⌘E">Bold, italic, inline code</Row>
+            <Row code="⌘⇧X">Strikethrough</Row>
+            <Row code="⌘K">Link the selection, or unlink</Row>
+            <Row code="⌘⌥1 – ⌘⌥3">Heading levels; ⌘⌥0 for plain text</Row>
+            <Row code="⌘⇧7 ⌘⇧8 ⌘⇧9">Numbered, bullet, checklist (also ⌘⇧↵)</Row>
+            <Row code="⌘⇧.">Quote</Row>
+            <Row code="⌘↵">New paragraph below — out of any block</Row>
+            <Row code="⌫">At a block's start, undoes its formatting</Row>
+            <Row code="⌘Z">Right after an automatic change, reverts it</Row>
           </Section>
 
           <Section title="Checkboxes & tracks">
@@ -151,6 +179,12 @@ export function EditorHelpModal() {
             <Row code="/chevron">
               <p class="te-chevron m-0">A quieter line, set aside.</p>
             </Row>
+          </Section>
+
+          <Section title="Blocks">
+            <Row code="/quote">Quote</Row>
+            <Row code="/code">Code block</Row>
+            <Row code="/divider">Divider</Row>
           </Section>
 
           <Section title="Revising">

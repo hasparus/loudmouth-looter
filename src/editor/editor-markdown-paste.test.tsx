@@ -22,6 +22,18 @@ describe("markdownPasteHtml", () => {
     ],
     ["- one\n- two", "<ul><li>one</li><li>two</li></ul>"],
     ["1. one\n2. two", "<ol><li>one</li><li>two</li></ol>"],
+    ["### Heading", "<h3>Heading</h3>"],
+    ["> a quote", "<blockquote><p>a quote</p></blockquote>"],
+    [
+      "```ts\nconst answer = 42;\n```",
+      '<pre data-lang="ts">const answer = 42;</pre>',
+    ],
+    ["one\n\n---\n\ntwo", "<p>one</p><hr><p>two</p>"],
+    ["**bold** ~~deleted~~", "<p><strong>bold</strong> <s>deleted</s></p>"],
+    [
+      "**bold** `inline code`",
+      "<p><strong>bold</strong> <code>inline code</code></p>",
+    ],
   ])("converts supported Markdown: %s", (source, html) => {
     expect(markdownPasteHtml(source)?.html).toBe(html);
   });
@@ -43,15 +55,10 @@ describe("markdownPasteHtml", () => {
     "First line\nSecond line",
     "https://example.com",
     "#hashtag",
-    "> a quote",
-    "```ts\nconst answer = 42;\n```",
     "| A | B |\n| - | - |\n| 1 | 2 |",
-    "### unsupported heading depth",
-    "## Good\n\n### Important",
+    "#### too deep",
     "- parent\n  - child",
     "10. tenth\n11. eleventh",
-    "**bold** ~~deleted~~",
-    "**bold** `inline code`",
     "[click](<java\tscript:alert(1)>)",
     "**bold**\n\n",
     " **bold**",

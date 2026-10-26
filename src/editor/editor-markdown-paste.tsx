@@ -13,11 +13,13 @@ function supported(node: Nodes): boolean {
   switch (node.type) {
     case "root":
     case "paragraph":
+    case "blockquote":
     case "emphasis":
     case "strong":
+    case "delete":
       return node.children.every(supported);
     case "heading":
-      return node.depth <= 2 && node.children.every(supported);
+      return node.depth <= 3 && node.children.every(supported);
     case "list":
       return (
         !node.spread &&
@@ -40,6 +42,9 @@ function supported(node: Nodes): boolean {
     case "text":
       return !node.value.includes("\n");
     case "break":
+    case "code":
+    case "inlineCode":
+    case "thematicBreak":
       return true;
     default:
       return false;
@@ -50,8 +55,13 @@ function containsSyntax(node: Nodes, source: string): boolean {
   switch (node.type) {
     case "heading":
     case "list":
+    case "blockquote":
+    case "code":
+    case "thematicBreak":
     case "emphasis":
     case "strong":
+    case "delete":
+    case "inlineCode":
     case "image":
     case "break":
       return true;

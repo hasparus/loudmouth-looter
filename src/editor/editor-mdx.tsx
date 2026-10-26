@@ -1,5 +1,6 @@
 import type {
   BlockContent,
+  Blockquote,
   Heading,
   List,
   ListItem,
@@ -68,10 +69,22 @@ function blockFrom(node: ChildNode): RootContent | null {
   if (node.classList.contains("te-jsx")) return rawMdxBlock(node);
 
   switch (node.tagName) {
+    case "BLOCKQUOTE":
+      return blockquote(node);
     case "H1":
       return heading(1, node);
     case "H2":
       return heading(2, node);
+    case "H3":
+      return heading(3, node);
+    case "HR":
+      return { type: "thematicBreak" };
+    case "PRE":
+      return {
+        type: "code",
+        lang: node.dataset.lang || null,
+        value: normalizeText(node.textContent).replace(/\n$/, ""),
+      };
     case "OL":
       return listFrom(node, true);
     case "ARTICLE":
@@ -137,7 +150,45 @@ function storedMoveAttributes(
   return [];
 }
 
-function heading(depth: 1 | 2, el: HTMLElement): Heading {
+// Quotes hold blocks, but pasted or hand-edited ones can carry bare inline
+// runs — those are gathered into paragraphs so no formatting is dropped.
+function blockquote(el: HTMLElement): Blockquote {
+  const children: BlockContent[] = [];
+  let inline: Node[] = [];
+  const flushInline = () => {
+    const holder = document.createElement("p");
+    holder.append(...inline.map((node) => node.cloneNode(true)));
+    inline = [];
+    const content = phrasingFrom(holder);
+    if (content.some((node) => node.type !== "text" || node.value.trim()))
+      children.push({ type: "paragraph", children: content });
+  };
+  for (const node of el.childNodes) {
+    if (node instanceof HTMLElement && QUOTE_BLOCK_TAGS.has(node.tagName)) {
+      flushInline();
+      const block = blockFrom(node);
+      if (block) children.push(block as BlockContent);
+    } else {
+      inline.push(node);
+    }
+  }
+  flushInline();
+  return { type: "blockquote", children };
+}
+
+const QUOTE_BLOCK_TAGS = new Set([
+  "BLOCKQUOTE",
+  "H1",
+  "H2",
+  "H3",
+  "HR",
+  "OL",
+  "P",
+  "PRE",
+  "UL",
+]);
+
+function heading(depth: 1 | 2 | 3, el: HTMLElement): Heading {
   return { type: "heading", children: phrasingFrom(el), depth };
 }
 
@@ -220,8 +271,21 @@ function phrasingFrom(parent: HTMLElement): PhrasingContent[] {
       });
       continue;
     }
-    if (node.tagName === "STRONG") {
+    if (node.tagName === "STRONG" || node.tagName === "B") {
       out.push({ type: "strong", children: phrasingFrom(node) });
+      continue;
+    }
+    if (node.tagName === "CODE") {
+      const value = normalizeText(node.textContent);
+      if (value) out.push({ type: "inlineCode", value });
+      continue;
+    }
+    if (
+      node.tagName === "S" ||
+      node.tagName === "DEL" ||
+      node.tagName === "STRIKE"
+    ) {
+      out.push({ type: "delete", children: phrasingFrom(node) });
       continue;
     }
     if (node.tagName === "I" || node.tagName === "EM") {
@@ -320,10 +384,28 @@ export function mdxToHtml(mdx: string): string {
 function blockToDom(node: RootContent): HTMLElement | null {
   switch (node.type) {
     case "heading": {
-      const el = document.createElement(node.depth <= 1 ? "h1" : "h2");
+      const el = document.createElement(
+        node.depth <= 1 ? "h1" : node.depth === 2 ? "h2" : "h3",
+      );
       appendPhrasing(el, node.children);
       return el;
     }
+    case "blockquote": {
+      const el = document.createElement("blockquote");
+      for (const child of node.children) {
+        const childEl = blockToDom(child);
+        if (childEl) el.append(childEl);
+      }
+      return el;
+    }
+    case "code": {
+      const el = document.createElement("pre");
+      if (node.lang) el.dataset.lang = node.lang;
+      el.textContent = node.value;
+      return el;
+    }
+    case "thematicBreak":
+      return document.createElement("hr");
     case "list":
       return listToDom(node);
     case "mdxFlowExpression":
@@ -446,9 +528,18 @@ function appendPhrasing(parent: HTMLElement, nodes: PhrasingContent[]): void {
         parent.append(el);
         break;
       }
-      case "inlineCode":
-        parent.append(document.createTextNode(node.value));
+      case "delete": {
+        const el = document.createElement("s");
+        appendPhrasing(el, node.children);
+        parent.append(el);
         break;
+      }
+      case "inlineCode": {
+        const el = document.createElement("code");
+        el.textContent = node.value;
+        parent.append(el);
+        break;
+      }
       case "link": {
         const el = document.createElement("a");
         el.setAttribute("href", node.url);

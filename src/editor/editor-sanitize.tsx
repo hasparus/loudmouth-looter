@@ -49,17 +49,22 @@ export function sanitizeImageSrc(src: string): string {
 const ALLOWED_TAGS = new Set([
   "A",
   "ARTICLE",
+  "BLOCKQUOTE",
   "BR",
+  "CODE",
   "DIV",
   "H1",
   "H2",
   "H3",
+  "HR",
   "I",
   "IMG",
   "INPUT",
   "LI",
   "OL",
   "P",
+  "PRE",
+  "S",
   "STRONG",
   "UL",
 ]);
@@ -72,7 +77,12 @@ const DROPPED_TAGS = new Set([
   "STYLE",
   "SVG",
 ]);
-const TAG_RENAME: Record<string, string> = { B: "STRONG", EM: "I" };
+const TAG_RENAME: Record<string, string> = {
+  B: "STRONG",
+  DEL: "S",
+  EM: "I",
+  STRIKE: "S",
+};
 
 const ATOM_TAGS: Record<string, string> = {
   "te-arrow": "P",
@@ -83,6 +93,33 @@ const ATOM_TAGS: Record<string, string> = {
   "te-track": "SPAN",
 };
 const SHAPES = new Set(["circle", "rhomb", "square"]);
+
+// Code blocks hold plain text only: highlighter spans are flattened and <br>s
+// (from rich-text sources) become newlines.
+function preText(node: Node): string {
+  if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? "";
+  if (node instanceof Element && node.tagName === "BR") return "\n";
+  if (node instanceof Element && DROPPED_TAGS.has(node.tagName.toUpperCase()))
+    return "";
+  let text = "";
+  for (const child of node.childNodes) text += preText(child);
+  return text;
+}
+
+const LANGUAGE_RE = /^[\w+#.-]{1,32}$/;
+
+function codeLanguage(pre: HTMLElement): string {
+  const candidates = [
+    pre.dataset.lang,
+    pre.dataset.language,
+    ...[pre, pre.querySelector("code")].flatMap((el) =>
+      [...(el?.classList ?? [])]
+        .filter((name) => name.startsWith("language-"))
+        .map((name) => name.slice("language-".length)),
+    ),
+  ];
+  return candidates.find((lang) => !!lang && LANGUAGE_RE.test(lang)) ?? "";
+}
 
 function sanitizeInto(source: ParentNode, target: ParentNode) {
   for (const child of source.childNodes) {
@@ -154,6 +191,15 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
       el.setAttribute("rel", "noreferrer");
       target.append(el);
       sanitizeInto(child, el);
+      continue;
+    }
+
+    if (tag === "PRE") {
+      const el = document.createElement("pre");
+      const lang = child instanceof HTMLElement ? codeLanguage(child) : "";
+      if (lang) el.dataset.lang = lang;
+      el.textContent = preText(child);
+      target.append(el);
       continue;
     }
 

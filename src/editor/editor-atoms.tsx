@@ -56,6 +56,24 @@ export const SLASH_COMMANDS: SlashCommand[] = [
     kind: "block",
     name: "move",
   },
+  {
+    defaultCount: 0,
+    description: "Quote",
+    kind: "block",
+    name: "quote",
+  },
+  {
+    defaultCount: 0,
+    description: "Code block",
+    kind: "block",
+    name: "code",
+  },
+  {
+    defaultCount: 0,
+    description: "Divider",
+    kind: "block",
+    name: "divider",
+  },
 ];
 
 const MAX_COUNT = 12;
