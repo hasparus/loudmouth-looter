@@ -143,7 +143,7 @@ describe("prose blocks and marks round-trip", () => {
     ["A\n\n***\n\nB\n", "<p>A</p><hr><p>B</p>"],
     [
       "```ts\nconst a = 1;\n\nconst b = 2;\n```\n",
-      '<pre data-lang="ts">const a = 1;\n\nconst b = 2;</pre>',
+      '<pre data-lang="ts">const a = 1;\n\nconst b = 2;\n</pre>',
     ],
     [
       "Use `npm i` and ~~pray~~.\n",
@@ -156,6 +156,12 @@ describe("prose blocks and marks round-trip", () => {
 
   test("a code block's trailing sentinel newline is dropped", () => {
     expect(htmlToMdx("<pre>x = 1\n</pre>")).toBe("```\nx = 1\n```\n");
+  });
+
+  test("a code block keeps a blank last line and non-breaking spaces", () => {
+    const mdx = "```\nx\u00A0= 1\n\n```\n";
+    expect(mdxToHtml(mdx)).toBe("<pre>x&nbsp;= 1\n\n</pre>");
+    expect(htmlToMdx(mdxToHtml(mdx))).toBe(mdx);
   });
 
   test("browser formatting tags serialize like their semantic twins", () => {

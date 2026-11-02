@@ -26,7 +26,7 @@ describe("markdownPasteHtml", () => {
     ["> a quote", "<blockquote><p>a quote</p></blockquote>"],
     [
       "```ts\nconst answer = 42;\n```",
-      '<pre data-lang="ts">const answer = 42;</pre>',
+      '<pre data-lang="ts">const answer = 42;\n</pre>',
     ],
     ["one\n\n---\n\ntwo", "<p>one</p><hr><p>two</p>"],
     ["**bold** ~~deleted~~", "<p><strong>bold</strong> <s>deleted</s></p>"],
@@ -57,6 +57,7 @@ describe("markdownPasteHtml", () => {
     "#hashtag",
     "| A | B |\n| - | - |\n| 1 | 2 |",
     "#### too deep",
+    "```js title=example\nconst a = 1;\n```",
     "- parent\n  - child",
     "10. tenth\n11. eleventh",
     "[click](<java\tscript:alert(1)>)",

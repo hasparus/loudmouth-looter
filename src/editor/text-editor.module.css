@@ -82,6 +82,11 @@
   margin-top: 1rem;
 }
 
+/* A Move card's title sits in a row with its checkbox. */
+.editor h3[data-move-title] {
+  margin: 0;
+}
+
 /* ⌘B goes through execCommand, which writes <b>; the sanitizer turns it into
    <strong> on load, so match skin.css's strong to keep the look stable. */
 .editor b {

@@ -332,4 +332,90 @@ test.describe("editor formatting", () => {
     // The card's own title is not a prose heading.
     await expect(editor.locator("h3[data-move-title]")).toHaveText("New Move");
   });
+
+  test("Backspace turns a checklist item into a bullet, then a paragraph", async ({
+    page,
+  }) => {
+    const editor = await setEditor(page, "<p>Item</p>");
+    await page.keyboard.press("ControlOrMeta+Shift+Digit9");
+    await expect(editor.getByRole("checkbox")).toHaveCount(1);
+    await caretToStartOf(editor, "li");
+    await page.keyboard.press("End");
+    await page.keyboard.press("Home");
+    await page.keyboard.press("Backspace");
+    await expect(editor.getByRole("checkbox")).toHaveCount(0);
+    await expect(editor.locator("ul > li")).toHaveText("Item");
+    await page.keyboard.press("Backspace");
+    await expect(editor.locator("li")).toHaveCount(0);
+    await expect(editor.locator("p")).toHaveText("Item");
+  });
+
+  test("Mod-Enter leaves a quote from any of its paragraphs", async ({
+    page,
+  }) => {
+    const editor = await setEditor(
+      page,
+      "<blockquote><p>first</p><p>second</p></blockquote>",
+      "first",
+    );
+    await page.keyboard.press("ControlOrMeta+Enter");
+    await editor.pressSequentially("between");
+    await expect(editor.locator("blockquote")).toHaveCount(2);
+    await expect(editor.locator("blockquote + p")).toHaveText("between");
+    await expect(editor.locator("p + blockquote > p")).toHaveText("second");
+  });
+
+  test("/code keeps the text that followed the command", async ({ page }) => {
+    const editor = await setEditor(page, "<p>keep me</p>");
+    await caretToStartOf(editor, "p");
+    await editor.pressSequentially("/code");
+    await page.keyboard.press("Enter");
+    await expect(editor.locator("pre")).toHaveCount(1);
+    await expect(editor.locator("pre + p")).toHaveText("keep me");
+  });
+
+  test("a URL pasted over part of a link doesn't nest links", async ({
+    page,
+  }) => {
+    const editor = await setEditor(
+      page,
+      '<p><a href="https://a.example">linked</a> plain</p>',
+    );
+    await editor.evaluate((el) => {
+      const link = el.querySelector("a")!.firstChild!;
+      const plain = el.querySelector("p")!.lastChild!;
+      const range = document.createRange();
+      range.setStart(link, 2);
+      range.setEnd(plain, 3);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      const data = new DataTransfer();
+      data.setData("text/plain", "https://b.example");
+      el.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+    await expect(editor.locator("a a")).toHaveCount(0);
+  });
+
+  test("an HTML-only paste into code inserts its text", async ({ page }) => {
+    const editor = await setEditor(page, "<pre>a\n</pre>");
+    await caretToStartOf(editor, "pre");
+    await editor.evaluate((el) => {
+      const data = new DataTransfer();
+      data.setData("text/html", "<b>bold</b> text ");
+      el.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+    await expect(editor.locator("pre")).toHaveText("bold text a\n");
+  });
 });

@@ -111,11 +111,22 @@ function preText(node: Node): string {
   if (node instanceof Element && DROPPED_TAGS.has(node.tagName.toUpperCase()))
     return "";
   let text = "";
-  for (const child of node.childNodes) text += preText(child);
+  for (const child of node.childNodes) {
+    text += preText(child);
+    // Line-per-element code (some highlighters) ends each line with a block.
+    if (
+      child instanceof Element &&
+      (child.tagName === "DIV" || child.tagName === "P") &&
+      !text.endsWith("\n")
+    )
+      text += "\n";
+  }
   return text;
 }
 
-const LANGUAGE_RE = /^[\w+#.-]{1,32}$/;
+// A code block's language label (the fence info string), as stored.
+export const CODE_LANGUAGE = /[\w+#.-]{1,32}/;
+const LANGUAGE_RE = new RegExp(`^${CODE_LANGUAGE.source}$`);
 
 function codeLanguage(pre: HTMLElement): string {
   const candidates = [

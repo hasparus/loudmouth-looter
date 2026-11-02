@@ -316,8 +316,8 @@ export function TextEditor() {
     if (!event.clipboardData) return;
     const literal = literalContextAt(editor);
     if (literal) {
-      const text = event.clipboardData.getData("text/plain");
-      if (pasteLiteral(editor, literal, text)) afterChange(editor, true);
+      if (pasteLiteral(editor, literal, event.clipboardData))
+        afterChange(editor, true);
       return;
     }
     handleEditorPaste(editor, event.clipboardData, (image) => {

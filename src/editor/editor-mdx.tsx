@@ -85,7 +85,8 @@ function blockFrom(node: ChildNode): RootContent | null {
       return {
         type: "code",
         lang: node.dataset.lang || null,
-        value: normalizeText(node.textContent).replace(/\n$/, ""),
+        // Only the caret markers go; the "\n" sentinel is the block's own.
+        value: node.textContent.replaceAll("\u200B", "").replace(/\n$/, ""),
       };
     case "OL":
       return listFrom(node, true);
@@ -386,7 +387,7 @@ function blockToDom(node: RootContent): HTMLElement | null {
     case "code": {
       const el = document.createElement("pre");
       if (node.lang) el.dataset.lang = node.lang;
-      el.textContent = node.value;
+      el.textContent = `${node.value}\n`;
       return el;
     }
     case "thematicBreak":

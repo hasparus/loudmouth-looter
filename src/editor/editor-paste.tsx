@@ -117,7 +117,8 @@ export function handleEditorPaste(
     url &&
     !range.collapsed &&
     currentBlock?.contains(range.endContainer) &&
-    !closestWithin(range.commonAncestorContainer, "a", editor)
+    !closestWithin(range.startContainer, "a", editor) &&
+    !closestWithin(range.endContainer, "a", editor)
   ) {
     const link = buildLink(url, range.extractContents());
     range.insertNode(link);

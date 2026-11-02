@@ -7,6 +7,7 @@ import { buildToggleElement } from "./editor-atoms";
 import {
   codeBlockKey,
   currentCodeBlock,
+  replaceOrPrecede,
   replaceWithCodeBlock,
 } from "./editor-code-block";
 import {
@@ -430,7 +431,7 @@ function insertMove(block: HTMLElement): boolean {
   const body = document.createElement("p");
   body.innerHTML = "<br>";
   const move = buildMoveElement("New Move", undefined, [body]);
-  block.replaceWith(move);
+  replaceOrPrecede(block, move);
   const title = move.querySelector("h3");
   const caret = document.createRange();
   caret.selectNodeContents(title ?? body);
@@ -444,19 +445,17 @@ function insertMove(block: HTMLElement): boolean {
 export function insertParagraphBelow(editor: HTMLElement): boolean {
   const block = getCurrentBlock(editor);
   if (!block) return false;
-  let unit = blockUnit(block);
-  const quote = unit.parentElement;
-  if (quote?.tagName === "BLOCKQUOTE" && quote.lastElementChild === unit)
-    unit = quote;
   const paragraph = document.createElement("p");
   paragraph.innerHTML = "<br>";
-  unit.after(paragraph);
+  blockUnit(block).after(paragraph);
+  liftOutOfQuote(paragraph);
   placeCaretAtStart(paragraph);
   return true;
 }
 
 // ── Backspace at the start of a block: undo the block's formatting first ──
 
+// At the start of the block's text — after a checklist item's own toggle.
 function caretAtBlockStart(block: HTMLElement): boolean {
   const selection = globalThis.getSelection();
   if (!selection || selection.rangeCount === 0) return false;
@@ -464,6 +463,8 @@ function caretAtBlockStart(block: HTMLElement): boolean {
   if (!caret.collapsed || !block.contains(caret.startContainer)) return false;
   const before = document.createRange();
   before.selectNodeContents(block);
+  const toggle = block.querySelector(":scope > .te-toggle");
+  if (toggle) before.setStartAfter(toggle);
   before.setEnd(caret.startContainer, caret.startOffset);
   if (before.toString().replaceAll("\u200B", "") !== "") return false;
   return !before
@@ -488,8 +489,12 @@ export function handleBackspace(editor: HTMLElement): boolean {
   }
 
   if (block.tagName === "LI") {
-    if (block.classList.contains("te-task")) return false;
-    withCaret(block, () => itemToParagraph(block));
+    // A checklist item becomes a bullet first, then a paragraph.
+    withCaret(block, () => {
+      if (!block.classList.contains("te-task")) return itemToParagraph(block);
+      setTask(block, false);
+      return block;
+    });
     return true;
   }
 

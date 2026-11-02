@@ -43,6 +43,12 @@ describe("sanitizeHtml", () => {
     ).toBe('<pre data-lang="ts">const a\n= 1</pre>');
   });
 
+  test("keeps the lines of line-per-element code", () => {
+    expect(sanitizeHtml("<pre><div>first</div><div>second</div></pre>")).toBe(
+      "<pre>first\nsecond\n</pre>",
+    );
+  });
+
   test("drops an unsafe language label", () => {
     expect(sanitizeHtml('<pre data-lang="a&quot; onload=x">y</pre>')).toBe(
       "<pre>y</pre>",

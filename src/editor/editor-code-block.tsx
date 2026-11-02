@@ -38,11 +38,21 @@ function paragraphAfter(element: Element) {
   return paragraph;
 }
 
+// Puts `element` in place of an empty block, or before one that still holds
+// text (what followed a slash command), so that text is kept.
+export function replaceOrPrecede(block: HTMLElement, element: HTMLElement) {
+  const empty =
+    !block.textContent?.replaceAll("\u200B", "").trim() &&
+    !block.querySelector(":not(br)");
+  if (empty) block.replaceWith(element);
+  else block.before(element);
+}
+
 export function replaceWithCodeBlock(block: HTMLElement, lang: string) {
   const pre = document.createElement("pre");
   if (lang) pre.dataset.lang = lang;
   pre.textContent = "\n";
-  block.replaceWith(pre);
+  replaceOrPrecede(block, pre);
   if (!pre.nextElementSibling) paragraphAfter(pre);
   placeCaretAtStart(pre);
   return true;
@@ -105,13 +115,22 @@ export function codeBlockKey(pre: HTMLElement, key: CodeBlockKey): boolean {
   }
 }
 
+function clipboardText(clipboard: DataTransfer): string {
+  const text = clipboard.getData("text/plain");
+  if (text) return text;
+  const template = document.createElement("template");
+  template.innerHTML = clipboard.getData("text/html");
+  return template.content.textContent ?? "";
+}
+
 // Paste into code: plain text only — newlines kept in a block, collapsed in
 // an inline span.
 export function pasteLiteral(
   editor: HTMLElement,
   context: LiteralContext,
-  text: string,
+  clipboard: DataTransfer,
 ): boolean {
+  const text = clipboardText(clipboard);
   if (context === "pre") {
     const pre = currentCodeBlock(editor);
     return !!pre && insertText(pre, text.replaceAll(/\r\n?/g, "\n"));

@@ -41,8 +41,10 @@ function supported(node: Nodes): boolean {
       return !node.title && !!sanitizeImageSrc(node.url);
     case "text":
       return !node.value.includes("\n");
-    case "break":
     case "code":
+      // Info-string metadata (```js title=x) has nowhere to live.
+      return !node.meta;
+    case "break":
     case "inlineCode":
     case "thematicBreak":
       return true;

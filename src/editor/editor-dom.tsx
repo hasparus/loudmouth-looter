@@ -7,6 +7,7 @@ import {
 } from "./editor-atoms";
 import { replaceWithCodeBlock } from "./editor-code-block";
 import { normalizeEditableText } from "./editor-inline";
+import { CODE_LANGUAGE } from "./editor-sanitize";
 import {
   breaksWords,
   MAX_HEADING_LEVEL,
@@ -383,6 +384,7 @@ export function matchSlashCommands(state: SlashState): SlashCommand[] {
 }
 
 const HEADING_PREFIX = new RegExp(`^#{1,${MAX_HEADING_LEVEL}} `);
+const CODE_FENCE = new RegExp(`^\`\`\`(${CODE_LANGUAGE.source})?$`);
 
 export function handleEnter(root: HTMLElement) {
   const block = getCurrentBlock(root);
@@ -396,8 +398,11 @@ export function handleEnter(root: HTMLElement) {
       return insertRule(block);
     }
 
-    const fence = /^```([\w+#.-]*)$/.exec(rawText.trim());
-    if (fence) return replaceWithCodeBlock(block, fence[1] ?? "");
+    const fence = CODE_FENCE.exec(rawText.trim());
+    if (fence) {
+      block.replaceChildren();
+      return replaceWithCodeBlock(block, fence[1] ?? "");
+    }
 
     if (rawText.startsWith("> ")) {
       const quote = document.createElement("blockquote");
