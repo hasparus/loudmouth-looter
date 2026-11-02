@@ -1,3 +1,4 @@
+import { FLOW_BLOCK_TAGS, MARK_TAGS, markTag } from "./editor-schema";
 import {
   populateJsxElement,
   populateToggleElement,
@@ -40,6 +41,32 @@ export function sanitizeUrl(url: string): string {
   }
 }
 
+const BARE_URL = /^(?:https?:\/\/|mailto:)\S+$/;
+
+// Text that is nothing but a safe URL, so it can become a link on its own.
+export function linkableUrl(text: string): string | null {
+  const url = text.trim();
+  return BARE_URL.test(url) && sanitizeUrl(url) ? url : null;
+}
+
+// A Markdown link target read out of escaped HTML.
+export const linkableHref = (escapedUrl: string) =>
+  sanitizeUrl(unescapeHtml(escapedUrl));
+
+export function buildLink(href: string, ...content: Node[]) {
+  const link = document.createElement("a");
+  link.setAttribute("href", href);
+  link.setAttribute("rel", "noreferrer");
+  link.append(...content);
+  return link;
+}
+
+export function linkHtml(href: string, innerHtml: string) {
+  const link = buildLink(href);
+  link.innerHTML = innerHtml;
+  return link.outerHTML;
+}
+
 export function sanitizeImageSrc(src: string): string {
   const trimmed = src.trim();
   if (/^data:image\/(png|jpeg|gif|webp|avif);/i.test(trimmed)) return trimmed;
@@ -47,21 +74,14 @@ export function sanitizeImageSrc(src: string): string {
 }
 
 const ALLOWED_TAGS = new Set([
-  "A",
+  ...FLOW_BLOCK_TAGS,
+  ...MARK_TAGS,
   "ARTICLE",
   "BR",
   "DIV",
-  "H1",
-  "H2",
-  "H3",
-  "I",
   "IMG",
   "INPUT",
   "LI",
-  "OL",
-  "P",
-  "STRONG",
-  "UL",
 ]);
 
 const DROPPED_TAGS = new Set([
@@ -72,7 +92,6 @@ const DROPPED_TAGS = new Set([
   "STYLE",
   "SVG",
 ]);
-const TAG_RENAME: Record<string, string> = { B: "STRONG", EM: "I" };
 
 const ATOM_TAGS: Record<string, string> = {
   "te-arrow": "P",
@@ -84,6 +103,44 @@ const ATOM_TAGS: Record<string, string> = {
 };
 const SHAPES = new Set(["circle", "rhomb", "square"]);
 
+// Code blocks hold plain text only: highlighter spans are flattened and <br>s
+// (from rich-text sources) become newlines.
+function preText(node: Node): string {
+  if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? "";
+  if (node instanceof Element && node.tagName === "BR") return "\n";
+  if (node instanceof Element && DROPPED_TAGS.has(node.tagName.toUpperCase()))
+    return "";
+  let text = "";
+  for (const child of node.childNodes) {
+    text += preText(child);
+    // Line-per-element code (some highlighters) ends each line with a block.
+    if (
+      child instanceof Element &&
+      (child.tagName === "DIV" || child.tagName === "P") &&
+      !text.endsWith("\n")
+    )
+      text += "\n";
+  }
+  return text;
+}
+
+// A code block's language label (the fence info string), as stored.
+export const CODE_LANGUAGE = /[\w+#.-]{1,32}/;
+const LANGUAGE_RE = new RegExp(`^${CODE_LANGUAGE.source}$`);
+
+function codeLanguage(pre: HTMLElement): string {
+  const candidates = [
+    pre.dataset.lang,
+    pre.dataset.language,
+    ...[pre, pre.querySelector("code")].flatMap((el) =>
+      [...(el?.classList ?? [])]
+        .filter((name) => name.startsWith("language-"))
+        .map((name) => name.slice("language-".length)),
+    ),
+  ];
+  return candidates.find((lang) => !!lang && LANGUAGE_RE.test(lang)) ?? "";
+}
+
 function sanitizeInto(source: ParentNode, target: ParentNode) {
   for (const child of source.childNodes) {
     if (child.nodeType === Node.TEXT_NODE) {
@@ -93,7 +150,7 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
     if (!(child instanceof Element)) continue;
 
     const rawTag = child.tagName.toUpperCase();
-    const tag = TAG_RENAME[rawTag] ?? rawTag;
+    const tag = markTag(rawTag);
 
     if (DROPPED_TAGS.has(tag)) continue;
 
@@ -149,11 +206,18 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
         sanitizeInto(child, target);
         continue;
       }
-      const el = document.createElement("a");
-      el.setAttribute("href", href);
-      el.setAttribute("rel", "noreferrer");
+      const el = buildLink(href);
       target.append(el);
       sanitizeInto(child, el);
+      continue;
+    }
+
+    if (tag === "PRE") {
+      const el = document.createElement("pre");
+      const lang = child instanceof HTMLElement ? codeLanguage(child) : "";
+      if (lang) el.dataset.lang = lang;
+      el.textContent = preText(child);
+      target.append(el);
       continue;
     }
 
@@ -187,6 +251,12 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
 
     if (ALLOWED_TAGS.has(tag)) {
       const el = document.createElement(tag.toLowerCase());
+      if (
+        tag === "H3" &&
+        child instanceof HTMLElement &&
+        "moveTitle" in child.dataset
+      )
+        el.dataset.moveTitle = "";
       target.append(el);
       sanitizeInto(child, el);
       continue;

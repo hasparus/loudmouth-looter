@@ -55,11 +55,13 @@ export function SlashMenu(props: SlashMenuProps) {
               <span class="text-neu-700 dark:text-neu-300 flex-1 text-sm">
                 {command.description}
               </span>
-              <Show when={command.kind === "track" && command.shape}>
-                <TrackPreview
-                  count={Math.min(props.count ?? command.defaultCount, 6)}
-                  shape={command.shape!}
-                />
+              <Show when={command.kind === "track" ? command : undefined}>
+                {(track) => (
+                  <TrackPreview
+                    count={Math.min(props.count ?? track().defaultCount, 6)}
+                    shape={track().shape}
+                  />
+                )}
               </Show>
             </div>
           )}

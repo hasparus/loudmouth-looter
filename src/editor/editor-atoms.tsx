@@ -1,18 +1,16 @@
 import { Index } from "solid-js";
 
+import type { EditorCommand } from "./editor-commands";
+
 // Primitive atoms shared by the text editor, its slash menu, and the help
 // modal. DOM builders produce the live, interactive elements embedded in the
 
 export type Shape = "circle" | "rhomb" | "square";
 
-export interface SlashCommand {
-  blockClass?: string;
-  defaultCount: number;
-  description: string;
-  kind: "block" | "track";
-  name: string;
-  shape?: Shape;
-}
+export type SlashCommand = { description: string; name: string } & (
+  | { kind: "block"; command: EditorCommand }
+  | { kind: "track"; defaultCount: number; shape: Shape }
+);
 
 export const SLASH_COMMANDS: SlashCommand[] = [
   {
@@ -37,24 +35,40 @@ export const SLASH_COMMANDS: SlashCommand[] = [
     shape: "rhomb",
   },
   {
-    blockClass: "te-arrow",
-    defaultCount: 0,
+    command: { kind: "line", line: "te-arrow" },
     description: "Arrow line",
     kind: "block",
     name: "arrow",
   },
   {
-    blockClass: "te-chevron",
-    defaultCount: 0,
+    command: { kind: "line", line: "te-chevron" },
     description: "Chevron line",
     kind: "block",
     name: "chevron",
   },
   {
-    defaultCount: 0,
+    command: { kind: "move" },
     description: "Move card",
     kind: "block",
     name: "move",
+  },
+  {
+    command: { kind: "quote" },
+    description: "Quote",
+    kind: "block",
+    name: "quote",
+  },
+  {
+    command: { kind: "code-block" },
+    description: "Code block",
+    kind: "block",
+    name: "code",
+  },
+  {
+    command: { kind: "rule" },
+    description: "Divider",
+    kind: "block",
+    name: "divider",
   },
 ];
 

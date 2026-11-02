@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { formatInline } from "./editor-dom";
+import { formatInline, inlineMarkdown } from "./editor-inline";
 import { htmlToMdx, mdxToHtml } from "./editor-mdx";
 
 describe("mdxToHtml", () => {
@@ -133,7 +133,128 @@ describe("htmlToMdx", () => {
   });
 });
 
+describe("prose blocks and marks round-trip", () => {
+  test.each([
+    ["### Small heading\n", "<h3>Small heading</h3>"],
+    [
+      "> Quoted **words**.\n",
+      "<blockquote><p>Quoted <strong>words</strong>.</p></blockquote>",
+    ],
+    ["A\n\n***\n\nB\n", "<p>A</p><hr><p>B</p>"],
+    [
+      "```ts\nconst a = 1;\n\nconst b = 2;\n```\n",
+      '<pre data-lang="ts">const a = 1;\n\nconst b = 2;\n</pre>',
+    ],
+    [
+      "Use `npm i` and ~~pray~~.\n",
+      "<p>Use <code>npm i</code> and <s>pray</s>.</p>",
+    ],
+  ])("%j", (mdx, html) => {
+    expect(mdxToHtml(mdx)).toBe(html);
+    expect(htmlToMdx(html)).toBe(mdx);
+  });
+
+  test("a code block's trailing sentinel newline is dropped", () => {
+    expect(htmlToMdx("<pre>x = 1\n</pre>")).toBe("```\nx = 1\n```\n");
+  });
+
+  test("a code block keeps a blank last line and non-breaking spaces", () => {
+    const mdx = "```\nx\u00A0= 1\n\n```\n";
+    expect(mdxToHtml(mdx)).toBe("<pre>x&nbsp;= 1\n\n</pre>");
+    expect(htmlToMdx(mdxToHtml(mdx))).toBe(mdx);
+  });
+
+  test("browser formatting tags serialize like their semantic twins", () => {
+    expect(htmlToMdx("<p><b>a</b> <em>b</em> <strike>c</strike></p>")).toBe(
+      "**a** _b_ ~~c~~\n",
+    );
+  });
+
+  test("a Move card inside a quote is kept as a block", () => {
+    const move = mdxToHtml("<Move>\n## Title\n\nBody text.\n</Move>\n");
+    const mdx = htmlToMdx(`<blockquote><p>Quoted</p>${move}</blockquote>`);
+    expect(mdx).toContain("<Move");
+    expect(mdx).toContain("Body text.");
+    expect(mdx).toContain("> Quoted");
+  });
+
+  test("an empty inline code span is dropped, not written as ``", () => {
+    expect(htmlToMdx("<p>a <code>\u200B</code> b</p>")).toBe("a  b\n");
+  });
+
+  test("bare inline content in a quote keeps its formatting", () => {
+    expect(
+      htmlToMdx("<blockquote>plain <strong>bold</strong></blockquote>"),
+    ).toBe("> plain **bold**\n");
+  });
+});
+
+describe("inlineMarkdown", () => {
+  const nodesOf = (html: string) => {
+    const template = document.createElement("template");
+    template.innerHTML = html;
+    return template.content;
+  };
+
+  test.each(["a_b", "2*3 [x]", "plain **bold** _it_ ~~gone~~ `x_y`"])(
+    "is formatInline's inverse: %s",
+    (markdown) => {
+      expect(inlineMarkdown(nodesOf(formatInline(markdown)).childNodes)).toBe(
+        markdown,
+      );
+    },
+  );
+
+  test.each(["a_b", "2*3 [x]", "**bold** words"])(
+    "a Mod-K label links with its own text: %s",
+    (label) => {
+      const shown = nodesOf(formatInline(label));
+      const link = nodesOf(
+        formatInline(`[${inlineMarkdown(shown.childNodes)}](https://x.com)`),
+      ).firstElementChild;
+      expect(link?.tagName).toBe("A");
+      expect(link?.innerHTML).toBe(
+        [...shown.childNodes]
+          .map((node) =>
+            node instanceof Element ? node.outerHTML : node.textContent,
+          )
+          .join(""),
+      );
+    },
+  );
+
+  test("browser tags write as their marks", () => {
+    expect(
+      inlineMarkdown(
+        nodesOf("<b>a</b> <em>b</em> <strike>c</strike> <code>d</code>")
+          .childNodes,
+      ),
+    ).toBe("**a** _b_ ~~c~~ `d`");
+  });
+});
+
 describe("formatInline", () => {
+  test("code spans, strikethrough and star italics", () => {
+    expect(formatInline("run `a **b**` now")).toBe(
+      "run <code>a **b**</code> now",
+    );
+    expect(formatInline("~~gone~~ and *lean*")).toBe(
+      "<s>gone</s> and <i>lean</i>",
+    );
+  });
+
+  test("lone or padded asterisks stay literal", () => {
+    expect(formatInline("2 * 3 * 4")).toBe("2 * 3 * 4");
+    expect(formatInline("**half*")).toBe("**half*");
+    expect(formatInline("a*b*c")).toBe("a*b*c");
+  });
+
+  test("a code span inside a link label survives", () => {
+    expect(formatInline("[`x`](https://x.com)")).toBe(
+      '<a href="https://x.com" rel="noreferrer"><code>x</code></a>',
+    );
+  });
+
   test("link with underscores/asterisks in URL is not mangled", () => {
     expect(formatInline("[doc](https://x.com/a_b_c)")).toBe(
       '<a href="https://x.com/a_b_c" rel="noreferrer">doc</a>',

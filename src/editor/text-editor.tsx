@@ -9,22 +9,26 @@ import {
 
 import { ControlButton } from "./ControlButton";
 import { buildTrackElement, type SlashCommand } from "./editor-atoms";
+import { literalContextAt, pasteLiteral } from "./editor-code-block";
 import {
-  applyInlineTransform,
+  applyDashes,
+  commandForKey,
+  type EditorCommand,
+  isKeyRule,
+  runCommand,
+} from "./editor-commands";
+import {
   applyTaskShorthand,
   captureSnapshot,
+  countWords,
   DEFAULT_HTML,
   flushSave,
   focusSiblingToggle,
-  getCurrentBlock,
-  handleEditorPaste,
-  handleEnter,
   matchSlashCommands,
   migrateStorage,
   normalizeEmptyBlocks,
   normalizeTrackTabindexes,
   readSlashState,
-  restoreSelection,
   save,
   serializeDocument,
   SLASH_MENU_ID,
@@ -34,13 +38,14 @@ import {
   SPELLCHECK_KEY,
   STORAGE_KEY,
   syncDocumentTitle,
-  trackBeforeCaret,
   type UndoSnapshot,
   updateSnapshotImage,
 } from "./editor-dom";
 import { EditorHelpModal } from "./editor-help-modal";
+import { applyInlineTransform } from "./editor-inline";
+import { handleEditorPaste } from "./editor-paste";
 import { sanitizeHtml } from "./editor-sanitize";
-import { buildMoveElement } from "./move-dom";
+import { restoreSelection, select } from "./editor-selection";
 import { SlashMenu } from "./slash-menu";
 import styles from "./text-editor.module.css";
 import { useLinkedFile } from "./use-linked-file";
@@ -73,33 +78,72 @@ function caretOf(selection: Selection | null): Caret {
   ];
 }
 
+const WORD_COUNT_DELAY_MS = 300;
+
 export function TextEditor() {
   let editorEl: HTMLDivElement | undefined;
   let pendingUndo: UndoSnapshot | null = null;
   let slashCaret: Caret = [null, 0, null, 0];
+  let wordTimer: ReturnType<typeof setTimeout> | undefined;
   const [spellcheck, setSpellcheck] = createSignal(
     localStorage.getItem(SPELLCHECK_KEY) !== "false",
   );
   const [slash, setSlash] = createSignal<SlashState | null>(null);
   const [slashIndex, setSlashIndex] = createSignal(0);
+  const [words, setWords] = createSignal(0);
   const file = useLinkedFile();
+  onCleanup(() => clearTimeout(wordTimer));
 
-  function persist(editor: HTMLElement) {
-    save(editor);
+  // Every change to the document ends here: storage, linked file, title and
+  // word count. `now` writes immediately; typing is debounced.
+  function afterChange(editor: HTMLElement, now: boolean) {
     syncDocumentTitle(editor);
-    file.queue(serializeDocument(editor));
+    clearTimeout(wordTimer);
+    if (now) {
+      flushSave(editor);
+      setWords(countWords(editor));
+      void file.flushWrite(serializeDocument(editor));
+    } else {
+      save(editor);
+      wordTimer = setTimeout(
+        () => setWords(countWords(editor)),
+        WORD_COUNT_DELAY_MS,
+      );
+      file.queue(serializeDocument(editor));
+    }
   }
-  function persistNow(editor: HTMLElement) {
-    flushSave(editor);
+
+  function loadDocument(editor: HTMLElement, html: string) {
+    editor.innerHTML = sanitizeHtml(html);
+    normalizeTrackTabindexes(editor);
+    normalizeEmptyBlocks(editor);
     syncDocumentTitle(editor);
-    void file.flushWrite(serializeDocument(editor));
+    setWords(countWords(editor));
+    setSlash(null);
+    pendingUndo = null;
+  }
+
+  // Runs one edit as one undo step: snapshot, mutate, tidy, save. Native
+  // browser commands keep to the browser's own undo stack.
+  function applyEdit(
+    editor: HTMLElement,
+    edit: () => boolean,
+    undoable = true,
+  ): boolean {
+    const snapshot = captureSnapshot(editor);
+    if (!edit()) return false;
+    pendingUndo = undoable ? snapshot : null;
+    normalizeEmptyBlocks(editor);
+    setSlash(null);
+    afterChange(editor, true);
+    return true;
   }
 
   function refreshSlash() {
     const editor = editorEl;
     if (!editor) return;
     slashCaret = caretOf(globalThis.getSelection());
-    const next = readSlashState(editor);
+    const next = literalContextAt(editor) ? null : readSlashState(editor);
     setSlash(next && matchSlashCommands(next).length > 0 ? next : null);
     setSlashIndex(0);
   }
@@ -112,84 +156,48 @@ export function TextEditor() {
     restoreSelection(editor, snapshot.selection);
     pendingUndo = null;
     setSlash(null);
-    persistNow(editor);
+    afterChange(editor, true);
+  }
+
+  function insertTrack(
+    range: Range,
+    command: Extract<SlashCommand, { kind: "track" }>,
+    count: number | null,
+  ) {
+    const track = buildTrackElement(
+      command.shape,
+      count ?? command.defaultCount,
+    );
+    const space = document.createTextNode(" ");
+    range.insertNode(space);
+    range.insertNode(track);
+    range.setStartAfter(space);
+    range.collapse(true);
+    select(range);
   }
 
   function commitSlash(command: SlashCommand, count: number | null) {
     const editor = editorEl;
-    if (!editor) return;
-
     const selection = globalThis.getSelection();
-    if (!selection || selection.rangeCount === 0) {
+    const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+    const node = range?.startContainer;
+    const query =
+      node instanceof Text
+        ? SLASH_QUERY.exec(node.data.slice(0, range?.startOffset))
+        : null;
+    if (!editor || !range || !node || !query) {
       setSlash(null);
       return;
     }
 
-    const range = selection.getRangeAt(0);
-    const node = range.startContainer;
-    if (!(node instanceof Text)) {
-      setSlash(null);
-      return;
-    }
-
-    const localMatch = node.data.slice(0, range.startOffset).match(SLASH_QUERY);
-    if (!localMatch) {
-      setSlash(null);
-      return;
-    }
-
-    const snapshot = captureSnapshot(editor);
-
-    const deleteRange = document.createRange();
-    deleteRange.setStart(node, range.startOffset - localMatch[0].length);
-    deleteRange.setEnd(node, range.startOffset);
-    deleteRange.deleteContents();
-
-    if (command.kind === "track" && command.shape) {
-      const track = buildTrackElement(
-        command.shape,
-        count ?? command.defaultCount,
-      );
-      const space = document.createTextNode(" ");
-      const fragment = document.createDocumentFragment();
-      fragment.append(track, space);
-      deleteRange.insertNode(fragment);
-
-      const caret = document.createRange();
-      caret.setStartAfter(space);
-      caret.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(caret);
-    } else if (command.name === "move") {
-      const body = document.createElement("p");
-      body.innerHTML = "<br>";
-      const move = buildMoveElement("New Move", undefined, [body]);
-      const block = getCurrentBlock(editor);
-      if (block) block.replaceWith(move);
-      else deleteRange.insertNode(move);
-
-      const title = move.querySelector("h3");
-      const caret = document.createRange();
-      if (title) caret.selectNodeContents(title);
-      else {
-        caret.selectNodeContents(body);
-        caret.collapse(true);
-      }
-      selection.removeAllRanges();
-      selection.addRange(caret);
-    } else if (command.blockClass) {
-      const block = getCurrentBlock(editor);
-      if (block && block.tagName === "P") {
-        block.classList.remove("te-arrow", "te-chevron");
-        block.classList.add(command.blockClass);
-      }
-    }
-
-    pendingUndo = snapshot;
-    setSlash(null);
+    applyEdit(editor, () => {
+      range.setStart(node, range.startOffset - query[0].length);
+      range.deleteContents();
+      if (command.kind === "track") insertTrack(range, command, count);
+      else runCommand(editor, command.command);
+      return true;
+    });
     setSlashIndex(0);
-    normalizeEmptyBlocks(editor);
-    persistNow(editor);
   }
 
   onMount(() => {
@@ -197,11 +205,7 @@ export function TextEditor() {
     if (!editor) return;
 
     migrateStorage();
-    editor.innerHTML = sanitizeHtml(
-      localStorage.getItem(STORAGE_KEY) || DEFAULT_HTML,
-    );
-    normalizeTrackTabindexes(editor);
-    syncDocumentTitle(editor);
+    loadDocument(editor, localStorage.getItem(STORAGE_KEY) || DEFAULT_HTML);
 
     const handleBeforeUnload = () => flushSave(editor);
     globalThis.addEventListener("beforeunload", handleBeforeUnload);
@@ -242,11 +246,7 @@ export function TextEditor() {
     if (!editor) return;
     const html = await file.open();
     if (html === null) return;
-    editor.innerHTML = sanitizeHtml(html);
-    normalizeTrackTabindexes(editor);
-    syncDocumentTitle(editor);
-    setSlash(null);
-    pendingUndo = null;
+    loadDocument(editor, html);
     flushSave(editor);
   }
 
@@ -272,7 +272,7 @@ export function TextEditor() {
 
   function handleBlur() {
     const editor = editorEl;
-    if (editor) persistNow(editor);
+    if (editor) afterChange(editor, true);
     setSlash(null);
   }
 
@@ -283,7 +283,7 @@ export function TextEditor() {
     if (toggle instanceof HTMLElement && editor.contains(toggle)) {
       const checked = toggle.getAttribute("aria-checked") === "true";
       toggle.setAttribute("aria-checked", checked ? "false" : "true");
-      persistNow(editor);
+      afterChange(editor, true);
     }
     refreshSlash();
   }
@@ -292,11 +292,19 @@ export function TextEditor() {
     const editor = editorEl;
     if (!editor) return;
     if (event.isComposing) return;
-    applyInlineTransform(editor);
-    pendingUndo = applyTaskShorthand(editor);
+    let autocorrected: UndoSnapshot | null = null;
+    // Code is literal: no inline Markdown, no dashes.
+    if (!literalContextAt(editor)) {
+      if (event.inputType === "insertText" && event.data === "-") {
+        const snapshot = captureSnapshot(editor);
+        if (applyDashes(editor)) autocorrected = snapshot;
+      }
+      applyInlineTransform(editor);
+    }
+    pendingUndo = applyTaskShorthand(editor) ?? autocorrected;
     normalizeEmptyBlocks(editor);
     refreshSlash();
-    persist(editor);
+    afterChange(editor, false);
   }
 
   function handlePaste(event: ClipboardEvent) {
@@ -305,12 +313,16 @@ export function TextEditor() {
     event.preventDefault();
     pendingUndo = null;
     if (!event.clipboardData) return;
+    const literal = literalContextAt(editor);
+    if (literal) {
+      if (pasteLiteral(editor, literal, event.clipboardData))
+        afterChange(editor, true);
+      return;
+    }
     handleEditorPaste(editor, event.clipboardData, (image) => {
       if (image && pendingUndo)
         pendingUndo = updateSnapshotImage(pendingUndo, image);
-      flushSave(editor);
-      syncDocumentTitle(editor);
-      file.queue(serializeDocument(editor));
+      afterChange(editor, true);
     });
   }
 
@@ -348,6 +360,22 @@ export function TextEditor() {
       return true;
     }
     return false;
+  }
+
+  function runKeyCommand(
+    editor: HTMLElement,
+    event: KeyboardEvent,
+    command: EditorCommand,
+  ) {
+    // Shortcuts always own their keys; Enter/Backspace/Tab rules fall back
+    // to the browser where they don't apply.
+    if (!isKeyRule(command)) event.preventDefault();
+    const applied = applyEdit(
+      editor,
+      () => runCommand(editor, command),
+      command.kind !== "native",
+    );
+    if (applied) event.preventDefault();
   }
 
   function handleKeyDown(event: KeyboardEvent) {
@@ -411,27 +439,8 @@ export function TextEditor() {
 
     if (handleSlashKey(event)) return;
 
-    if (event.key === "Backspace") {
-      const track = trackBeforeCaret(editor);
-      const toggles = track ? [...track.querySelectorAll(".te-toggle")] : [];
-      const last = toggles.at(-1);
-      if (last && toggles.length > 1) {
-        event.preventDefault();
-        last.remove();
-        persistNow(editor);
-        return;
-      }
-    }
-
-    if (event.key === "Enter") {
-      const snapshot = captureSnapshot(editor);
-      if (handleEnter(editor)) {
-        event.preventDefault();
-        normalizeEmptyBlocks(editor);
-        pendingUndo = snapshot;
-        persistNow(editor);
-      }
-    }
+    const command = commandForKey(event);
+    if (command) runKeyCommand(editor, event, command);
   }
 
   return (
@@ -509,6 +518,9 @@ export function TextEditor() {
             </Show>
           </Show>
         </div>
+        <span class="text-neu-500 dark:text-neu-400 ml-auto px-1 font-mono text-xs tabular-nums">
+          {words()} {words() === 1 ? "word" : "words"}
+        </span>
         <ControlButton
           aria-label={
             spellcheck() ? "Turn spellcheck off" : "Turn spellcheck on"

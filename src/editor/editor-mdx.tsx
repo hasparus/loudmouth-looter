@@ -1,6 +1,6 @@
 import type {
   BlockContent,
-  Heading,
+  Blockquote,
   List,
   ListItem,
   Paragraph,
@@ -24,6 +24,13 @@ import {
   buildToggleElement,
   buildTrackElement,
 } from "./editor-atoms";
+import {
+  headingLevel,
+  headingTag,
+  isFlowBlock,
+  markTag,
+} from "./editor-schema";
+import { normalizeEditableText } from "./editor-inline";
 import { buildMoveElement } from "./move-dom";
 import { resolveMoveFromMdx } from "./move-props";
 import { resolveTrackProps, type Shape, TRACK_SHAPES } from "./track-props";
@@ -67,11 +74,21 @@ function blockFrom(node: ChildNode): RootContent | null {
 
   if (node.classList.contains("te-jsx")) return rawMdxBlock(node);
 
+  const depth = headingLevel(node.tagName);
+  if (depth) return { type: "heading", children: phrasingFrom(node), depth };
+
   switch (node.tagName) {
-    case "H1":
-      return heading(1, node);
-    case "H2":
-      return heading(2, node);
+    case "BLOCKQUOTE":
+      return blockquote(node);
+    case "HR":
+      return { type: "thematicBreak" };
+    case "PRE":
+      return {
+        type: "code",
+        lang: node.dataset.lang || null,
+        // Only the caret markers go; the "\n" sentinel is the block's own.
+        value: node.textContent.replaceAll("\u200B", "").replace(/\n$/, ""),
+      };
     case "OL":
       return listFrom(node, true);
     case "ARTICLE":
@@ -94,7 +111,7 @@ function blockFrom(node: ChildNode): RootContent | null {
 function moveElement(el: HTMLElement): MdxJsxFlowElement {
   const bodyRoot = el.querySelector("[data-move-body]");
   if (bodyRoot instanceof HTMLElement) {
-    const titleEl = el.querySelector("h3");
+    const titleEl = el.querySelector("h3[data-move-title]");
     const title = titleEl ? normalizeText(titleEl.textContent) : "";
     const children: BlockContent[] = [];
     if (title) {
@@ -137,8 +154,30 @@ function storedMoveAttributes(
   return [];
 }
 
-function heading(depth: 1 | 2, el: HTMLElement): Heading {
-  return { type: "heading", children: phrasingFrom(el), depth };
+// Quotes hold blocks, but pasted or hand-edited ones can carry bare inline
+// runs — those are gathered into paragraphs so no formatting is dropped.
+function blockquote(el: HTMLElement): Blockquote {
+  const children: BlockContent[] = [];
+  let inline: Node[] = [];
+  const flushInline = () => {
+    const holder = document.createElement("p");
+    holder.append(...inline.map((node) => node.cloneNode(true)));
+    inline = [];
+    const content = phrasingFrom(holder);
+    if (content.some((node) => node.type !== "text" || node.value.trim()))
+      children.push({ type: "paragraph", children: content });
+  };
+  for (const node of el.childNodes) {
+    if (isFlowBlock(node)) {
+      flushInline();
+      const block = blockFrom(node);
+      if (block) children.push(block as BlockContent);
+    } else {
+      inline.push(node);
+    }
+  }
+  flushInline();
+  return { type: "blockquote", children };
 }
 
 function paragraph(el: HTMLElement): Paragraph {
@@ -220,17 +259,31 @@ function phrasingFrom(parent: HTMLElement): PhrasingContent[] {
       });
       continue;
     }
-    if (node.tagName === "STRONG") {
-      out.push({ type: "strong", children: phrasingFrom(node) });
-      continue;
-    }
-    if (node.tagName === "I" || node.tagName === "EM") {
-      out.push({ type: "emphasis", children: phrasingFrom(node) });
+    const mark = markPhrasing(node);
+    if (mark) {
+      out.push(mark);
       continue;
     }
     out.push(...phrasingFrom(node));
   }
   return out;
+}
+
+function markPhrasing(node: HTMLElement): PhrasingContent | null {
+  switch (markTag(node.tagName)) {
+    case "CODE": {
+      const value = normalizeText(node.textContent);
+      return value ? { type: "inlineCode", value } : null;
+    }
+    case "I":
+      return { type: "emphasis", children: phrasingFrom(node) };
+    case "S":
+      return { type: "delete", children: phrasingFrom(node) };
+    case "STRONG":
+      return { type: "strong", children: phrasingFrom(node) };
+    default:
+      return null;
+  }
 }
 
 function trackElement(track: HTMLElement): MdxJsxTextElement {
@@ -320,10 +373,26 @@ export function mdxToHtml(mdx: string): string {
 function blockToDom(node: RootContent): HTMLElement | null {
   switch (node.type) {
     case "heading": {
-      const el = document.createElement(node.depth <= 1 ? "h1" : "h2");
+      const el = document.createElement(headingTag(node.depth));
       appendPhrasing(el, node.children);
       return el;
     }
+    case "blockquote": {
+      const el = document.createElement("blockquote");
+      for (const child of node.children) {
+        const childEl = blockToDom(child);
+        if (childEl) el.append(childEl);
+      }
+      return el;
+    }
+    case "code": {
+      const el = document.createElement("pre");
+      if (node.lang) el.dataset.lang = node.lang;
+      el.textContent = `${node.value}\n`;
+      return el;
+    }
+    case "thematicBreak":
+      return document.createElement("hr");
     case "list":
       return listToDom(node);
     case "mdxFlowExpression":
@@ -446,9 +515,18 @@ function appendPhrasing(parent: HTMLElement, nodes: PhrasingContent[]): void {
         parent.append(el);
         break;
       }
-      case "inlineCode":
-        parent.append(document.createTextNode(node.value));
+      case "delete": {
+        const el = document.createElement("s");
+        appendPhrasing(el, node.children);
+        parent.append(el);
         break;
+      }
+      case "inlineCode": {
+        const el = document.createElement("code");
+        el.textContent = node.value;
+        parent.append(el);
+        break;
+      }
       case "link": {
         const el = document.createElement("a");
         el.setAttribute("href", node.url);
@@ -537,6 +615,4 @@ function text(value: string): PhrasingContent {
   return { type: "text", value };
 }
 
-function normalizeText(value: string): string {
-  return value.replaceAll("​", "").replaceAll(" ", " ");
-}
+const normalizeText = normalizeEditableText;

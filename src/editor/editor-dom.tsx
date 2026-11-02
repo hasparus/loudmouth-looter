@@ -5,18 +5,21 @@ import {
   SLASH_COMMANDS,
   type SlashCommand,
 } from "./editor-atoms";
+import { replaceWithCodeBlock } from "./editor-code-block";
+import { normalizeEditableText } from "./editor-inline";
+import { CODE_LANGUAGE } from "./editor-sanitize";
 import {
-  escapeHtml,
-  plainTextToHtml,
-  sanitizeHtml,
-  sanitizeImageSrc,
-  sanitizeUrl,
-  unescapeHtml,
-} from "./editor-sanitize";
+  breaksWords,
+  MAX_HEADING_LEVEL,
+  TEXT_BLOCK_TAGS,
+} from "./editor-schema";
 import {
-  htmlIsThinTextWrapper,
-  markdownPasteHtml,
-} from "./editor-markdown-paste";
+  captureSelection,
+  getCurrentBlock,
+  placeCaretAtEnd,
+  placeCaretAtStart,
+  type SelectionPath,
+} from "./editor-selection";
 
 export const STORAGE_KEY = "text-editor-document";
 const STORAGE_LEGACY_KEYS: string[] = [];
@@ -42,80 +45,6 @@ export const DEFAULT_HTML = [
   '<p>"We would be ruled by a magic lord," they said.</p>',
   "<p><i>— Lord Dunsany, The King of Elfland's Daughter (1924)</i></p>",
 ].join("");
-
-const BLOCK_TAGS = new Set(["H1", "H2", "OL", "P", "UL"]);
-
-export function formatInline(text: string) {
-  const links: string[] = [];
-  const withLinks = escapeHtml(text).replaceAll(
-    /\[([^\]]+)\]\(([^)\s]+)\)/g,
-    (whole, label: string, url: string) => {
-      const href = sanitizeUrl(unescapeHtml(url));
-      if (!href) return whole;
-      links.push(
-        `<a href="${escapeHtml(href)}" rel="noreferrer">${formatEmphasis(label)}</a>`,
-      );
-      return `\u0000${links.length - 1}\u0000`;
-    },
-  );
-  return formatEmphasis(withLinks).replaceAll(
-    // eslint-disable-next-line no-control-regex -- NUL is a deliberate placeholder sentinel
-    /\u0000(\d+)\u0000/g,
-    (_, index: string) => links[Number(index)] ?? "",
-  );
-}
-
-function formatEmphasis(escaped: string) {
-  return escaped
-    .replaceAll(/\*\*([^*]+)\*\*([.,!?])?/g, "<strong>$1$2</strong>")
-    .replaceAll(/_([^_]+)_([.,!?])?/g, "<i>$1$2</i>");
-}
-
-function normalizeEditableText(text: string) {
-  return text.replaceAll("\u200B", "").replaceAll("\u00A0", " ");
-}
-
-export function getCurrentBlock(
-  root: HTMLElement,
-  anchor: Node | null = globalThis.getSelection()?.anchorNode ?? null,
-) {
-  if (!anchor || !root.contains(anchor)) return null;
-
-  let node: Node | null = anchor;
-  while (node && node !== root) {
-    if (
-      node instanceof HTMLElement &&
-      ["H1", "H2", "LI", "P"].includes(node.tagName)
-    ) {
-      return node;
-    }
-    node = node.parentNode;
-  }
-
-  return null;
-}
-
-function placeCaretAtEnd(element: HTMLElement) {
-  const selection = globalThis.getSelection();
-  if (!selection) return;
-
-  const range = document.createRange();
-  range.selectNodeContents(element);
-  range.collapse(false);
-  selection.removeAllRanges();
-  selection.addRange(range);
-}
-
-function placeCaretAtStart(element: HTMLElement) {
-  const selection = globalThis.getSelection();
-  if (!selection) return;
-
-  const range = document.createRange();
-  range.selectNodeContents(element);
-  range.collapse(true);
-  selection.removeAllRanges();
-  selection.addRange(range);
-}
 
 function findPrefixTextNode(block: HTMLElement, prefix: string): Text | null {
   for (const child of block.childNodes) {
@@ -203,53 +132,7 @@ export function normalizeTrackTabindexes(root: HTMLElement) {
 
 export interface UndoSnapshot {
   html: string;
-  selection: { offset: number; path: number[] } | null;
-}
-
-function captureSelection(root: HTMLElement): UndoSnapshot["selection"] {
-  const selection = globalThis.getSelection();
-  if (!selection || selection.rangeCount === 0) return null;
-
-  const range = selection.getRangeAt(0);
-  if (!root.contains(range.startContainer)) return null;
-
-  const path: number[] = [];
-  let node: Node = range.startContainer;
-  while (node !== root) {
-    const parent: ParentNode | null = node.parentNode;
-    if (!parent) return null;
-    path.unshift([...parent.childNodes].indexOf(node as ChildNode));
-    node = parent;
-  }
-  return { offset: range.startOffset, path };
-}
-
-export function restoreSelection(
-  root: HTMLElement,
-  snapshot: UndoSnapshot["selection"],
-) {
-  if (!snapshot) return;
-
-  let node: Node = root;
-  for (const index of snapshot.path) {
-    const child: ChildNode | undefined = node.childNodes[index];
-
-    if (!child) return;
-    node = child;
-  }
-
-  const limit =
-    node.nodeType === Node.TEXT_NODE
-      ? (node.textContent ?? "").length
-      : node.childNodes.length;
-  const selection = globalThis.getSelection();
-  if (!selection) return;
-
-  const range = document.createRange();
-  range.setStart(node, Math.min(snapshot.offset, limit));
-  range.collapse(true);
-  selection.removeAllRanges();
-  selection.addRange(range);
+  selection: SelectionPath;
 }
 
 export function captureSnapshot(root: HTMLElement): UndoSnapshot {
@@ -272,7 +155,7 @@ export function updateSnapshotImage(
   return { ...snapshot, html: template.innerHTML };
 }
 
-function restorePendingImageFallbacks(parent: ParentNode) {
+export function restorePendingImageFallbacks(parent: ParentNode) {
   let image = parent.querySelector<HTMLElement>("[data-pending-image]");
   while (image) {
     const fallback = document.createElement("template");
@@ -288,6 +171,32 @@ export function serializeDocument(root: HTMLElement): string {
   const copy = root.cloneNode(true) as HTMLElement;
   restorePendingImageFallbacks(copy);
   return copy.innerHTML.replaceAll("\u200B", "");
+}
+
+const wordSegmenter = new Intl.Segmenter(undefined, { granularity: "word" });
+
+// Prose words only: block MDX atoms show source previews, not writing. Block
+// boundaries count as spaces so adjacent paragraphs don't fuse into one word.
+export function countWords(root: HTMLElement): number {
+  let text = "";
+  const walker = document.createTreeWalker(
+    root,
+    NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
+    {
+      acceptNode: (node) =>
+        node instanceof HTMLElement && node.classList.contains("te-jsx")
+          ? NodeFilter.FILTER_REJECT
+          : NodeFilter.FILTER_ACCEPT,
+    },
+  );
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (node instanceof Text) text += node.data;
+    else if (node instanceof Element && breaksWords(node)) text += " ";
+  }
+  let count = 0;
+  for (const segment of wordSegmenter.segment(text))
+    if (segment.isWordLike) count++;
+  return count;
 }
 
 const EDITOR_FALLBACK_TITLE = "editor";
@@ -329,126 +238,17 @@ export function flushSave(root: HTMLElement) {
   saveImmediate(root);
 }
 
-function insertCaretMarker(root: HTMLElement) {
-  const selection = globalThis.getSelection();
-  if (!selection || selection.rangeCount === 0) return null;
-
-  const range = selection.getRangeAt(0);
-  if (!root.contains(range.startContainer)) return null;
-
-  const marker = document.createElement("span");
-  marker.dataset.caretMarker = "true";
-  marker.setAttribute("contenteditable", "false");
-  marker.textContent = "\u200B";
-  range.insertNode(marker);
-  return marker;
-}
-
-function restoreCaretFromMarker(marker: HTMLElement) {
-  const parent = marker.parentNode;
-  if (!(parent instanceof HTMLElement)) return;
-
-  const boundary = document.createTextNode("\u200B");
-
-  marker.replaceWith(boundary);
-
-  const selection = globalThis.getSelection();
-  if (!selection) return;
-
-  const range = document.createRange();
-  range.setStart(boundary, 1);
-  range.collapse(true);
-  selection.removeAllRanges();
-  selection.addRange(range);
-}
-
-function transformInlineTextNodes(node: Node): boolean {
-  let changed = false;
-
-  if (node instanceof Text) {
-    const raw = normalizeEditableText(node.textContent);
-    if (!raw.includes("**") && !raw.includes("_") && !raw.includes("]("))
-      return false;
-
-    const wrapper = document.createElement("span");
-    wrapper.innerHTML = formatInline(raw);
-
-    if (wrapper.textContent === raw && wrapper.children.length === 0)
-      return false;
-
-    node.replaceWith(...wrapper.childNodes);
-    return true;
-  }
-
-  if (!(node instanceof HTMLElement)) return false;
-  if (node.dataset.caretMarker === "true") return false;
-  if (node.tagName === "STRONG" || node.tagName === "I" || node.tagName === "A")
-    return false;
-
-  for (const child of [...node.childNodes]) {
-    changed = transformInlineTextNodes(child) || changed;
-  }
-
-  return changed;
-}
-
-function absorbTrailingPunctuation(block: HTMLElement) {
-  let changed = false;
-
-  for (const child of [...block.childNodes]) {
-    if (!(child instanceof HTMLElement)) continue;
-    if (child.tagName !== "STRONG" && child.tagName !== "I") continue;
-
-    const next = child.nextSibling;
-    if (!(next instanceof Text)) continue;
-
-    const match = /^(\u200B*)([.,!?])(.*)$/s.exec(next.textContent);
-    if (!match?.[2]) continue;
-
-    child.append(match[2]);
-    next.textContent = `${match[1]}${match[3]}`;
-    if (!next.textContent) next.remove();
-    changed = true;
-  }
-
-  return changed;
-}
+const TEXT_ELEMENTS = [...TEXT_BLOCK_TAGS, "LI"].join(",");
 
 export function normalizeEmptyBlocks(root: HTMLElement) {
-  for (const tag of ["p", "h1", "h2", "li"]) {
-    for (const el of root.querySelectorAll(tag)) {
-      if (el.childNodes.length === 0) {
-        el.append(document.createElement("br"));
-      }
-    }
+  for (const el of root.querySelectorAll(TEXT_ELEMENTS)) {
+    if (el.childNodes.length === 0) el.append(document.createElement("br"));
   }
-}
-
-export function applyInlineTransform(root: HTMLElement) {
-  const block = getCurrentBlock(root);
-  if (!block || (block.tagName === "LI" && block.closest("ul, ol") === null))
-    return;
-
-  const raw = normalizeEditableText(block.textContent);
-  let changed = false;
-
-  if (
-    /\*\*[^*]+\*\*/.test(raw) ||
-    /_[^_]+_/.test(raw) ||
-    /\[[^\]]+\]\([^)\s]+\)/.test(raw)
-  ) {
-    const marker = insertCaretMarker(root);
-    changed = transformInlineTextNodes(block);
-
-    if (marker && changed) {
-      restoreCaretFromMarker(marker);
-    } else {
-      marker?.remove();
-    }
+  for (const pre of root.querySelectorAll("pre")) {
+    pre.textContent ||= "\n";
   }
-
-  if (absorbTrailingPunctuation(block)) {
-    placeCaretAtEnd(block);
+  for (const quote of root.querySelectorAll("blockquote")) {
+    if (quote.childNodes.length === 0) quote.innerHTML = "<p><br></p>";
   }
 }
 
@@ -583,18 +383,54 @@ export function matchSlashCommands(state: SlashState): SlashCommand[] {
   );
 }
 
+const HEADING_PREFIX = new RegExp(`^#{1,${MAX_HEADING_LEVEL}} `);
+const CODE_FENCE = new RegExp(`^\`\`\`(${CODE_LANGUAGE.source})?$`);
+
 export function handleEnter(root: HTMLElement) {
   const block = getCurrentBlock(root);
   if (!block) return false;
 
   const rawText = normalizeEditableText(block.textContent);
 
-  if (
-    block.tagName === "P" &&
-    (rawText.startsWith("## ") || rawText.startsWith("# "))
-  ) {
-    const prefix = rawText.startsWith("## ") ? "## " : "# ";
-    const tag = prefix === "## " ? "h2" : "h1";
+  if (block.tagName === "P" && !block.className) {
+    if (/^(?:-{3,}|\*{3,}|_{3,})$/.test(rawText.trim())) {
+      block.replaceChildren();
+      return insertRule(block);
+    }
+
+    const fence = CODE_FENCE.exec(rawText.trim());
+    if (fence) {
+      block.replaceChildren();
+      return replaceWithCodeBlock(block, fence[1] ?? "");
+    }
+
+    if (rawText.startsWith("> ")) {
+      const quote = document.createElement("blockquote");
+      const first = document.createElement("p");
+      first.append(extractBeforeCaret(block, "> "));
+      const next = document.createElement("p");
+      const hasAfter = block.hasChildNodes();
+      if (hasAfter) moveChildrenInto(block, next);
+      else next.innerHTML = "<br>";
+      quote.append(first, next);
+      block.replaceWith(quote);
+      if (hasAfter) placeCaretAtStart(next);
+      else placeCaretAtEnd(next);
+      return true;
+    }
+
+    // An empty line inside a quote ends the quote, like an empty list item.
+    if (!rawText.trim() && block.parentElement?.tagName === "BLOCKQUOTE") {
+      liftOutOfQuote(block);
+      placeCaretAtStart(block);
+      return true;
+    }
+  }
+
+  const headingPrefix = HEADING_PREFIX.exec(rawText)?.[0];
+  if (block.tagName === "P" && headingPrefix) {
+    const prefix = headingPrefix;
+    const tag = `h${prefix.length - 1}`;
     const heading = document.createElement(tag);
     heading.append(extractBeforeCaret(block, prefix));
 
@@ -683,7 +519,7 @@ export function handleEnter(root: HTMLElement) {
     return true;
   }
 
-  if (block.tagName === "H1" || block.tagName === "H2") {
+  if (block.tagName !== "P" && TEXT_BLOCK_TAGS.has(block.tagName)) {
     const paragraph = document.createElement("p");
     paragraph.innerHTML = "<br>";
     block.after(paragraph);
@@ -694,192 +530,23 @@ export function handleEnter(root: HTMLElement) {
   return false;
 }
 
-function editorRange(editor: HTMLElement): Range | null {
-  const selection = globalThis.getSelection();
-  if (
-    !selection ||
-    selection.rangeCount === 0 ||
-    !editor.contains(selection.anchorNode)
-  )
-    return null;
-  return selection.getRangeAt(0);
+// A divider above `block`, which keeps the caret.
+export function insertRule(block: HTMLElement) {
+  block.before(document.createElement("hr"));
+  if (!block.textContent && !block.firstElementChild)
+    block.replaceChildren(document.createElement("br"));
+  placeCaretAtStart(block);
+  return true;
 }
 
-function selectPasteCaret(range: Range) {
-  const selection = globalThis.getSelection();
-  selection?.removeAllRanges();
-  selection?.addRange(range);
-}
-
-type ImageSettlement = { id: string; html: string };
-type PasteCommit = (image?: ImageSettlement) => void;
-let nextPendingImageId = 0;
-
-function insertImageFile(
-  editor: HTMLElement,
-  file: File,
-  onCommit: PasteCommit,
-) {
-  const range = editorRange(editor)?.cloneRange();
-  if (!range || !/^image\/(png|jpeg|gif|webp|avif)$/.test(file.type)) return;
-
-  const previous = range.cloneContents();
-  restorePendingImageFallbacks(previous);
-  const container = document.createElement("div");
-  container.append(previous.cloneNode(true));
-  const previousHtml = container.innerHTML;
-  const preview = URL.createObjectURL(file);
-  const id = String(++nextPendingImageId);
-  const img = document.createElement("img");
-  img.src = preview;
-  img.dataset.pendingImage = id;
-  img.dataset.pendingFallback = previousHtml;
-  range.deleteContents();
-  range.insertNode(img);
-  range.setStartAfter(img);
-  range.collapse(true);
-  selectPasteCaret(range);
-
-  const currentImage = () =>
-    editor.isConnected
-      ? editor.querySelector<HTMLImageElement>(
-          `img[data-pending-image="${id}"]`,
-        )
-      : null;
-  const fail = () => {
-    const target = currentImage();
-    URL.revokeObjectURL(preview);
-    if (!target) return;
-    target.replaceWith(previous);
-    onCommit({ id, html: previousHtml });
-  };
-  const reader = new FileReader();
-  reader.addEventListener("load", () => {
-    const src =
-      typeof reader.result === "string" ? sanitizeImageSrc(reader.result) : "";
-    if (!src) {
-      fail();
-      return;
-    }
-    const target = currentImage();
-    URL.revokeObjectURL(preview);
-    if (!target) return;
-    target.src = src;
-    delete target.dataset.pendingImage;
-    delete target.dataset.pendingFallback;
-    onCommit({ id, html: target.outerHTML });
-  });
-  reader.addEventListener("error", fail);
-  reader.addEventListener("abort", fail);
-  try {
-    reader.readAsDataURL(file);
-  } catch {
-    fail();
-  }
-}
-
-export function handleEditorPaste(
-  editor: HTMLElement,
-  clipboard: DataTransfer,
-  onCommit: PasteCommit,
-) {
-  const imageFile = [...clipboard.files].find((file) =>
-    file.type.startsWith("image/"),
-  );
-  if (imageFile) {
-    insertImageFile(editor, imageFile, onCommit);
-    return;
-  }
-
-  const range = editorRange(editor)?.cloneRange();
-  if (!range) return;
-  const currentBlock = getCurrentBlock(editor, range.startContainer);
-  const html = clipboard.getData("text/html");
-  const text = clipboard.getData("text/plain");
-  const explicitMarkdown = clipboard.getData("text/markdown");
-  let cleanHtml = html
-    ? sanitizeHtml(html)
-    : plainTextToHtml(text || explicitMarkdown);
-  let inlineMarkdown = false;
-
-  const markdown = explicitMarkdown.trim() ? explicitMarkdown : text;
-  if (markdown && htmlIsThinTextWrapper(html, markdown)) {
-    const parsed = markdownPasteHtml(markdown, !!explicitMarkdown.trim());
-    if (parsed) {
-      cleanHtml = sanitizeHtml(parsed.html);
-      inlineMarkdown = parsed.inline;
-    }
-  }
-
-  range.deleteContents();
-
-  const template = document.createElement("template");
-  template.innerHTML = cleanHtml;
-  const content = template.content;
-  if (
-    inlineMarkdown &&
-    currentBlock &&
-    currentBlock.contains(range.startContainer) &&
-    currentBlock.contains(range.endContainer) &&
-    content.childElementCount === 1 &&
-    content.firstElementChild?.tagName === "P"
-  ) {
-    content.replaceChildren(...content.firstElementChild.childNodes);
-  }
-  const hasBlockChild = [...content.childNodes].some(
-    (n) => n instanceof Element && BLOCK_TAGS.has(n.tagName),
-  );
-
-  if (!hasBlockChild || !currentBlock) {
-    const lastNode = content.lastChild;
-    range.insertNode(content);
-    if (lastNode) {
-      range.setStartAfter(lastNode);
-      range.collapse(true);
-    }
-    selectPasteCaret(range);
-    normalizeEmptyBlocks(editor);
-    onCommit();
-    return;
-  }
-
-  const list = currentBlock.closest("ul, ol");
-  const insertAfter =
-    currentBlock.tagName === "LI" && list ? list : currentBlock;
-  const shouldSplitTail = insertAfter === currentBlock;
-
-  let tail: DocumentFragment | null = null;
-  if (shouldSplitTail) {
-    const tailRange = document.createRange();
-    tailRange.setStart(range.endContainer, range.endOffset);
-    tailRange.setEndAfter(currentBlock.lastChild ?? currentBlock);
-    tail = tailRange.extractContents();
-  }
-
-  let previous: ChildNode = insertAfter;
-  for (const node of [...content.childNodes]) {
-    if (node instanceof Element && BLOCK_TAGS.has(node.tagName)) {
-      previous.after(node);
-      previous = node;
-    } else {
-      const wrapper = document.createElement("p");
-      wrapper.append(node);
-      previous.after(wrapper);
-      previous = wrapper;
-    }
-  }
-
-  if (tail && tail.childNodes.length > 0) {
-    const tailBlock = document.createElement("p");
-    tailBlock.append(tail);
-    previous.after(tailBlock);
-  }
-
-  if (previous instanceof HTMLElement) {
-    range.selectNodeContents(previous);
-    range.collapse(false);
-  }
-  selectPasteCaret(range);
-  normalizeEmptyBlocks(editor);
-  onCommit();
+// Moves `block` out of its <blockquote>, splitting the quote around it so the
+// blocks before and after stay quoted.
+export function liftOutOfQuote(block: HTMLElement) {
+  const quote = block.parentElement;
+  if (!quote || quote.tagName !== "BLOCKQUOTE") return;
+  const after = document.createElement("blockquote");
+  while (block.nextSibling) after.append(block.nextSibling);
+  quote.after(block);
+  if (after.hasChildNodes()) block.after(after);
+  if (!quote.hasChildNodes()) quote.remove();
 }
