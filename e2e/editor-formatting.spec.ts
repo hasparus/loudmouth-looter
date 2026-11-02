@@ -418,4 +418,35 @@ test.describe("editor formatting", () => {
     });
     await expect(editor.locator("pre")).toHaveText("bold text a\n");
   });
+
+  test("marks and links don't apply inside inline code", async ({ page }) => {
+    const editor = await setEditor(page, "<p>x <code>foo</code></p>", "oo");
+    await page.keyboard.press("ControlOrMeta+k");
+    await page.keyboard.press("ControlOrMeta+b");
+    await expect(editor.locator("code")).toHaveText("foo");
+    await expect(editor.locator("code *")).toHaveCount(0);
+  });
+
+  test("Mod-K leaves a selection holding an image alone", async ({ page }) => {
+    const editor = await setEditor(
+      page,
+      '<p>see <img src="https://example.com/x.png" alt="x"> here</p>',
+    );
+    await editor.evaluate((el) => {
+      const range = document.createRange();
+      range.selectNodeContents(el.querySelector("p")!);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+    });
+    await page.keyboard.press("ControlOrMeta+k");
+    await expect(editor.locator("img")).toHaveCount(1);
+    await expect(editor.locator("p")).not.toContainText("[");
+  });
+
+  test("Mod-Shift-. quotes a code block", async ({ page }) => {
+    const editor = await setEditor(page, "<pre>x\n</pre>");
+    await caretToStartOf(editor, "pre");
+    await page.keyboard.press("ControlOrMeta+Shift+Period");
+    await expect(editor.locator("blockquote > pre")).toHaveText("x\n");
+  });
 });

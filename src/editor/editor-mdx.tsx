@@ -30,6 +30,7 @@ import {
   isFlowBlock,
   markTag,
 } from "./editor-schema";
+import { normalizeEditableText } from "./editor-inline";
 import { buildMoveElement } from "./move-dom";
 import { resolveMoveFromMdx } from "./move-props";
 import { resolveTrackProps, type Shape, TRACK_SHAPES } from "./track-props";
@@ -110,7 +111,7 @@ function blockFrom(node: ChildNode): RootContent | null {
 function moveElement(el: HTMLElement): MdxJsxFlowElement {
   const bodyRoot = el.querySelector("[data-move-body]");
   if (bodyRoot instanceof HTMLElement) {
-    const titleEl = el.querySelector("h3");
+    const titleEl = el.querySelector("h3[data-move-title]");
     const title = titleEl ? normalizeText(titleEl.textContent) : "";
     const children: BlockContent[] = [];
     if (title) {
@@ -614,6 +615,4 @@ function text(value: string): PhrasingContent {
   return { type: "text", value };
 }
 
-function normalizeText(value: string): string {
-  return value.replaceAll("\u200B", "").replaceAll(" ", " ");
-}
+const normalizeText = normalizeEditableText;

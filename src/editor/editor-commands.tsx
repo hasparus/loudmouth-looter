@@ -7,6 +7,7 @@ import { buildToggleElement } from "./editor-atoms";
 import {
   codeBlockKey,
   currentCodeBlock,
+  literalContextAt,
   replaceOrPrecede,
   replaceWithCodeBlock,
 } from "./editor-code-block";
@@ -18,7 +19,7 @@ import {
 } from "./editor-dom";
 import { inlineMarkdown } from "./editor-inline";
 import { buildLink, linkableUrl } from "./editor-sanitize";
-import { HEADING_TAGS, TEXT_BLOCK_TAGS } from "./editor-schema";
+import { HEADING_TAGS, MARK_TAGS, TEXT_BLOCK_TAGS } from "./editor-schema";
 import {
   caretAfter,
   closestWithin,
@@ -110,9 +111,11 @@ export function runCommand(
   editor: HTMLElement,
   command: EditorCommand,
 ): boolean {
-  const pre = currentCodeBlock(editor);
+  // Code is literal. A code block takes only its own keys, the way out and
+  // being quoted; an inline code span takes everything but marks and links.
+  const literal = literalContextAt(editor);
+  const pre = literal === "pre" ? currentCodeBlock(editor) : null;
   if (pre) {
-    // Code is literal: only its own keys, and the way out.
     switch (command.kind) {
       case "backspace":
       case "enter":
@@ -120,10 +123,17 @@ export function runCommand(
         return codeBlockKey(pre, command.kind);
       case "paragraph-below":
         return insertParagraphBelow(editor);
+      case "quote":
+        return toggleQuote(editor);
       default:
         return false;
     }
   }
+  if (
+    literal === "code" &&
+    (command.kind === "native" || command.kind === "link")
+  )
+    return false;
 
   switch (command.kind) {
     case "backspace":
@@ -293,7 +303,14 @@ export function toggleLink(editor: HTMLElement): boolean {
     return true;
   }
 
-  const label = inlineMarkdown(span.cloneContents().childNodes).trim();
+  // Only text and marks can be written out as a label; anything else (an
+  // image, a track) would be lost.
+  const contents = span.cloneContents();
+  const hasAtom = [...contents.querySelectorAll("*")].some(
+    (element) => !MARK_TAGS.has(element.tagName) && element.tagName !== "BR",
+  );
+  if (hasAtom) return false;
+  const label = inlineMarkdown(contents.childNodes).trim();
   if (!label) return false;
   const markdown = document.createTextNode(`[${label}](`);
   span.deleteContents();

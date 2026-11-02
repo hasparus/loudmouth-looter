@@ -140,7 +140,8 @@ function absorbTrailingPunctuation(block: HTMLElement) {
 
   for (const child of [...block.childNodes]) {
     if (!(child instanceof HTMLElement)) continue;
-    if (child.tagName !== "STRONG" && child.tagName !== "I") continue;
+    const mark = markTag(child.tagName);
+    if (mark !== "STRONG" && mark !== "I") continue;
 
     const next = child.nextSibling;
     if (!(next instanceof Text)) continue;

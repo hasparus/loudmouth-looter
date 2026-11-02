@@ -161,10 +161,9 @@ export function TextEditor() {
 
   function insertTrack(
     range: Range,
-    command: SlashCommand,
+    command: Extract<SlashCommand, { kind: "track" }>,
     count: number | null,
   ) {
-    if (command.kind !== "track") return;
     const track = buildTrackElement(
       command.shape,
       count ?? command.defaultCount,
