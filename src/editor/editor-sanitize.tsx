@@ -1,5 +1,5 @@
 import { FLOW_BLOCK_TAGS, MARK_TAGS, markTag } from "./editor-schema";
-import { buildMoveElement } from "./move-dom";
+import { buildMoveElement, ownMoveParts } from "./move-dom";
 import {
   populateJsxElement,
   populateToggleElement,
@@ -146,13 +146,13 @@ function codeLanguage(pre: HTMLElement): string {
 // restores the card layout and the data-move-body marker the serializer
 // reads, from the card's title, id and body.
 function sanitizeMove(card: HTMLElement): HTMLElement {
-  const body = card.querySelector<HTMLElement>("[data-move-body]");
+  const [body] = ownMoveParts(card, "[data-move-body]");
   const title = body
-    ? [...card.querySelectorAll("h3")].find((h3) => !body.contains(h3))
+    ? ownMoveParts(card, "h3").find((h3) => !body.contains(h3))
     : undefined;
   const content = document.createElement("div");
   sanitizeInto(body ?? card, content);
-  const id = card.querySelector('input[type="checkbox"]')?.id ?? "";
+  const id = ownMoveParts(card, 'input[type="checkbox"]')[0]?.id ?? "";
   const move = buildMoveElement(
     title?.textContent.trim() || undefined,
     /^[\w-]+$/.test(id) ? id : undefined,

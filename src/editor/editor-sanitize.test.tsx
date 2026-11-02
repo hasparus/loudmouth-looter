@@ -76,6 +76,18 @@ describe("Move cards", () => {
     expect(htmlToMdx(once)).toContain("## Bellow");
   });
 
+  test("a titled card nested in an untitled one keeps both bodies", () => {
+    const mdx =
+      "<Move>\nOuter text.\n\n<Move>\n## Inner\n\nInner text.\n</Move>\n</Move>\n";
+    const html = mdxToHtml(mdx);
+    for (const loaded of [html, sanitizeHtml(html)]) {
+      const saved = htmlToMdx(loaded);
+      expect(saved).toContain("Outer text.");
+      expect(saved).toContain("## Inner");
+      expect(saved).toContain("Inner text.");
+    }
+  });
+
   test("an untitled card keeps its body", () => {
     const mdx = "<Move>\nJust a body.\n</Move>\n";
     expect(htmlToMdx(sanitizeHtml(mdxToHtml(mdx)))).toContain("Just a body.");

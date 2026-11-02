@@ -52,3 +52,14 @@ export function buildMoveElement(
   article.append(flex1);
   return article;
 }
+
+// The parts of `card` itself matching `selector` — not those of a Move card
+// nested in its body, which owns its own title, checkbox and body.
+export function ownMoveParts(
+  card: HTMLElement,
+  selector: string,
+): HTMLElement[] {
+  return [...card.querySelectorAll<HTMLElement>(selector)].filter(
+    (part) => part.closest(".te-move") === card,
+  );
+}
