@@ -1,3 +1,4 @@
+import { FLOW_BLOCK_TAGS, MARK_TAGS, markTag } from "./editor-schema";
 import {
   populateJsxElement,
   populateToggleElement,
@@ -40,6 +41,32 @@ export function sanitizeUrl(url: string): string {
   }
 }
 
+const BARE_URL = /^(?:https?:\/\/|mailto:)\S+$/;
+
+// Text that is nothing but a safe URL, so it can become a link on its own.
+export function linkableUrl(text: string): string | null {
+  const url = text.trim();
+  return BARE_URL.test(url) && sanitizeUrl(url) ? url : null;
+}
+
+// A Markdown link target read out of escaped HTML.
+export const linkableHref = (escapedUrl: string) =>
+  sanitizeUrl(unescapeHtml(escapedUrl));
+
+export function buildLink(href: string, ...content: Node[]) {
+  const link = document.createElement("a");
+  link.setAttribute("href", href);
+  link.setAttribute("rel", "noreferrer");
+  link.append(...content);
+  return link;
+}
+
+export function linkHtml(href: string, innerHtml: string) {
+  const link = buildLink(href);
+  link.innerHTML = innerHtml;
+  return link.outerHTML;
+}
+
 export function sanitizeImageSrc(src: string): string {
   const trimmed = src.trim();
   if (/^data:image\/(png|jpeg|gif|webp|avif);/i.test(trimmed)) return trimmed;
@@ -47,26 +74,14 @@ export function sanitizeImageSrc(src: string): string {
 }
 
 const ALLOWED_TAGS = new Set([
-  "A",
+  ...FLOW_BLOCK_TAGS,
+  ...MARK_TAGS,
   "ARTICLE",
-  "BLOCKQUOTE",
   "BR",
-  "CODE",
   "DIV",
-  "H1",
-  "H2",
-  "H3",
-  "HR",
-  "I",
   "IMG",
   "INPUT",
   "LI",
-  "OL",
-  "P",
-  "PRE",
-  "S",
-  "STRONG",
-  "UL",
 ]);
 
 const DROPPED_TAGS = new Set([
@@ -77,12 +92,6 @@ const DROPPED_TAGS = new Set([
   "STYLE",
   "SVG",
 ]);
-const TAG_RENAME: Record<string, string> = {
-  B: "STRONG",
-  DEL: "S",
-  EM: "I",
-  STRIKE: "S",
-};
 
 const ATOM_TAGS: Record<string, string> = {
   "te-arrow": "P",
@@ -130,7 +139,7 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
     if (!(child instanceof Element)) continue;
 
     const rawTag = child.tagName.toUpperCase();
-    const tag = TAG_RENAME[rawTag] ?? rawTag;
+    const tag = markTag(rawTag);
 
     if (DROPPED_TAGS.has(tag)) continue;
 
@@ -186,9 +195,7 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
         sanitizeInto(child, target);
         continue;
       }
-      const el = document.createElement("a");
-      el.setAttribute("href", href);
-      el.setAttribute("rel", "noreferrer");
+      const el = buildLink(href);
       target.append(el);
       sanitizeInto(child, el);
       continue;
@@ -233,6 +240,12 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
 
     if (ALLOWED_TAGS.has(tag)) {
       const el = document.createElement(tag.toLowerCase());
+      if (
+        tag === "H3" &&
+        child instanceof HTMLElement &&
+        "moveTitle" in child.dataset
+      )
+        el.dataset.moveTitle = "";
       target.append(el);
       sanitizeInto(child, el);
       continue;

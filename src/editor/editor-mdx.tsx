@@ -1,7 +1,6 @@
 import type {
   BlockContent,
   Blockquote,
-  Heading,
   List,
   ListItem,
   Paragraph,
@@ -25,6 +24,12 @@ import {
   buildToggleElement,
   buildTrackElement,
 } from "./editor-atoms";
+import {
+  headingLevel,
+  headingTag,
+  isFlowBlock,
+  markTag,
+} from "./editor-schema";
 import { buildMoveElement } from "./move-dom";
 import { resolveMoveFromMdx } from "./move-props";
 import { resolveTrackProps, type Shape, TRACK_SHAPES } from "./track-props";
@@ -68,15 +73,12 @@ function blockFrom(node: ChildNode): RootContent | null {
 
   if (node.classList.contains("te-jsx")) return rawMdxBlock(node);
 
+  const depth = headingLevel(node.tagName);
+  if (depth) return { type: "heading", children: phrasingFrom(node), depth };
+
   switch (node.tagName) {
     case "BLOCKQUOTE":
       return blockquote(node);
-    case "H1":
-      return heading(1, node);
-    case "H2":
-      return heading(2, node);
-    case "H3":
-      return heading(3, node);
     case "HR":
       return { type: "thematicBreak" };
     case "PRE":
@@ -164,7 +166,7 @@ function blockquote(el: HTMLElement): Blockquote {
       children.push({ type: "paragraph", children: content });
   };
   for (const node of el.childNodes) {
-    if (node instanceof HTMLElement && QUOTE_BLOCK_TAGS.has(node.tagName)) {
+    if (isFlowBlock(node)) {
       flushInline();
       const block = blockFrom(node);
       if (block) children.push(block as BlockContent);
@@ -174,22 +176,6 @@ function blockquote(el: HTMLElement): Blockquote {
   }
   flushInline();
   return { type: "blockquote", children };
-}
-
-const QUOTE_BLOCK_TAGS = new Set([
-  "BLOCKQUOTE",
-  "H1",
-  "H2",
-  "H3",
-  "HR",
-  "OL",
-  "P",
-  "PRE",
-  "UL",
-]);
-
-function heading(depth: 1 | 2 | 3, el: HTMLElement): Heading {
-  return { type: "heading", children: phrasingFrom(el), depth };
 }
 
 function paragraph(el: HTMLElement): Paragraph {
@@ -271,30 +257,31 @@ function phrasingFrom(parent: HTMLElement): PhrasingContent[] {
       });
       continue;
     }
-    if (node.tagName === "STRONG" || node.tagName === "B") {
-      out.push({ type: "strong", children: phrasingFrom(node) });
-      continue;
-    }
-    if (node.tagName === "CODE") {
-      const value = normalizeText(node.textContent);
-      if (value) out.push({ type: "inlineCode", value });
-      continue;
-    }
-    if (
-      node.tagName === "S" ||
-      node.tagName === "DEL" ||
-      node.tagName === "STRIKE"
-    ) {
-      out.push({ type: "delete", children: phrasingFrom(node) });
-      continue;
-    }
-    if (node.tagName === "I" || node.tagName === "EM") {
-      out.push({ type: "emphasis", children: phrasingFrom(node) });
+    const mark = markPhrasing(node);
+    if (mark) {
+      out.push(mark);
       continue;
     }
     out.push(...phrasingFrom(node));
   }
   return out;
+}
+
+function markPhrasing(node: HTMLElement): PhrasingContent | null {
+  switch (markTag(node.tagName)) {
+    case "CODE": {
+      const value = normalizeText(node.textContent);
+      return value ? { type: "inlineCode", value } : null;
+    }
+    case "I":
+      return { type: "emphasis", children: phrasingFrom(node) };
+    case "S":
+      return { type: "delete", children: phrasingFrom(node) };
+    case "STRONG":
+      return { type: "strong", children: phrasingFrom(node) };
+    default:
+      return null;
+  }
 }
 
 function trackElement(track: HTMLElement): MdxJsxTextElement {
@@ -384,9 +371,7 @@ export function mdxToHtml(mdx: string): string {
 function blockToDom(node: RootContent): HTMLElement | null {
   switch (node.type) {
     case "heading": {
-      const el = document.createElement(
-        node.depth <= 1 ? "h1" : node.depth === 2 ? "h2" : "h3",
-      );
+      const el = document.createElement(headingTag(node.depth));
       appendPhrasing(el, node.children);
       return el;
     }
@@ -629,5 +614,5 @@ function text(value: string): PhrasingContent {
 }
 
 function normalizeText(value: string): string {
-  return value.replaceAll("​", "").replaceAll(" ", " ");
+  return value.replaceAll("\u200B", "").replaceAll(" ", " ");
 }

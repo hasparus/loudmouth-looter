@@ -290,4 +290,46 @@ test.describe("editor formatting", () => {
     await page.keyboard.press("Enter");
     await expect(editor.locator("pre")).toHaveCount(1);
   });
+
+  test("hyphens typed into a URL stay hyphens", async ({ page }) => {
+    const editor = await setEditor(page, "<p><br></p>");
+    await editor.pressSequentially("[docs](https://ex.com/a--b)");
+    await expect(editor.getByRole("link", { name: "docs" })).toHaveAttribute(
+      "href",
+      "https://ex.com/a--b",
+    );
+  });
+
+  test("pasting updates the word count", async ({ page }) => {
+    const editor = await setEditor(page, "<p>one</p>");
+    await editor.evaluate((el) => {
+      const data = new DataTransfer();
+      data.setData("text/plain", " two three");
+      el.dispatchEvent(
+        new ClipboardEvent("paste", {
+          clipboardData: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+    await expect(page.getByText("3 words")).toBeVisible();
+  });
+
+  test("headings inside a Move card body toggle like anywhere else", async ({
+    page,
+  }) => {
+    const editor = await setEditor(page, "<p><br></p>");
+    await editor.pressSequentially("/move");
+    await page.keyboard.press("Enter");
+    await caretToStartOf(editor, "[data-move-body] p");
+    await editor.pressSequentially("Rules");
+    await page.keyboard.press("ControlOrMeta+Alt+3");
+    await expect(editor.locator("[data-move-body] h3")).toHaveText("Rules");
+    await page.keyboard.press("ControlOrMeta+Alt+3");
+    await expect(editor.locator("[data-move-body] h3")).toHaveCount(0);
+    await expect(editor.locator("[data-move-body] p")).toHaveText("Rules");
+    // The card's own title is not a prose heading.
+    await expect(editor.locator("h3[data-move-title]")).toHaveText("New Move");
+  });
 });

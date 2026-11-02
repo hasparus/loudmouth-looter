@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, type JSX, Show } from "solid-js";
+import { createEffect, createSignal, For, type JSX } from "solid-js";
 
 import { SLASH_COMMANDS, TrackPreview } from "./editor-atoms";
 
@@ -45,8 +45,8 @@ export function EditorHelpModal() {
     else if (!open() && dialog.open) dialog.close();
   });
 
-  const trackCommands = SLASH_COMMANDS.filter(
-    (command) => command.kind === "track",
+  const trackCommands = SLASH_COMMANDS.flatMap((command) =>
+    command.kind === "track" ? [command] : [],
   );
 
   return (
@@ -160,12 +160,10 @@ export function EditorHelpModal() {
                 <Row code={`/${command.name} ${command.defaultCount}`}>
                   <span class="inline-flex items-center gap-2">
                     {command.description}
-                    <Show when={command.shape}>
-                      <TrackPreview
-                        count={command.defaultCount}
-                        shape={command.shape!}
-                      />
-                    </Show>
+                    <TrackPreview
+                      count={command.defaultCount}
+                      shape={command.shape}
+                    />
                   </span>
                 </Row>
               )}

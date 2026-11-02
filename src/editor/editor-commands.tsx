@@ -1,39 +1,77 @@
-// Formatting commands behind the editor's keyboard shortcuts, plus the
-// Backspace and typography rules. Each command mutates the DOM directly and
-// reports whether it did anything; the caller snapshots for undo and saves.
+// Every edit the editor makes on request — keyboard shortcuts, the Enter /
+// Backspace / Tab rules, slash-menu blocks — as one command type with one
+// dispatcher. Commands mutate the DOM and report whether they did anything;
+// the caller snapshots for undo and saves.
 
 import { buildToggleElement } from "./editor-atoms";
 import {
+  codeBlockKey,
+  currentCodeBlock,
+  replaceWithCodeBlock,
+} from "./editor-code-block";
+import {
+  handleEnter,
+  insertRule,
+  liftOutOfQuote,
+  trackBeforeCaret,
+} from "./editor-dom";
+import { inlineMarkdown } from "./editor-inline";
+import { buildLink, linkableUrl } from "./editor-sanitize";
+import { HEADING_TAGS, TEXT_BLOCK_TAGS } from "./editor-schema";
+import {
+  caretAfter,
   closestWithin,
   editorRange,
   getCurrentBlock,
-  insertCodeText,
-  liftOutOfQuote,
   placeCaretAtStart,
-} from "./editor-dom";
-import { htmlToMdx } from "./editor-mdx";
-import { sanitizeUrl } from "./editor-sanitize";
+  select,
+  setCaret,
+  withCaret,
+} from "./editor-selection";
+import { buildMoveElement } from "./move-dom";
 
 export type BlockType = "h1" | "h2" | "h3" | "p";
 export type ListKind = "ol" | "task" | "ul";
+export type LineClass = "te-arrow" | "te-chevron";
 
 export type EditorCommand =
+  // Key rules: they apply only in some places, and otherwise leave the key
+  // to the browser.
+  | { kind: "backspace" }
+  | { kind: "enter" }
+  | { kind: "indent" }
+  // Shortcuts and slash-menu blocks.
   | { kind: "block"; type: BlockType }
   | { kind: "code" }
+  | { kind: "code-block" }
   | { kind: "ignore" }
+  | { kind: "line"; line: LineClass }
   | { kind: "link" }
   | { kind: "list"; list: ListKind }
+  | { kind: "move" }
   | { kind: "native"; name: "bold" | "italic" | "strikeThrough" }
   | { kind: "paragraph-below" }
-  | { kind: "quote" };
+  | { kind: "quote" }
+  | { kind: "rule" };
+
+export const isKeyRule = (command: EditorCommand) =>
+  command.kind === "backspace" ||
+  command.kind === "enter" ||
+  command.kind === "indent";
 
 const BLOCK_TYPES: BlockType[] = ["p", "h1", "h2", "h3"];
 
 // Shortcuts follow Writer (and most Markdown editors): Mod-B/I/E/K,
 // Mod-Shift-X, Mod-Alt-0…3, Mod-Shift-7/8/9/., Mod-Shift-Enter, Mod-Enter.
 export function commandForKey(event: KeyboardEvent): EditorCommand | null {
-  if (!event.metaKey && !event.ctrlKey) return null;
   const key = event.key.toLowerCase();
+  if (!event.metaKey && !event.ctrlKey) {
+    if (key === "enter") return { kind: "enter" };
+    if (event.altKey || event.shiftKey) return null;
+    if (key === "backspace") return { kind: "backspace" };
+    if (key === "tab") return { kind: "indent" };
+    return null;
+  }
 
   if (event.altKey && !event.shiftKey) {
     // Option rewrites event.key on macOS, so read the physical key there. On
@@ -67,69 +105,66 @@ export function commandForKey(event: KeyboardEvent): EditorCommand | null {
   return null;
 }
 
-export function runCommand(editor: HTMLElement, command: EditorCommand) {
+export function runCommand(
+  editor: HTMLElement,
+  command: EditorCommand,
+): boolean {
+  const pre = currentCodeBlock(editor);
+  if (pre) {
+    // Code is literal: only its own keys, and the way out.
+    switch (command.kind) {
+      case "backspace":
+      case "enter":
+      case "indent":
+        return codeBlockKey(pre, command.kind);
+      case "paragraph-below":
+        return insertParagraphBelow(editor);
+      default:
+        return false;
+    }
+  }
+
   switch (command.kind) {
+    case "backspace":
+      return handleBackspace(editor);
     case "block":
       return setBlockType(editor, command.type);
     case "code":
       return toggleInlineCode(editor);
+    case "code-block":
+      return withBlock(editor, (block) => replaceWithCodeBlock(block, ""));
+    case "enter":
+      return handleEnter(editor);
     case "ignore":
+    case "indent":
       return false;
+    case "line":
+      return setLine(editor, command.line);
     case "link":
       return toggleLink(editor);
     case "list":
       return toggleList(editor, command.list);
+    case "move":
+      return withBlock(editor, insertMove);
     case "native":
       // The browser's own commands toggle marks across partial selections and
       // land on its native undo stack.
-
       return document.execCommand(command.name);
     case "paragraph-below":
       return insertParagraphBelow(editor);
     case "quote":
       return toggleQuote(editor);
+    case "rule":
+      return withBlock(editor, insertRule);
   }
 }
 
-// ── Caret bookkeeping ───────────────────────────────────────────────────────
-// Commands that move or rebuild a block lose the live selection; they record
-// the caret as a text offset into the block and restore it afterwards.
-
-function caretOffset(block: HTMLElement): number | null {
-  const selection = globalThis.getSelection();
-  if (!selection || selection.rangeCount === 0) return null;
-  const caret = selection.getRangeAt(0);
-  if (!block.contains(caret.startContainer)) return null;
-  const range = document.createRange();
-  range.selectNodeContents(block);
-  range.setEnd(caret.startContainer, caret.startOffset);
-  return range.toString().length;
-}
-
-function restoreCaret(block: HTMLElement, offset: number | null) {
-  const selection = globalThis.getSelection();
-  if (!selection) return;
-  let remaining = offset ?? 0;
-  const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
-  const range = document.createRange();
-  range.selectNodeContents(block);
-  range.collapse(offset === null);
-  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-    const length = node.textContent?.length ?? 0;
-    if (remaining <= length) {
-      range.setStart(node, remaining);
-      range.collapse(true);
-      break;
-    }
-    remaining -= length;
-  }
-  selection.removeAllRanges();
-  selection.addRange(range);
-}
-
-function withCaret(block: HTMLElement, move: () => HTMLElement) {
-  const offset = caretOffset(block);
-  restoreCaret(move(), offset);
+function withBlock(
+  editor: HTMLElement,
+  edit: (block: HTMLElement) => boolean,
+): boolean {
+  const block = getCurrentBlock(editor);
+  return !!block && edit(block);
 }
 
 function retag(block: HTMLElement, tag: string): HTMLElement {
@@ -158,23 +193,6 @@ function wordRangeAt(range: Range): Range | null {
   return word;
 }
 
-function select(range: Range) {
-  const selection = globalThis.getSelection();
-  selection?.removeAllRanges();
-  selection?.addRange(range);
-}
-
-function caretAfter(node: Node) {
-  // A zero-width boundary outside the element so typing continues unformatted
-  // (serializeDocument strips it).
-  const boundary = document.createTextNode("​");
-  node.parentNode?.insertBefore(boundary, node.nextSibling);
-  const range = document.createRange();
-  range.setStart(boundary, 1);
-  range.collapse(true);
-  select(range);
-}
-
 function unwrap(element: HTMLElement): Range {
   const range = document.createRange();
   const first = element.firstChild;
@@ -191,7 +209,7 @@ function selectionInBlock(editor: HTMLElement) {
   const range = editorRange(editor);
   if (!range) return null;
   const block = getCurrentBlock(editor, range.startContainer);
-  if (!block || block.tagName === "PRE") return null;
+  if (!block) return null;
   if (!block.contains(range.endContainer)) return null;
   return { block, range };
 }
@@ -226,7 +244,7 @@ export function toggleInlineCode(editor: HTMLElement): boolean {
 
   const element = document.createElement("code");
   if (span) {
-    element.textContent = span.toString().replaceAll("​", "");
+    element.textContent = span.toString().replaceAll("\u200B", "");
     span.deleteContents();
     span.insertNode(element);
     if (target.range.collapsed) {
@@ -239,13 +257,10 @@ export function toggleInlineCode(editor: HTMLElement): boolean {
     return true;
   }
 
-  element.textContent = "​";
+  element.textContent = "\u200B";
   target.range.insertNode(element);
-  element.after(document.createTextNode("​"));
-  const inside = document.createRange();
-  inside.setStart(element.firstChild!, 1);
-  inside.collapse(true);
-  select(inside);
+  element.after(document.createTextNode("\u200B"));
+  setCaret(element.firstChild!, 1);
   return true;
 }
 
@@ -269,38 +284,28 @@ export function toggleLink(editor: HTMLElement): boolean {
     : target.range;
   if (!span) return false;
 
-  const text = span.toString().trim();
-  if (/^(?:https?:\/\/|mailto:)\S+$/.test(text) && sanitizeUrl(text)) {
-    const anchor = document.createElement("a");
-    anchor.setAttribute("href", text);
-    anchor.setAttribute("rel", "noreferrer");
-    anchor.append(span.extractContents());
+  const url = linkableUrl(span.toString());
+  if (url) {
+    const anchor = buildLink(url, span.extractContents());
     span.insertNode(anchor);
     caretAfter(anchor);
     return true;
   }
 
-  const holder = document.createElement("p");
-  holder.append(span.cloneContents());
-  const label = htmlToMdx(holder.outerHTML).trim().replaceAll("\n", " ");
+  const label = inlineMarkdown(span.cloneContents().childNodes).trim();
   if (!label) return false;
   const markdown = document.createTextNode(`[${label}](`);
   span.deleteContents();
   span.insertNode(markdown);
-  const caret = document.createRange();
-  caret.setStart(markdown, markdown.length);
-  caret.collapse(true);
-  select(caret);
+  setCaret(markdown, markdown.length);
   return true;
 }
 
 // ── Blocks ──────────────────────────────────────────────────────────────────
 
-const TEXT_BLOCKS = new Set(["H1", "H2", "H3", "P"]);
-
 export function setBlockType(editor: HTMLElement, type: BlockType): boolean {
   const block = getCurrentBlock(editor);
-  if (!block || !TEXT_BLOCKS.has(block.tagName)) return false;
+  if (!block || !TEXT_BLOCK_TAGS.has(block.tagName)) return false;
   const tag = type.toUpperCase();
   // Pressing a heading's own shortcut again turns it back into a paragraph.
   const next = block.tagName === tag && tag !== "P" ? "p" : type;
@@ -320,7 +325,7 @@ function blockUnit(block: HTMLElement): HTMLElement {
 
 export function toggleQuote(editor: HTMLElement): boolean {
   const block = getCurrentBlock(editor);
-  if (!block || block.tagName === "PRE") return false;
+  if (!block) return false;
   const unit = blockUnit(block);
 
   if (unit.parentElement?.tagName === "BLOCKQUOTE") {
@@ -396,7 +401,7 @@ export function toggleList(editor: HTMLElement, kind: ListKind): boolean {
     return true;
   }
 
-  if (!TEXT_BLOCKS.has(block.tagName)) return false;
+  if (!TEXT_BLOCK_TAGS.has(block.tagName)) return false;
   withCaret(block, () => {
     const item = retag(block, "li");
     const previous = item.previousElementSibling;
@@ -410,6 +415,27 @@ export function toggleList(editor: HTMLElement, kind: ListKind): boolean {
     if (kind === "task") setTask(item, true);
     return item;
   });
+  return true;
+}
+
+function setLine(editor: HTMLElement, line: LineClass): boolean {
+  const block = getCurrentBlock(editor);
+  if (block?.tagName !== "P") return false;
+  block.classList.remove("te-arrow", "te-chevron");
+  block.classList.add(line);
+  return true;
+}
+
+function insertMove(block: HTMLElement): boolean {
+  const body = document.createElement("p");
+  body.innerHTML = "<br>";
+  const move = buildMoveElement("New Move", undefined, [body]);
+  block.replaceWith(move);
+  const title = move.querySelector("h3");
+  const caret = document.createRange();
+  caret.selectNodeContents(title ?? body);
+  if (!title) caret.collapse(true);
+  select(caret);
   return true;
 }
 
@@ -429,13 +455,6 @@ export function insertParagraphBelow(editor: HTMLElement): boolean {
   return true;
 }
 
-export function insertCodeIndent(editor: HTMLElement): boolean {
-  const block = getCurrentBlock(editor);
-  if (block?.tagName !== "PRE") return false;
-  insertCodeText(block, "  ");
-  return true;
-}
-
 // ── Backspace at the start of a block: undo the block's formatting first ──
 
 function caretAtBlockStart(block: HTMLElement): boolean {
@@ -446,26 +465,24 @@ function caretAtBlockStart(block: HTMLElement): boolean {
   const before = document.createRange();
   before.selectNodeContents(block);
   before.setEnd(caret.startContainer, caret.startOffset);
-  if (before.toString().replaceAll("​", "") !== "") return false;
+  if (before.toString().replaceAll("\u200B", "") !== "") return false;
   return !before
     .cloneContents()
     .querySelector("img, button, input, .te-track, .te-jsx-inline");
 }
 
 export function handleBackspace(editor: HTMLElement): boolean {
-  const block = getCurrentBlock(editor);
-  if (!block || !caretAtBlockStart(block)) return false;
-
-  if (block.tagName === "PRE") {
-    if ((block.textContent ?? "").replaceAll("\n", "") !== "") return false;
-    const paragraph = document.createElement("p");
-    paragraph.innerHTML = "<br>";
-    block.replaceWith(paragraph);
-    placeCaretAtStart(paragraph);
+  // Right after a track, Backspace drops its last toggle (keeping one).
+  const toggles = trackBeforeCaret(editor)?.querySelectorAll(".te-toggle");
+  if (toggles && toggles.length > 1) {
+    [...toggles].at(-1)?.remove();
     return true;
   }
 
-  if (/^H[1-3]$/.test(block.tagName)) {
+  const block = getCurrentBlock(editor);
+  if (!block || !caretAtBlockStart(block)) return false;
+
+  if (HEADING_TAGS.has(block.tagName)) {
     withCaret(block, () => retag(block, "p"));
     return true;
   }
@@ -507,20 +524,21 @@ export function handleBackspace(editor: HTMLElement): boolean {
 // ── Typography ──────────────────────────────────────────────────────────────
 
 // `--` becomes an en dash and a third hyphen an em dash, as Writer displays
-// them. Code stays literal, and a line of bare hyphens is left alone so `---`
-// can still become a rule.
+// them. (Callers skip code.) A line of bare hyphens is left alone so `---`
+// can still become a rule, and so is anything typed into a URL.
 export function applyDashes(editor: HTMLElement): boolean {
   const range = editorRange(editor);
   if (!range?.collapsed) return false;
   const node = range.startContainer;
   if (!(node instanceof Text)) return false;
   const block = getCurrentBlock(editor, node);
-  if (!block || block.tagName === "PRE") return false;
-  if (closestWithin(node, "code", editor)) return false;
+  if (!block) return false;
 
   const head = node.data.slice(0, range.startOffset);
   const dash = head.endsWith("–-") ? "—" : head.endsWith("--") ? "–" : null;
   if (!dash) return false;
+  const word = head.slice(head.search(/\S*$/));
+  if (/:\/\/|\]\(/.test(word)) return false;
 
   const lead = document.createRange();
   lead.selectNodeContents(block);
@@ -529,9 +547,6 @@ export function applyDashes(editor: HTMLElement): boolean {
 
   const start = range.startOffset - 2;
   node.replaceData(start, 2, dash);
-  const caret = document.createRange();
-  caret.setStart(node, start + 1);
-  caret.collapse(true);
-  select(caret);
+  setCaret(node, start + 1);
   return true;
 }
