@@ -283,12 +283,18 @@ test.describe("editor formatting", () => {
 
   test("slash menu offers quote, code and divider blocks", async ({ page }) => {
     const editor = await setEditor(page, "<p><br></p>");
+    await editor.pressSequentially("/quote");
+    await page.keyboard.press("Enter");
+    await editor.pressSequentially("Quoted");
+    await expect(editor.locator("blockquote > p")).toHaveText("Quoted");
+
+    await page.keyboard.press("ControlOrMeta+Enter");
     await editor.pressSequentially("/divider");
     await page.keyboard.press("Enter");
-    await expect(editor.locator("hr")).toHaveCount(1);
+    await expect(editor.locator("blockquote + hr")).toHaveCount(1);
     await editor.pressSequentially("/code");
     await page.keyboard.press("Enter");
-    await expect(editor.locator("pre")).toHaveCount(1);
+    await expect(editor.locator("hr + pre")).toHaveCount(1);
   });
 
   test("hyphens typed into a URL stay hyphens", async ({ page }) => {
