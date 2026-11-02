@@ -449,4 +449,24 @@ test.describe("editor formatting", () => {
     await page.keyboard.press("ControlOrMeta+Shift+Period");
     await expect(editor.locator("blockquote > pre")).toHaveText("x\n");
   });
+
+  test("a Move card keeps its title and body across a reload", async ({
+    page,
+  }) => {
+    const editor = await setEditor(page, "<p><br></p>");
+    await editor.pressSequentially("/move");
+    await page.keyboard.press("Enter");
+    await editor.pressSequentially("Bellow");
+    await caretToStartOf(editor, "[data-move-body] p");
+    await editor.pressSequentially("Roar at them.");
+    await expect.poll(() => stored(page)).toContain("Roar at them.");
+
+    await page.reload();
+    const card = editor.locator("article.te-move");
+    await expect(card.locator("h3[data-move-title]")).toHaveText("Bellow");
+    await expect(card.locator("[data-move-body] p")).toHaveText(
+      "Roar at them.",
+    );
+    await expect(card.locator('input[type="checkbox"]')).toHaveCount(1);
+  });
 });

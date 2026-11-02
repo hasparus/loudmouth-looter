@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
+import { htmlToMdx, mdxToHtml } from "./editor-mdx";
 import { sanitizeHtml, sanitizeUrl } from "./editor-sanitize";
 
 describe("sanitizeUrl", () => {
@@ -53,5 +54,38 @@ describe("sanitizeHtml", () => {
     expect(sanitizeHtml('<pre data-lang="a&quot; onload=x">y</pre>')).toBe(
       "<pre>y</pre>",
     );
+  });
+});
+
+describe("Move cards", () => {
+  test("a titled card survives a reload", () => {
+    const mdx = "<Move>\n## Title\n\nBody **text**.\n</Move>\n";
+    const reloaded = sanitizeHtml(mdxToHtml(mdx));
+    expect(reloaded).toContain("te-move group");
+    expect(reloaded).toContain("data-move-body");
+    expect(reloaded).toContain("data-move-title");
+    expect(htmlToMdx(reloaded)).toBe(htmlToMdx(mdxToHtml(mdx)));
+  });
+
+  test("reloading is stable", () => {
+    const once = sanitizeHtml(
+      mdxToHtml("<Move illuminated>\n## Bellow\n\nRoar.\n</Move>\n"),
+    );
+    expect(sanitizeHtml(once)).toBe(once);
+    expect(htmlToMdx(once)).toContain("<Move illuminated>");
+    expect(htmlToMdx(once)).toContain("## Bellow");
+  });
+
+  test("an untitled card keeps its body", () => {
+    const mdx = "<Move>\nJust a body.\n</Move>\n";
+    expect(htmlToMdx(sanitizeHtml(mdxToHtml(mdx)))).toContain("Just a body.");
+  });
+
+  test("a hostile checkbox id is dropped", () => {
+    const html = mdxToHtml("<Move>\n## T\n\nb\n</Move>\n").replace(
+      'id="t"',
+      'id="x&quot; onclick=&quot;y"',
+    );
+    expect(sanitizeHtml(html)).not.toContain("onclick");
   });
 });
