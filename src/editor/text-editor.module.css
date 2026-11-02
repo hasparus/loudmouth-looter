@@ -82,9 +82,13 @@
   margin-top: 1rem;
 }
 
-.editor strong,
+/* ⌘B goes through execCommand, which writes <b>; the sanitizer turns it into
+   <strong> on load, so match skin.css's strong to keep the look stable. */
 .editor b {
+  font-family: var(--font-serif);
+  font-size: 0.755em;
   font-weight: 600;
+  font-style: normal;
 }
 
 .editor s,
