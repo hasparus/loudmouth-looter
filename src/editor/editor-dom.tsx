@@ -240,9 +240,16 @@ export function flushSave(root: HTMLElement) {
 
 const TEXT_ELEMENTS = [...TEXT_BLOCK_TAGS, "LI"].join(",");
 
+// A text block with nothing but empty text nodes has no height, and the
+// browser then puts typed text outside it — so it gets a <br>, keeping the
+// caret if it was there.
 export function normalizeEmptyBlocks(root: HTMLElement) {
-  for (const el of root.querySelectorAll(TEXT_ELEMENTS)) {
-    if (el.childNodes.length === 0) el.append(document.createElement("br"));
+  const anchor = globalThis.getSelection()?.anchorNode ?? null;
+  for (const el of root.querySelectorAll<HTMLElement>(TEXT_ELEMENTS)) {
+    if (el.firstElementChild || el.textContent) continue;
+    const hadCaret = !!anchor && el.contains(anchor);
+    el.replaceChildren(document.createElement("br"));
+    if (hadCaret) placeCaretAtStart(el);
   }
   for (const pre of root.querySelectorAll("pre")) {
     pre.textContent ||= "\n";
@@ -533,8 +540,6 @@ export function handleEnter(root: HTMLElement) {
 // A divider above `block`, which keeps the caret.
 export function insertRule(block: HTMLElement) {
   block.before(document.createElement("hr"));
-  if (!block.textContent && !block.firstElementChild)
-    block.replaceChildren(document.createElement("br"));
   placeCaretAtStart(block);
   return true;
 }

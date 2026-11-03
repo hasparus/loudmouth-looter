@@ -31,7 +31,7 @@ import {
   markTag,
 } from "./editor-schema";
 import { normalizeEditableText } from "./editor-inline";
-import { buildMoveElement } from "./move-dom";
+import { buildMoveElement, ownMoveParts } from "./move-dom";
 import { resolveMoveFromMdx } from "./move-props";
 import { resolveTrackProps, type Shape, TRACK_SHAPES } from "./track-props";
 
@@ -109,9 +109,9 @@ function blockFrom(node: ChildNode): RootContent | null {
 }
 
 function moveElement(el: HTMLElement): MdxJsxFlowElement {
-  const bodyRoot = el.querySelector("[data-move-body]");
-  if (bodyRoot instanceof HTMLElement) {
-    const titleEl = el.querySelector("h3[data-move-title]");
+  const [bodyRoot] = ownMoveParts(el, "[data-move-body]");
+  if (bodyRoot) {
+    const [titleEl] = ownMoveParts(el, "h3[data-move-title]");
     const title = titleEl ? normalizeText(titleEl.textContent) : "";
     const children: BlockContent[] = [];
     if (title) {

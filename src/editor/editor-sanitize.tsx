@@ -1,4 +1,5 @@
 import { FLOW_BLOCK_TAGS, MARK_TAGS, markTag } from "./editor-schema";
+import { buildMoveElement, ownMoveParts } from "./move-dom";
 import {
   populateJsxElement,
   populateToggleElement,
@@ -141,6 +142,28 @@ function codeLanguage(pre: HTMLElement): string {
   return candidates.find((lang) => !!lang && LANGUAGE_RE.test(lang)) ?? "";
 }
 
+// Move cards are rebuilt whole, like the other atoms: buildMoveElement
+// restores the card layout and the data-move-body marker the serializer
+// reads, from the card's title, id and body.
+function sanitizeMove(card: HTMLElement): HTMLElement {
+  const [body] = ownMoveParts(card, "[data-move-body]");
+  const title = body
+    ? ownMoveParts(card, "h3").find((h3) => !body.contains(h3))
+    : undefined;
+  const content = document.createElement("div");
+  sanitizeInto(body ?? card, content);
+  const id = ownMoveParts(card, 'input[type="checkbox"]')[0]?.id ?? "";
+  const move = buildMoveElement(
+    title?.textContent.trim() || undefined,
+    /^[\w-]+$/.test(id) ? id : undefined,
+    [...content.childNodes],
+  );
+  // Preserved Move attributes; inert text, only read by the remark
+  // serializer on save.
+  if (card.dataset.moveAttrs) move.dataset.moveAttrs = card.dataset.moveAttrs;
+  return move;
+}
+
 function sanitizeInto(source: ParentNode, target: ParentNode) {
   for (const child of source.childNodes) {
     if (child.nodeType === Node.TEXT_NODE) {
@@ -154,27 +177,32 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
 
     if (DROPPED_TAGS.has(tag)) continue;
 
-    const atomClass = child.getAttribute("class");
+    const classAttr = child.getAttribute("class");
 
     // Opaque MDX atoms (preserved JSX, imports, frontmatter): rebuild the
     // whole chip from data-mdx instead of trusting its inner HTML. The
     // payload is inert — it only ever reaches the remark serializer.
     if (
-      (atomClass === "te-jsx" && tag === "DIV") ||
-      (atomClass === "te-jsx-inline" && tag === "SPAN")
+      (classAttr === "te-jsx" && tag === "DIV") ||
+      (classAttr === "te-jsx-inline" && tag === "SPAN")
     ) {
       const mdx = child instanceof HTMLElement ? (child.dataset.mdx ?? "") : "";
       if (!mdx.trim()) continue;
       const el = document.createElement(tag.toLowerCase());
-      populateJsxElement(el, mdx, atomClass === "te-jsx-inline");
+      populateJsxElement(el, mdx, classAttr === "te-jsx-inline");
       target.append(el);
       continue;
     }
-    if (
-      atomClass &&
-      ATOM_TAGS[atomClass] === tag &&
-      child instanceof HTMLElement
-    ) {
+
+    // Atoms carry layout classes beside their own, so look for the token.
+    const atomClass = [...child.classList].find(
+      (name) => ATOM_TAGS[name] === tag,
+    );
+    if (atomClass === "te-move" && child instanceof HTMLElement) {
+      target.append(sanitizeMove(child));
+      continue;
+    }
+    if (atomClass && child instanceof HTMLElement) {
       const el = document.createElement(tag.toLowerCase());
       el.className = atomClass;
       if (atomClass === "te-track") {
@@ -189,11 +217,6 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
           shape,
           child.getAttribute("aria-checked") === "true",
         );
-      }
-      if (atomClass === "te-move" && child.dataset.moveAttrs) {
-        // Preserved Move attributes; inert text, only read by the remark
-        // serializer on save.
-        el.dataset.moveAttrs = child.dataset.moveAttrs;
       }
       target.append(el);
       sanitizeInto(child, el);
@@ -251,12 +274,6 @@ function sanitizeInto(source: ParentNode, target: ParentNode) {
 
     if (ALLOWED_TAGS.has(tag)) {
       const el = document.createElement(tag.toLowerCase());
-      if (
-        tag === "H3" &&
-        child instanceof HTMLElement &&
-        "moveTitle" in child.dataset
-      )
-        el.dataset.moveTitle = "";
       target.append(el);
       sanitizeInto(child, el);
       continue;
