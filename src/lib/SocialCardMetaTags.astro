@@ -1,18 +1,20 @@
 ---
-import { SITE_NAME, SITE_OG_IMAGE } from "./siteMeta";
+import type { SocialCard } from "./ogImage";
+import { SITE_NAME, SITE_OG_IMAGE, X_HANDLE } from "./siteMeta";
 
 interface Props {
   title: string;
   description: string;
-  ogImage: string | undefined;
+  socialCard: SocialCard | undefined;
   /** "article" for posts; default "website". */
   ogType?: "website" | "article" | undefined;
 }
 
-const { title, description, ogType = "website" } = Astro.props;
-let { ogImage = SITE_OG_IMAGE } = Astro.props;
+const { title, description, socialCard, ogType = "website" } = Astro.props;
 
-ogImage &&= new URL(ogImage, import.meta.env.PUBLIC_URL).href;
+const absolute = (url: string) => new URL(url, import.meta.env.PUBLIC_URL).href;
+const image = absolute(socialCard?.image ?? SITE_OG_IMAGE);
+const video = socialCard?.video;
 ---
 
 <meta property="og:type" content={ogType} />
@@ -20,12 +22,28 @@ ogImage &&= new URL(ogImage, import.meta.env.PUBLIC_URL).href;
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 {/* twitter:title/description fall back to og:* — no need to repeat them. */}
+{X_HANDLE && <meta name="twitter:site" content={X_HANDLE} />}
+<meta property="og:image" content={image} />
+<meta name="twitter:image" content={image} />
+<meta
+  name="twitter:card"
+  content={video && X_HANDLE ? "player" : "summary_large_image"}
+/>
 {
-  ogImage && (
+  video && (
     <>
-      <meta property="og:image" content={ogImage} />
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:image" content={ogImage} />
+      <meta property="og:video" content={absolute(video.src)} />
+      <meta property="og:video:secure_url" content={absolute(video.src)} />
+      <meta property="og:video:type" content="video/mp4" />
+      <meta property="og:video:width" content="1200" />
+      <meta property="og:video:height" content="630" />
+      {X_HANDLE && (
+        <>
+          <meta name="twitter:player" content={absolute(video.player)} />
+          <meta name="twitter:player:width" content="1200" />
+          <meta name="twitter:player:height" content="630" />
+        </>
+      )}
     </>
   )
 }

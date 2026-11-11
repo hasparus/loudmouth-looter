@@ -4,6 +4,7 @@ import type { MDXInstance } from "astro";
 import PostLayout from "../layouts/PostLayout.astro";
 import { isPostRoutable } from "../lib/isPostVisible";
 import { mdxComponents } from "../lib/mdxComponents";
+import { routeParamOf } from "../lib/posts";
 import type { PostFrontmatter } from "../types";
 
 export const getStaticPaths = async () => {
@@ -18,7 +19,7 @@ export const getStaticPaths = async () => {
   return posts.map((post) => {
     return {
       params: {
-        path: post.frontmatter.path.replace(/^\//, ""),
+        path: routeParamOf(post.frontmatter),
       },
       props: post,
     };

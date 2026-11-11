@@ -1,51 +1,60 @@
 import type { ImageMetadata } from "astro";
-import { dirname, join } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 
 import type { PostFrontmatter } from "../types/PostFrontmatter";
 
-const postImages = import.meta.glob<{ default: ImageMetadata }>(
+const postImageGlob = import.meta.glob<{ default: ImageMetadata }>(
   "/posts/**/*.{png,jpg,jpeg,webp,avif,gif}",
 );
 
 /**
- * Looks up a root-absolute key in an `import.meta.glob` record and loads the
- * image, deriving its filesystem path from the key.
+ * Validates `img` and `og` frontmatter and imports their `./` paths from next
+ * to the post, so Astro emits and optimizes them. `file` is the post's
+ * absolute path (`MDXInstance.file`).
  */
-export async function loadGlobImage(
-  images: Record<string, () => Promise<{ default: ImageMetadata }>>,
-  key: string,
-  globName: string,
-): Promise<{ image: ImageMetadata; fsPath: string }> {
-  const load = images[key];
-  if (!load) {
-    throw new Error(`Image not found in ${globName}: ${key}`);
+export async function resolvePostImages(
+  { img, og = {} }: PostFrontmatter,
+  file: string,
+) {
+  if (og.image && og.backgroundImage) {
+    throw new Error(`${file}: set og.image or og.backgroundImage, not both`);
   }
+  if (og.video !== undefined && !og.video.endsWith(".mp4")) {
+    throw new Error(`${file}: og.video must be an .mp4, got "${og.video}"`);
+  }
+
+  const [header, image, backgroundImage] = await Promise.all([
+    img?.startsWith(".") ? importPostImage(file, img) : img,
+    urlOf(file, og.image),
+    urlOf(file, og.backgroundImage),
+  ]);
+  return {
+    img: header,
+    og: {
+      image,
+      backgroundImage:
+        backgroundImage ?? (typeof header === "object" ? header.src : header),
+      video: og.video,
+    },
+  };
+}
+
+export type ResolvedPostImages = Awaited<ReturnType<typeof resolvePostImages>>;
+
+/** Keeps the query, e.g. card options like `./bg.png?paddingBottom=112px`. */
+async function urlOf(file: string, path: string | undefined) {
+  if (!path?.startsWith(".")) return path;
+  const [pathname, query] = path.split("?");
+  const { src } = await importPostImage(file, pathname!);
+  return query ? `${src}?${query}` : src;
+}
+
+async function importPostImage(file: string, path: string) {
+  const fromRoot = relative(process.cwd(), join(dirname(file), path));
+  const key = "/" + fromRoot.split(sep).join("/");
+  const load = postImageGlob[key];
+  if (!load) throw new Error(`Image ${key} not found, referenced from ${file}`);
 
   const { default: image } = await load();
-  return { image, fsPath: join(process.cwd(), key) };
-}
-
-/** Resolves a post-relative image path (`./stonetop.png`). */
-export async function resolvePostImage(
-  file: string,
-  src: string,
-): Promise<{ image: ImageMetadata; fsPath: string }> {
-  const postsAt = file.indexOf("/posts/");
-  if (postsAt === -1) {
-    throw new Error(`resolvePostImage: expected a post under /posts/: ${file}`);
-  }
-
-  return loadGlobImage(
-    postImages,
-    join(dirname(file.slice(postsAt)), src),
-    "posts",
-  );
-}
-
-export function normalizeImg(img: PostFrontmatter["img"]): {
-  og?: string;
-  src?: string;
-} {
-  if (typeof img === "object") return img;
-  return img === undefined ? {} : { src: img };
+  return image;
 }

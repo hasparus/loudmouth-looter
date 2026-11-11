@@ -25,6 +25,10 @@ export interface PostEntry {
   sigil?: string | undefined;
 }
 
+/** The `[...path]` route param for a post. */
+export const routeParamOf = ({ path }: PostFrontmatter) =>
+  path.replace(/^\//, "");
+
 let cache: PostEntry[] | undefined;
 
 /** Visible posts, newest first, each with its teaser component. */

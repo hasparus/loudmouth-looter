@@ -5,10 +5,12 @@
  */
 export const SITE_NAME = "loudmouth looter";
 export const SITE_BLURB = "rants, mechanics and kitbashes";
+/** Emitted as `twitter:site`. X player cards (from `og.video`) need it; without it, posts fall back to `summary_large_image`. */
+export const X_HANDLE: string | undefined = undefined;
 
 /**
  * Fallback og:image for pages that don't bring their own (home, tags, 404).
- * Posts override it — see `resolvePostOgImage`. Carries no lettering on
+ * Posts override it — see `socialCardOf`. Carries no lettering on
  * purpose: og:title and og:description supply the words, so the art doesn't
  * go stale when a page is retitled. Lives in `public/`, so the path is the
  * filename — swap both together.
