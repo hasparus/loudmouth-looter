@@ -4,24 +4,26 @@ import { createHmac } from "node:crypto";
 import type { StringifiedPost } from "../../api/og";
 import type { PostFrontmatter } from "../types/PostFrontmatter";
 
-import { normalizeImg, resolvePostImage } from "./postImages";
+import type { ResolvedPostImages } from "./postImages";
+import { routeParamOf } from "./posts";
 
-export async function resolvePostOgImage(
-  frontmatter: PostFrontmatter,
-  file: string,
-): Promise<string> {
-  const { og, src } = normalizeImg(frontmatter.img);
-  if (og) return resolveIfRelative(file, og);
-  return createOgImageLink(frontmatter, await resolveIfRelative(file, src));
+export interface SocialCard {
+  image: string;
+  /** A looping mp4 and the page X's player card embeds to play it. */
+  video?: { player: string; src: string };
 }
 
-async function resolveIfRelative<T extends string | undefined>(
-  file: string,
-  path: T,
-): Promise<string | T> {
-  if (!path?.startsWith(".")) return path;
-  const { image } = await resolvePostImage(file, path);
-  return image.src;
+/** A ready-made `og.image` is served as is. Otherwise `/api/og` draws a card over `og.backgroundImage`. */
+export function socialCardOf(
+  frontmatter: PostFrontmatter,
+  { image, backgroundImage, video }: ResolvedPostImages["og"],
+): SocialCard {
+  return {
+    image: image ?? createOgImageLink(frontmatter, backgroundImage),
+    ...(video && {
+      video: { player: `/og/player/${routeParamOf(frontmatter)}/`, src: video },
+    }),
+  };
 }
 
 function createOgImageLink(

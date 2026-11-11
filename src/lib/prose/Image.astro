@@ -11,248 +11,144 @@
  * @changes
  * - Added placeholder powered by `plaiceholder` CSS strategy.
  * - Limited the width of the image to wide container width, to get smaller & ligher images.
+ *
+ * Accepted `src`s:
+ * - `ImageMetadata`: imported, e.g. by MDX from `![](./image.png)` next to the post
+ * - an imported SVG component: served as is
+ * - `https://…`: remote
+ * - `/content/…`: from `public/`, served as is in its own aspect ratio
+ * - `raw!…`: served as is
  */
 
-import type { ImageMetadata, ImageTransform } from "astro";
-import {
-  getImage,
-  type LocalImageProps,
-  type RemoteImageProps,
-} from "astro:assets";
+import type { GetImageResult, ImageMetadata, ImageTransform } from "astro";
+import { getImage, type LocalImageProps } from "astro:assets";
 import { readFile } from "node:fs/promises";
 import { getPlaiceholder } from "plaiceholder";
-
-import { loadGlobImage, resolvePostImage } from "../postImages";
+import sharp from "sharp";
 
 import "./Image.css";
-
-// All* images with `src`s starting from / are imported from `src/images/` folder.
-const SRC_IMAGES_PREFIX = "/";
-
-// Astro rewrites relative markdown image imports to built asset URLs.
-const ASTRO_ASSET_PREFIX = "/_astro/";
-const VITE_FS_PREFIX = "/@fs/";
-
-// Images with `src` starting with /content/ live in public dir.
-const PUBLIC_IMAGES_PREFIX = "/content/";
 
 // No image needs to be wider than this.
 // TODO: Support High DPI screens by ensuring Astro emits images 2x of that.
 const WIDE_CONTAINER_WIDTH = 774;
 
-type LocalProps = LocalImageProps & {
+export type Props = Omit<LocalImageProps, "src" | "height"> & {
+  src: LocalImageProps["src"] | string;
   aspectRatio?: number | string;
   height?: number | string;
-};
-type RemoteProps = RemoteImageProps & {
-  aspectRatio?: number | string;
-  height?: number | string;
-};
-export type Props = (LocalProps | RemoteProps) & {
-  /**
-   * Absolute path of the post's `.mdx` file — must live under `posts/`.
-   * Enables `src="./image.png"` colocated with the post.
-   */
-  relativeTo?: string;
 };
 
-type ImageSource =
-  | {
-      kind: "raw" | "astro-asset" | "vite-fs" | "protocol-relative";
-      src: string;
-    }
-  | { kind: "public"; src: string; image: ImageMetadata }
-  | { kind: "asset"; src: string; image: ImageMetadata; fsPath: string }
-  | { kind: "optimized-string"; src: string };
+type Source =
+  | { optimize: true; image: ImageMetadata | string; bytes: Buffer }
+  | { optimize: false; src: string; intrinsic?: ImageMetadata };
+
+const publicImages = import.meta.glob<{ default: ImageMetadata }>(
+  "/public/content/**/*.{avif,gif,jpeg,jpg,png,svg,webp}",
+);
 
 const {
   loading = "lazy",
   decoding = "async",
-  relativeTo,
+  alt = "",
+  src: srcProp,
+  aspectRatio: aspectRatioProp,
   ...props
 } = Astro.props as Props;
 
-let width = props.width;
-let height = props.height;
+const source = await resolveSource(srcProp);
 
-const srcInput = await props.src;
-let src: string;
-if (typeof srcInput === "object" || typeof srcInput === "function") {
-  const image = "default" in srcInput ? srcInput.default : srcInput;
-  width ??= image.width;
-  height ??= image.height;
-  src = image.src;
-} else {
-  src = srcInput;
-}
+let { width, height } = props;
+let aspectRatio = aspectRatioProp;
+let placeholder: Awaited<ReturnType<typeof getPlaiceholder>>["css"] | null =
+  null;
 
-let placeholder: null | {
-  backgroundImage: string;
-  backgroundPosition: string;
-  backgroundSize: string;
-  backgroundRepeat: string;
-} = null;
+if (source.optimize) {
+  const { metadata, css } = await getPlaiceholder(source.bytes, { size: 10 });
+  // A blurred placeholder would show through transparent pixels.
+  const { isOpaque } = await sharp(source.bytes).stats();
+  if (isOpaque) placeholder = css;
 
-const imageSource = await resolveImageSource(src);
-applyIntrinsicSizeFromQuery(imageSource.src);
-
-if (imageSource.kind === "public") {
-  // Raw public images may contain text or details, so preserve their full ratio.
-  const derivedAspectRatio = Number.parseFloat(props.aspectRatio as string);
-  const parsedWidth = Number.parseFloat(props.width as string);
-  height =
-    !Number.isNaN(derivedAspectRatio) && !Number.isNaN(parsedWidth)
-      ? parsedWidth / derivedAspectRatio
-      : props.height
-        ? Number.parseFloat(props.height as string)
-        : undefined;
-  props.aspectRatio = imageSource.image.width / imageSource.image.height;
-  width =
-    height == null
-      ? undefined
-      : height * (imageSource.image.width / imageSource.image.height);
-}
-
-const imageForPlaceholder = await readImageForPlaceholder(imageSource);
-if (imageForPlaceholder) {
-  const { metadata, css } = await getPlaiceholder(imageForPlaceholder, {
-    size: 10,
-  });
-  placeholder = css;
-
-  if (!width && !height && !props.aspectRatio) {
-    width ??= metadata.width;
-    props.aspectRatio ??= metadata.width / metadata.height;
-    width = Math.min(width, WIDE_CONTAINER_WIDTH);
-    height = Math.round(width / Number.parseFloat(props.aspectRatio as string));
+  if (!width && !height && !aspectRatio) {
+    width = Math.min(metadata.width, WIDE_CONTAINER_WIDTH);
+    aspectRatio = metadata.width / metadata.height;
+    height = Math.round(width / aspectRatio);
   }
+} else if (source.intrinsic) {
+  // Raw images can contain text or important details that shouldn't be cut
+  // off, so they keep their own aspect ratio.
+  const ratio = source.intrinsic.width / source.intrinsic.height;
+  height =
+    Number(width ?? source.intrinsic.width) / Number(aspectRatio ?? ratio);
+  width = height * ratio;
+  aspectRatio = ratio;
 }
 
 height ??=
-  typeof props.aspectRatio === "number"
-    ? Number.parseFloat(width as unknown as string) / props.aspectRatio
-    : undefined;
+  typeof aspectRatio === "number" ? Number(width) / aspectRatio : undefined;
 
-props.alt ||= "";
-let attrs = {
-  src: imageSource.src,
-  class: "",
-  width,
-  height,
-  aspectRatio: props.aspectRatio,
-};
+const { src, attributes }: Pick<GetImageResult, "src" | "attributes"> =
+  source.optimize
+    ? await getImage({
+        ...props,
+        src: source.image,
+        format: "webp",
+        width,
+        height,
+      } as ImageTransform)
+    : { src: source.src, attributes: {} };
+const { class: className, ...imgAttributes } = attributes;
 
-if (imageSource.kind === "asset" || imageSource.kind === "optimized-string") {
-  let attributes;
-  ({ src, attributes } = await getImage({
-    ...props,
-    src:
-      imageSource.kind === "optimized-string"
-        ? imageSource.src
-        : imageSource.image,
-    format: "webp",
-    width,
-    height,
-  } as ImageTransform));
-  attrs = { ...attrs, ...attributes, src };
-}
-
-async function resolveImageSource(source: string): Promise<ImageSource> {
-  if (source.startsWith("raw!")) {
-    return { kind: "raw", src: source.slice(4) };
+async function resolveSource(src: Props["src"]): Promise<Source> {
+  const resolved = await src;
+  if (typeof resolved === "function") {
+    const svg = resolved as unknown as ImageMetadata;
+    return { optimize: false, src: svg.src, intrinsic: svg };
+  }
+  if (typeof resolved === "object") {
+    const image = "default" in resolved ? resolved.default : resolved;
+    return { optimize: true, image, bytes: await readImported(image) };
   }
 
-  if (source.startsWith(".")) {
-    if (!relativeTo) {
+  if (resolved.startsWith("http")) {
+    const res = await fetch(resolved);
+    if (!res.ok) {
       throw new Error(
-        `Relative image src "${source}" requires the relativeTo prop`,
+        `Failed to fetch image ${resolved}: ${res.status} ${res.statusText}`,
       );
     }
-    return {
-      kind: "asset",
-      src: source,
-      ...(await resolvePostImage(relativeTo, source)),
-    };
+    const bytes = Buffer.from(await res.arrayBuffer());
+    return { optimize: true, image: resolved, bytes };
   }
 
-  if (source.startsWith(PUBLIC_IMAGES_PREFIX)) {
-    const publicImages = import.meta.glob<
-      false,
-      string,
-      { default: ImageMetadata }
-    >("/public/content/**/*");
-    const { image } = await loadGlobImage(
-      publicImages,
-      "/public" + source,
-      "public/content",
+  const raw = resolved.replace(/^raw!/, "");
+  if (raw.startsWith("/content/")) {
+    const key = decodeURIComponent(`/public${raw.split("?")[0]}`);
+    const importImage = publicImages[key];
+    if (!importImage) throw new Error(`Image ${key} not found`);
+    const { default: intrinsic } = await importImage();
+    return { optimize: false, src: raw, intrinsic };
+  }
+  if (raw !== resolved) return { optimize: false, src: raw };
+
+  throw new Error(
+    `Unsupported image src "${resolved}". Put the image next to the post and import it (\`![](./image.png)\`), or use a public/content/ path or a URL.`,
+  );
+}
+
+/** Astro attaches the source path to imported images, but leaves it out of `ImageMetadata`'s type. */
+function readImported(image: ImageMetadata & { fsPath?: string }) {
+  if (!image.fsPath) {
+    throw new Error(
+      `Image ${image.src} has no fsPath to read a placeholder from`,
     );
-    return { kind: "public", src: source, image };
   }
-
-  if (source.startsWith(ASTRO_ASSET_PREFIX)) {
-    return { kind: "astro-asset", src: source };
-  }
-
-  if (source.startsWith(VITE_FS_PREFIX)) {
-    return { kind: "vite-fs", src: source };
-  }
-
-  if (source.startsWith("//")) {
-    return { kind: "protocol-relative", src: source };
-  }
-
-  if (source.startsWith(SRC_IMAGES_PREFIX)) {
-    const srcImages = import.meta.glob<
-      false,
-      string,
-      { default: ImageMetadata }
-    >("/src/images/**/*");
-    return {
-      kind: "asset",
-      src: source,
-      ...(await loadGlobImage(
-        srcImages,
-        decodeURIComponent(`/src/images${source}`),
-        "src/images",
-      )),
-    };
-  }
-
-  return { kind: "optimized-string", src: source };
-}
-
-function applyIntrinsicSizeFromQuery(source: string) {
-  const [, query] = source.split("?", 2);
-  if (!query) return;
-
-  const params = new URLSearchParams(query);
-  const originalWidth = Number(params.get("origWidth"));
-  const originalHeight = Number(params.get("origHeight"));
-  if (!Number.isFinite(originalWidth) || !Number.isFinite(originalHeight))
-    return;
-
-  width ??= originalWidth;
-  height ??= originalHeight;
-}
-
-async function readImageForPlaceholder(source: ImageSource) {
-  if (source.kind === "asset") {
-    return readFile(source.fsPath);
-  }
-
-  if (source.kind !== "optimized-string") return null;
-
-  return source.src.startsWith("http")
-    ? fetch(source.src).then(async (res) =>
-        Buffer.from(await res.arrayBuffer()),
-      )
-    : readFile(new URL(source.src.replace("../", ""), import.meta.url));
+  return readFile(image.fsPath);
 }
 ---
 
 <span
   zaduma-image
-  style={`--zaduma-img-src: url("${attrs.src}")`}
+  style={`--zaduma-img-src: url("${src}")`}
   class:list={[
     "zaduma-image-box relative block overflow-hidden",
     !placeholder &&
@@ -260,10 +156,8 @@ async function readImageForPlaceholder(source: ImageSource) {
   ]}
 >
   <img
-    {...attrs}
-    class:list={["rounded-sm dark:opacity-80", attrs.class]}
-    loading={loading}
-    decoding={decoding}
+    {...{ src, width, height, alt, loading, decoding, ...imgAttributes }}
+    class:list={["rounded-sm dark:opacity-80", className]}
   />
   {
     placeholder && (

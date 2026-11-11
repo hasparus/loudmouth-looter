@@ -116,7 +116,9 @@ function Illustration({
   children?: React.ReactNode[];
   imageHref: string | null | undefined;
 }) {
-  imageHref = imageHref ? `https://${env.VERCEL_URL}${imageHref}` : "";
+  imageHref = imageHref?.startsWith("/")
+    ? `https://${env.VERCEL_URL}${imageHref}`
+    : (imageHref ?? "");
 
   return h(
     "div",

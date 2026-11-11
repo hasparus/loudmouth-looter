@@ -1,8 +1,8 @@
 ---
 import type { MarkdownHeading, MDXInstance } from "astro";
 
-import { resolvePostOgImage } from "../lib/ogImage";
-import { normalizeImg } from "../lib/postImages";
+import { socialCardOf } from "../lib/ogImage";
+import { resolvePostImages } from "../lib/postImages";
 import PostTime from "../lib/PostTime.astro";
 import Image from "../lib/prose/Image.astro";
 import { blogPostingSchema } from "../lib/seo/jsonLd";
@@ -21,10 +21,10 @@ interface Props extends Omit<MDXInstance<{}>, "frontmatter"> {
 
 const { frontmatter, headings } = Astro.props;
 
-const ogImage = await resolvePostOgImage(frontmatter, Astro.props.file);
+const { img, og } = await resolvePostImages(frontmatter, Astro.props.file);
+const socialCard = socialCardOf(frontmatter, og);
 const readingTime = frontmatter.readingTime;
 const date = new Date(frontmatter.date);
-const imgSrc = normalizeImg(frontmatter.img).src;
 const description = frontmatter.description || "";
 
 const canonical = Astro.site
@@ -42,7 +42,7 @@ const postSchema = blogPostingSchema({
 
 <BaseLayout
   title={frontmatter.title}
-  ogImage={ogImage}
+  socialCard={socialCard}
   description={description}
   ogType="article"
 >
@@ -63,18 +63,7 @@ const postSchema = blogPostingSchema({
       </div>
       <h1 class="mt-2 font-serif text-3xl font-bold">{frontmatter.title}</h1>
     </header>
-    {
-      imgSrc && (
-        <Image
-          alt=""
-          src={imgSrc}
-          format="webp"
-          width={774}
-          height={387}
-          relativeTo={Astro.props.file}
-        />
-      )
-    }
+    {img && <Image alt="" src={img} format="webp" width={774} height={387} />}
     <slot />
   </div>
   <TableOfContents headings={headings} />
