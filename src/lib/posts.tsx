@@ -1,7 +1,7 @@
 import { talks } from "../talks/talks";
 import type { PostFrontmatter } from "../types";
 
-import { isPostVisible } from "./isPostVisible";
+import { isPostRoutable, isPostVisible } from "./isPostVisible";
 
 /** A teaser component — the post's opening blocks, injected by recmaMdxExcerpt. */
 type ExcerptComponent = (props: { components?: unknown }) => unknown;
@@ -24,6 +24,11 @@ export interface PostEntry {
   /** Left-margin mark — from `frontmatter.sigil` or a named `sigil` export. */
   sigil?: string | undefined;
 }
+
+/** Every post that gets a page, hidden ones included. */
+export const routablePosts = Object.values(postModules).filter((m) =>
+  isPostRoutable(m.frontmatter, { isProd: import.meta.env.PROD }),
+);
 
 /** The `[...path]` route param for a post. */
 export const routeParamOf = ({ path }: PostFrontmatter) =>
