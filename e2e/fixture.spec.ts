@@ -15,6 +15,7 @@ test.describe("e2e fixture post", () => {
       "Moves",
       "Code",
       "Markdown",
+      "X posts",
     ]) {
       await expect(page.getByRole("heading", { name })).toBeVisible();
     }
@@ -173,6 +174,22 @@ test.describe("e2e fixture post", () => {
     expect(geometry!.markerHeight).toBeGreaterThan(0);
     expect(geometry!.topDelta).toBeLessThan(1);
     expect(geometry!.borderLeftWidth).toBe("1px");
+  });
+
+  test("draws an X post link as a picture of the post", async ({ page }) => {
+    const embed = page.locator(".zaduma-xeet a");
+    await expect(embed).toHaveAttribute("href", "https://x.com/jack/status/20");
+
+    const shown = embed.locator("img:visible");
+    await expect(shown).toHaveCount(1);
+    await expect(shown).toHaveAttribute(
+      "alt",
+      "jack (@jack) on X: just setting up my twttr",
+    );
+    await shown.scrollIntoViewIfNeeded();
+    await expect
+      .poll(() => shown.evaluate((img: HTMLImageElement) => img.naturalWidth))
+      .toBeGreaterThan(0);
   });
 
   test("is excluded from the index and llms.txt", async ({ request }) => {
