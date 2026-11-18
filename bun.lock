@@ -18,6 +18,7 @@
         "@types/unist": "^3.0.3",
         "@vercel/analytics": "2.0.1",
         "@vercel/og": "1.0.1",
+        "@xeet/core": "0.1.0",
         "astro": "7.2.9",
         "eslint-plugin-markdown": "^5.0.0",
         "estree-util-value-to-estree": "^3.5.0",
@@ -885,6 +886,8 @@
     "@vscode/l10n": ["@vscode/l10n@0.0.18", "", {}, "sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ=="],
 
     "@workflow/serde": ["@workflow/serde@4.1.0-beta.2", "", {}, "sha512-8kkeoQKLDaKXefjV5dbhBj2aErfKp1Mc4pb6tj8144cF+Em5SPbyMbyLCHp+BVrFfFVCBluCtMx+jjvaFVZGww=="],
+
+    "@xeet/core": ["@xeet/core@0.1.0", "", {}, "sha512-yrC/E6AxD4v9Rs8FaPn3l58ZfOwhlm8tqkTSd2vrzkfUNcgCi4z1gOmnivlGUVs8pVBJSlcBXy5CEOTEbIs6JQ=="],
 
     "abbrev": ["abbrev@3.0.1", "", {}, "sha512-AO2ac6pjRB3SJmGJo+v5/aK6Omggp6fsLrs6wN9bd35ulu4cCwaAU9+7ZhXjeqHVkaHThLuzH0nZr0YpCDhygg=="],
 
